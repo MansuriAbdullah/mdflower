@@ -6,6 +6,7 @@ import Collection from './pages/Collection';
 import ProductDetails from './pages/ProductDetails';
 import Contact from './pages/Contact';
 import Reviews from './pages/Reviews';
+import TopSellingArticles from './pages/TopSellingArticles';
 import Varieties from './pages/Varieties';
 import { CartProvider, CartContext } from './CartContext';
 
@@ -23,7 +24,7 @@ const GlobalStyles = () => (
 
     body {
       background-color: #fffdf0;
-      color: #0c0805;
+      color: #4a3b2c; /* Softer brown instead of black */
       font-family: 'Montserrat', sans-serif;
       overflow-x: hidden;
       line-height: 1.5;
@@ -49,7 +50,7 @@ const GlobalStyles = () => (
 
     h1, h2, h3, .brand-name {
       font-family: 'Cinzel', serif;
-      color: #1a130d;
+      color: #3e2f1d; /* Softer dark brown instead of black */
     }
 
     /* Restored Luxury Headings */
@@ -303,7 +304,12 @@ const CartSidebar = () => {
     const phoneNumber = "9016853590";
     let message = `Hello MD FLOWER, I would like to place an order:\n\n`;
     cartItems.forEach((item, index) => {
-      message += `${index + 1}. ${item.name} - ${item.price} (Qty: ${item.qty})\n`;
+      let itemName = item.name;
+      if (item.selectedColor && item.selectedColor !== 'Default') {
+        itemName += ` [Color: ${item.selectedColor}]`;
+      }
+      message += `${index + 1}. ${itemName} - ${item.price} (Qty: ${item.qty})\n`;
+      message += `   Image: https://mdflowers.in${item.image}\n`;
     });
     message += `\n*Total Amount: $${total.toFixed(2)}*\n\nPlease process my order.`;
 
@@ -387,22 +393,25 @@ const CartSidebar = () => {
                   }}
                 />
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: '700', fontSize: '0.9rem', color: '#1a130d', marginBottom: '3px' }}>{item.name}</p>
+                  <p style={{ fontWeight: '700', fontSize: '0.9rem', color: '#1a130d', marginBottom: '3px' }}>
+                    {item.name}
+                    {item.selectedColor && item.selectedColor !== 'Default' && <span style={{fontSize: '0.75rem', color: '#888'}}> ({item.selectedColor})</span>}
+                  </p>
                   <p style={{ color: '#d4af37', fontWeight: '800', fontSize: '0.9rem' }}>{item.price}</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px' }}>
                     <button
-                      onClick={() => decreaseQty(item.name)}
+                      onClick={() => decreaseQty(item.cartId)}
                       style={{ background: '#d4af37', color: '#fff', border: 'none', borderRadius: '5px', width: '25px', height: '25px', cursor: 'pointer' }}
                     >-</button>
                     <span style={{ fontWeight: 'bold' }}>{item.qty}</span>
                     <button
-                      onClick={() => increaseQty(item.name)}
+                      onClick={() => increaseQty(item.cartId)}
                       style={{ background: '#d4af37', color: '#fff', border: 'none', borderRadius: '5px', width: '25px', height: '25px', cursor: 'pointer' }}
                     >+</button>
                   </div>
                 </div>
                 <button
-                  onClick={() => removeFromCart(item.name)}
+                  onClick={() => removeFromCart(item.cartId)}
                   style={{
                     background: 'rgba(212,175,55,0.1)',
                     border: '1px solid rgba(212,175,55,0.3)',
@@ -491,10 +500,10 @@ const Navbar = () => {
       backdropFilter: (scrolled || menuOpen) ? 'blur(8px)' : 'none',
       borderBottom: scrolled ? '1px solid rgba(212, 175, 55, 0.1)' : 'none',
     }}>
-      <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', zIndex: 1001 }}>
-        <img src="/logo.png" alt="Logo" style={{ height: '28px', width: 'auto', transition: '0.4s' }} />
-        <div className="brand-name" style={{ fontSize: '1.2rem', fontWeight: 'bold', letterSpacing: '2px' }}>
-          MD <span className="gold-gradient-text" style={{ fontSize: '1rem' }}>FLOWER</span>
+      <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer', zIndex: 1001 }}>
+        <img src="/logo.png" alt="Logo" style={{ height: 'clamp(40px, 6vw, 60px)', width: 'auto', transition: '0.4s' }} />
+        <div className="brand-name" style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 'bold', letterSpacing: '2px' }}>
+          <span className="gold-gradient-text">MD FLOWER</span>
         </div>
       </Link>
 
@@ -511,7 +520,7 @@ const Navbar = () => {
             textDecoration: 'none',
             color: location.pathname === item.path ? '#d4af37' : '#1a130d',
             fontWeight: '700',
-            fontSize: '0.7rem',
+            fontSize: '0.9rem',
             textTransform: 'uppercase',
             letterSpacing: '1.5px',
             transition: 'all 0.4s',
@@ -659,8 +668,10 @@ const Footer = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '40px', marginBottom: '50px' }}>
       <div style={{ gridColumn: 'span 1' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
-          <img src="/logo.png" alt="MD FLOWER" style={{ height: '50px', width: 'auto' }} />
-          <h2 style={{ fontSize: '1.5rem', fontFamily: 'Cinzel', margin: 0, color: '#1a130d' }}>MD <span style={{ color: '#d4af37' }}>FLOWER</span></h2>
+          <img src="/logo.png" alt="MD FLOWER" style={{ height: 'clamp(55px, 8vw, 75px)', width: 'auto' }} />
+          <h2 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.2rem)', fontFamily: 'Cinzel', margin: 0 }}>
+            <span className="gold-gradient-text">MD FLOWER</span>
+          </h2>
         </div>
         <p style={{ color: '#5c4b22', fontSize: '0.85rem', marginBottom: '15px', lineHeight: '1.6' }}>
           Bringing eternal beauty to your spaces with India's finest artificial floral collections.
@@ -723,6 +734,7 @@ const App = () => {
           <Route path="/collection" element={<Collection />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/reviews" element={<Reviews />} />
+          <Route path="/top-selling" element={<TopSellingArticles />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/varieties" element={<Varieties />} />
         </Routes>

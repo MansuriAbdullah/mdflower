@@ -2,355 +2,535 @@ import React, { useState, useMemo, useEffect, useContext } from 'react';
 import { productsData } from '../data/products';
 import { CartContext } from '../CartContext';
 
-const categoryStructure = [
-  { 
-    name: 'Loose Flower Heads', 
-    subs: [
-      { 
-        name: 'Premium Flower Heads', 
-        varieties: ['Orchids', 'Tulips', 'Liliyums', 'Roses', 'Daisies', 'Cherry Blossoms', 'Peonies', 'Hydrangeas']
-      },
-      { name: 'Regular Flower Heads', varieties: [] }
-    ] 
-  },
-  { 
-    name: 'Leaves', 
-    subs: [{ name: 'Artificial Leaves', varieties: [] }, { name: 'Tropical Leaves', varieties: [] }] 
-  },
-  { 
-    name: 'Bunches', 
-    subs: [{ name: 'Flower Bunches', varieties: [] }, { name: 'Green Bunches', varieties: [] }, { name: 'Lavender Bunches', varieties: [] }] 
-  },
-  { 
-    name: 'Hangings', 
-    subs: [{ name: 'Flower Hangings', varieties: [] }, { name: 'Wisteria Hangings', varieties: [] }] 
-  },
-  { 
-    name: 'Chandeliers', 
-    subs: [{ name: 'Crystal Chandeliers', varieties: [] }, { name: 'Glass Chandeliers', varieties: [] }] 
-  },
-  { 
-    name: 'LED Item', 
-    subs: [{ name: 'LED Stands', varieties: [] }, { name: 'Glow Frames', varieties: [] }] 
-  },
-  { 
-    name: 'Flower Walls', 
-    subs: [{ name: 'Rose Walls', varieties: [] }, { name: 'Flower Mats', varieties: [] }] 
-  },
+// --- DATA STRUCTURE ---
+const mainCategories = [
+  'SHOP ALL',
+  'Loose Flower Heads',
+  'Leaves',
+  'Bunches',
+  'Hangings',
+  'Chandeliers',
+  'LED Item',
+  'Flower Walls',
+  'Flower Sticks',
+  'Candles & Showpieces',
+  'Pots'
 ];
 
+const categoryStructure = [
+  { name: 'SHOP ALL', subs: [] },
+  { name: 'Loose Flower Heads', subs: [{name: 'Premium Flower Heads', img: '/premium_orchid_blue_1777448990406.png'}, {name: 'Regular Flower Heads', img: '/premium_tulip_white_1777449008658.png'}] },
+  { name: 'Leaves', subs: [{name: 'Artificial Leaves', img: '/monstera_leaf_1777449184102.png'}, {name: 'Tropical Leaves', img: '/eucalyptus_bunch_1777449087274.png'}] },
+  { name: 'Bunches', subs: [{name: 'Flower Bunches', img: '/cherry_blossom_pink_1777449042427.png'}, {name: 'Green Bunches', img: '/eucalyptus_bunch_1777449087274.png'}, {name: 'Lavender Bunches', img: '/lavender_bunch_1777449072375.png'}] },
+  { name: 'Hangings', subs: [{name: 'Flower Hangings', img: '/lavender_bunch_1777449072375.png'}, {name: 'Wisteria Hangings', img: '/premium_orchid_blue_1777448990406.png'}] },
+  { name: 'Chandeliers', subs: [{name: 'Crystal Chandeliers', img: '/crystal_chandelier_1777449108874.png'}, {name: 'Glass Chandeliers', img: '/crystal_chandelier_1777449108874.png'}] },
+  { name: 'LED Item', subs: [{name: 'LED Stands', img: '/led_flower_stand_1777449127985.png'}, {name: 'Glow Frames', img: '/led_flower_stand_1777449127985.png'}] },
+  { name: 'Flower Walls', subs: [{name: 'Rose Walls', img: '/red_rose_wall_1777449145657.png'}, {name: 'Flower Mats', img: '/white_flower_mat_1777449163130.png'}] },
+  { name: 'Flower Sticks', subs: [{name: 'Elegant Sticks', img: '/gold_rose_1777449057426.png'}] },
+  { name: 'Candles & Showpieces', subs: [{name: 'Candles', img: '/premium_daisy_yellow_1777449025841.png'}, {name: 'Showpieces', img: '/led_flower_stand_1777449127985.png'}] },
+  { name: 'Pots', subs: [{name: 'Ceramic Pots', img: '/gold_rose_1777449057426.png'}] }
+];
+
+const colors = [
+  { name: 'Blue', image: '/premium_orchid_blue_1777448990406.png', code: '#0000FF' },
+  { name: 'White', image: '/premium_tulip_white_1777449008658.png', code: '#FFFFFF' },
+  { name: 'Purple', image: '/lavender_bunch_1777449072375.png', code: '#800080' },
+  { name: 'Pink', image: '/cherry_blossom_pink_1777449042427.png', code: '#FFC0CB' },
+  { name: 'Red', image: '/red_rose_wall_1777449145657.png', code: '#FF0000' },
+  { name: 'Gold', image: '/gold_rose_1777449057426.png', code: '#D4AF37' },
+  { name: 'Emerald', image: '/eucalyptus_bunch_1777449087274.png', code: '#50C878' }
+];
+
+// --- COMPONENTS ---
 const Collection = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState({
-    main: 'All',
-    sub: 'All',
-  });
+  const [activeMainCategory, setActiveMainCategory] = useState('SHOP ALL');
+  const [activeSubCategory, setActiveSubCategory] = useState('All');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
+  // Filter states
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [selectedPrices, setSelectedPrices] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [sortOption, setSortOption] = useState('Bestsellers');
+  
+  const [gridColumns, setGridColumns] = useState(4); // 2, 3, or 4
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [currentColor, setCurrentColor] = useState('Default');
   const { addToCart } = useContext(CartContext);
 
-  const colors = [
-    { name: 'Blue', image: '/rose_blue.png', code: '#0000FF' },
-    { name: 'White', image: '/rose_white.png', code: '#FFFFFF' },
-    { name: 'Purple', image: '/rose_purple.png', code: '#800080' },
-    { name: 'Pink', image: '/rose_pink.png', code: '#FFC0CB' },
-    { name: 'Red', image: '/rose_red.png', code: '#FF0000' },
-    { name: 'Gold', image: '/royal_gold_rose_luxe_1776258088166.png', code: '#D4AF37' },
-    { name: 'Emerald', image: '/green_eucalyptus_bunch_luxe_1776317733519.png', code: '#50C878' }
-  ];
+  const handleTypeChange = (type) => setSelectedTypes(prev => prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]);
+  const handlePriceChange = (price) => setSelectedPrices(prev => prev.includes(price) ? prev.filter(p => p !== price) : [...prev, price]);
+  const handleColorChange = (color) => setSelectedColors(prev => prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]);
+
+  // Handle outside click for filter dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showFilterDropdown && !e.target.closest('.filter-container')) {
+        setShowFilterDropdown(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showFilterDropdown]);
 
   const filteredProducts = useMemo(() => {
-    return productsData.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesMain = activeFilter.main === 'All' || p.category === activeFilter.main;
-      const matchesSub = activeFilter.sub === 'All' || p.sub === activeFilter.sub;
-      return matchesSearch && matchesMain && matchesSub;
+    let filtered = productsData.filter(p => {
+      let matchesMain = true;
+      if (activeMainCategory !== 'SHOP ALL') {
+        if (activeMainCategory === 'Candles & Showpieces') {
+            matchesMain = p.category === 'Home Decor' || p.category === 'Candles';
+        } else {
+            matchesMain = p.category === activeMainCategory;
+        }
+      }
+      
+      const matchesSub = activeSubCategory === 'All' || p.sub === activeSubCategory;
+      const matchesType = selectedTypes.length === 0 || selectedTypes.includes(p.sub) || selectedTypes.includes(p.variety);
+      
+      const matchesPrice = selectedPrices.length === 0 || selectedPrices.some(range => {
+        const numPrice = parseFloat(p.price.replace(/[^0-9.]/g, ''));
+        if (range === 'Under $50') return numPrice < 50;
+        if (range === '$50 - $100') return numPrice >= 50 && numPrice <= 100;
+        if (range === 'Over $100') return numPrice > 100;
+        return false;
+      });
+
+      const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
+      return matchesMain && matchesSub && matchesType && matchesPrice && matchesColor;
     });
-  }, [activeFilter, searchQuery]);
 
-  const openProduct = (product) => {
-    setSelectedProduct(product);
-    setCurrentColor('Default');
-  };
+    if (sortOption === 'Price: Low to High') {
+      filtered.sort((a, b) => parseFloat(a.price.replace(/[^0-9.]/g, '')) - parseFloat(b.price.replace(/[^0-9.]/g, '')));
+    } else if (sortOption === 'Price: High to Low') {
+      filtered.sort((a, b) => parseFloat(b.price.replace(/[^0-9.]/g, '')) - parseFloat(a.price.replace(/[^0-9.]/g, '')));
+    }
+    return filtered;
+  }, [activeMainCategory, activeSubCategory, selectedTypes, selectedPrices, selectedColors, sortOption]);
 
-  const closeProduct = () => {
-    setSelectedProduct(null);
-  };
+  const activeCategoryObj = categoryStructure.find(c => c.name === activeMainCategory) || categoryStructure[0];
+  const typeOptions = activeCategoryObj.subs.map(s => s.name);
 
   return (
-    <div style={{ 
-      padding: '100px 5% 50px', 
-      minHeight: '100vh', 
-      background: '#fffdf0',
-      fontFamily: 'Montserrat, sans-serif'
-    }}>
+    <div style={{ minHeight: '100vh', background: '#fffdf0', fontFamily: 'Montserrat, sans-serif' }}>
       
-      {/* Modern Header - SHOP & ALL COLLECTIONS Side by Side */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-end', 
-        marginBottom: '40px',
-        borderBottom: '2px solid rgba(26,19,13,0.1)',
-        paddingBottom: '20px',
-        flexWrap: 'wrap',
-        gap: '20px'
-      }}>
-        <h1 style={{ 
-          fontSize: 'clamp(2rem, 8vw, 3.5rem)', 
-          fontFamily: 'Cinzel, serif', 
-          color: '#1a130d', 
-          letterSpacing: '5px',
-          margin: 0,
-        }}>LUXURY COLLECTION</h1>
+      <div className="collection-page-layout">
         
-        <h2 style={{ 
-          fontSize: '0.9rem', 
-          color: '#d4af37', 
-          fontFamily: 'Montserrat', 
-          letterSpacing: '4px', 
-          margin: 0,
-          fontWeight: '900'
-        }}>ALL COLLECTIONS</h2>
-      </div>
+        {/* LEFT SIDEBAR */}
+        <div className={`collection-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+          <button className="mobile-close-btn" onClick={() => setIsSidebarOpen(false)}>×</button>
+          <h2 style={{ fontFamily: 'Cinzel', fontSize: '1.4rem', marginBottom: '30px', color: '#1a130d', letterSpacing: '2px', borderBottom: '1px solid rgba(212,175,55,0.3)', paddingBottom: '15px' }}>
+            Varieties
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            {mainCategories.map((cat) => {
+              const isActive = activeMainCategory === cat;
+              return (
+                <div 
+                  key={cat}
+                  onClick={() => { setActiveMainCategory(cat); setActiveSubCategory('All'); setSelectedTypes([]); setIsSidebarOpen(false); }}
+                  style={{
+                    padding: '12px 15px',
+                    fontSize: '0.85rem',
+                    fontWeight: isActive ? '800' : '600',
+                    color: isActive ? '#fffdf0' : '#1a130d',
+                    backgroundColor: isActive ? '#1a130d' : 'transparent',
+                    borderLeft: isActive ? '4px solid #d4af37' : '4px solid transparent',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                    transition: 'all 0.3s',
+                  }}
+                  onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.backgroundColor = 'rgba(212,175,55,0.1)'; }}
+                  onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  {cat}
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
-      {/* Fancy Search Bar & Explore Button */}
-      <div style={{ maxWidth: '1000px', margin: '0 auto 40px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: '1 1 300px' }}>
-          <input 
-            type="text" 
-            placeholder="Search our luxury collection..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+      <div className="collection-main-content">
+        
+        {/* MOBILE SIDEBAR TOGGLE BUTTON */}
+        <div className="mobile-sidebar-toggle">
+          <button 
+            onClick={() => setIsSidebarOpen(true)}
             style={{
-              width: '100%',
-              padding: '15px 25px',
-              borderRadius: '50px',
-              border: '1px solid rgba(212, 175, 55, 0.4)',
-              background: '#fff',
-              fontSize: '0.9rem',
-              outline: 'none',
-              boxShadow: '0 4px 15px rgba(212, 175, 55, 0.1)',
-              color: '#1a130d'
+              background: '#1a130d', color: '#d4af37', border: '1px solid #d4af37', padding: '10px 20px', 
+              fontSize: '0.85rem', fontWeight: 'bold', letterSpacing: '1px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '10px', borderRadius: '5px'
             }}
-          />
-          <span style={{ position: 'absolute', right: '20px', top: '50%', transform: 'translateY(-50%)', color: '#d4af37' }}>🔍</span>
+          >
+            ☰ VIEW VARIETIES
+          </button>
         </div>
         
-        <button 
-          onClick={() => window.location.href = '/varieties'}
-          style={{
-            flex: '1 1 auto',
-            whiteSpace: 'nowrap',
-            padding: '15px 25px',
-            borderRadius: '50px',
-            background: 'linear-gradient(135deg, #d4af37 0%, #c89b2a 100%)',
-            color: '#fff',
-            border: 'none',
-            fontWeight: '900',
-            fontSize: '0.75rem',
-            letterSpacing: '1px',
-            cursor: 'pointer',
-            boxShadow: '0 10px 20px rgba(212, 175, 55, 0.2)',
-            transition: '0.3s'
-          }}
-        >
-          EXPLORE ALL VARIETIES
-        </button>
-      </div>
-
-      <div className="collection-layout" style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '40px' }}>
-        
-        {/* Sidebar */}
-        <aside className="sidebar" style={{ 
-          height: 'fit-content', 
-          position: 'sticky', 
-          top: '120px',
-          background: '#fff',
-          padding: '25px',
-          borderRadius: '25px',
-          boxShadow: '0 10px 40px rgba(0,0,0,0.03)',
-          border: '1px solid rgba(212, 175, 55, 0.1)',
-          zIndex: 10
-        }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* 2. CIRCULAR SUB-CATEGORIES */}
+        <div className="sub-category-scroll" style={{ padding: '10px 0 10px', display: 'flex', justifyContent: 'center', gap: '30px' }}>
+          {activeCategoryObj.subs.length > 0 ? activeCategoryObj.subs.map(sub => (
             <div 
-              onClick={() => setActiveFilter({ main: 'All', sub: 'All' })}
+              key={sub.name}
+              onClick={() => setActiveSubCategory(sub.name === activeSubCategory ? 'All' : sub.name)}
               style={{ 
-                  padding: '12px 15px', borderRadius: '12px', cursor: 'pointer',
-                  background: activeFilter.main === 'All' ? 'linear-gradient(135deg, #1a130d 0%, #3a2a1e 100%)' : 'transparent',
-                  color: activeFilter.main === 'All' ? '#fff' : '#1a130d',
-                  fontWeight: '700', fontSize: '0.85rem', transition: '0.3s'
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px', 
+                cursor: 'pointer', opacity: activeSubCategory === 'All' || activeSubCategory === sub.name ? 1 : 0.4, 
+                transition: '0.3s', width: '100px'
               }}
             >
-              SHOP ALL
+              <div style={{
+                width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden',
+                boxShadow: activeSubCategory === sub.name ? '0 5px 15px rgba(212,175,55,0.3)' : 'none',
+                border: activeSubCategory === sub.name ? '2px solid #d4af37' : '1px solid rgba(0,0,0,0.1)',
+                background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <img src={sub.img} alt={sub.name} style={{ width: '90%', height: '90%', objectFit: 'contain' }} />
+              </div>
+              <span style={{ color: '#1a130d', fontSize: '0.75rem', textAlign: 'center', lineHeight: '1.2', fontWeight: activeSubCategory === sub.name ? 'bold' : 'normal' }}>
+                {sub.name}
+              </span>
+            </div>
+          )) : (
+            <div style={{ height: '0px' }} /> // Removed huge spacer to pull things up
+          )}
+        </div>
+
+        {/* MAIN TITLE REMOVED HERE AS REQUESTED */}
+
+        {/* 4. FILTER, SORT & GRID TOGGLE BAR */}
+        <div className="filter-sort-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '20px', borderBottom: '1px solid rgba(212, 175, 55, 0.3)', paddingBottom: '20px' }}>
+          
+          <div style={{ display: 'flex', gap: '10px', position: 'relative' }} className="filter-container">
+            {/* FILTER BUTTON */}
+            <button 
+              onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+              style={{
+                background: '#1a130d', color: '#d4af37', border: '1px solid #d4af37', padding: '12px 25px', 
+                fontSize: '0.85rem', fontWeight: 'bold', letterSpacing: '2px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: '10px', transition: '0.3s'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#d4af37'; e.currentTarget.style.color = '#1a130d'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#1a130d'; e.currentTarget.style.color = '#d4af37'; }}
+            >
+              FILTER <span>+</span>
+            </button>
+            
+            {/* SORT BUTTON */}
+            <div style={{ border: '1px solid rgba(212, 175, 55, 0.5)', display: 'flex', alignItems: 'center', padding: '0 15px', background: '#fffdf0' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#1a130d', letterSpacing: '1px', marginRight: '10px' }}>SORT BY</span>
+              <select 
+                value={sortOption} 
+                onChange={(e) => setSortOption(e.target.value)}
+                style={{ background: 'transparent', border: 'none', fontSize: '0.8rem', color: '#1a130d', outline: 'none', cursor: 'pointer', appearance: 'none', paddingRight: '15px' }}
+              >
+                <option>Bestsellers</option>
+                <option>New Arrivals</option>
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+              </select>
+              <span style={{ fontSize: '0.7rem', color: '#d4af37', pointerEvents: 'none', marginLeft: '-10px' }}>v</span>
             </div>
 
-            {categoryStructure.map((cat, i) => (
-              <div key={i}>
-                <div 
-                  onClick={() => setActiveFilter({ 
-                    main: activeFilter.main === cat.name ? 'All' : cat.name, 
-                    sub: 'All' 
-                  })}
-                  style={{ 
-                      padding: '12px 15px', borderRadius: '12px', cursor: 'pointer',
-                      background: activeFilter.main === cat.name ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
-                      color: activeFilter.main === cat.name ? '#d4af37' : '#1a130d', 
-                      fontWeight: '800', fontSize: '0.85rem', display: 'flex', justifyContent: 'space-between'
-                  }}
-                >
-                  {cat.name}
-                  <span style={{ transform: activeFilter.main === cat.name ? 'rotate(180deg)' : 'rotate(0deg)', transition: '0.3s' }}>▾</span>
-                </div>
-
-                {activeFilter.main === cat.name && (
-                  <div style={{ padding: '8px 0 8px 20px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                     {cat.subs.map((sub, si) => (
-                        <div 
-                          key={si}
-                          onClick={() => setActiveFilter({ ...activeFilter, sub: sub.name })}
-                          style={{ 
-                            fontSize: '0.8rem', cursor: 'pointer', padding: '8px 12px', borderRadius: '8px',
-                            color: activeFilter.sub === sub.name ? '#d4af37' : '#666', 
-                            fontWeight: activeFilter.sub === sub.name ? 'bold' : '500',
-                            background: activeFilter.sub === sub.name ? '#fff' : 'transparent',
-                            boxShadow: activeFilter.sub === sub.name ? '0 4px 10px rgba(0,0,0,0.05)' : 'none'
-                          }}
-                        >
-                          {sub.name}
-                        </div>
-                     ))}
+            {/* FILTER DROPDOWN */}
+            {showFilterDropdown && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, marginTop: '10px', background: '#fffdf0', 
+                boxShadow: '0 10px 40px rgba(0,0,0,0.15)', border: '1px solid rgba(212, 175, 55, 0.4)', zIndex: 100, 
+                width: '300px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px'
+              }}>
+                <div>
+                  <h4 style={{ fontSize: '0.8rem', letterSpacing: '1px', color: '#d4af37', borderBottom: '1px solid rgba(212, 175, 55, 0.2)', paddingBottom: '5px', marginBottom: '10px' }}>TYPE</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {(typeOptions.length > 0 ? typeOptions : ['Premium', 'Regular']).map(opt => (
+                      <label key={opt} style={{ fontSize: '0.85rem', color: '#1a130d', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <input type="checkbox" checked={selectedTypes.includes(opt)} onChange={() => handleTypeChange(opt)} style={{ accentColor: '#d4af37' }} /> {opt}
+                      </label>
+                    ))}
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </aside>
-
-        {/* Product Grid */}
-        <main>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(clamp(140px, 30vw, 200px), 1fr))', 
-            gap: 'clamp(15px, 2vw, 30px)' 
-          }}>
-            {filteredProducts.map((p, i) => (
-              <div 
-                key={i} 
-                className="boutique-card"
-                onClick={() => openProduct(p)}
-                style={{
-                  background: '#fff',
-                  borderRadius: '20px',
-                  padding: '10px',
-                  border: '1px solid #8a6d3b',
-                  cursor: 'pointer',
-                  transition: 'all 0.4s ease',
-                  position: 'relative',
-                  overflow: 'hidden'
-                }}
-              >
-                <div style={{ 
-                  height: 'clamp(140px, 25vw, 200px)', 
-                  borderRadius: '15px 15px 0 0', 
-                  overflow: 'hidden',
-                  position: 'relative'
-                }}>
-                  <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.6s' }} className="card-img" />
                 </div>
-                <div style={{ padding: '15px 8px', textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '0.75rem', margin: '0 0 5px', color: '#1a130d', fontWeight: '800', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase' }}>{p.name}</h3>
-                  <p style={{ fontSize: '0.9rem', margin: 0, color: '#d4af37', fontWeight: '900' }}>{p.price}</p>
+                <div>
+                  <h4 style={{ fontSize: '0.8rem', letterSpacing: '1px', color: '#d4af37', borderBottom: '1px solid rgba(212, 175, 55, 0.2)', paddingBottom: '5px', marginBottom: '10px' }}>PRICE</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {['Under $50', '$50 - $100', 'Over $100'].map(opt => (
+                      <label key={opt} style={{ fontSize: '0.85rem', color: '#1a130d', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <input type="checkbox" checked={selectedPrices.includes(opt)} onChange={() => handlePriceChange(opt)} style={{ accentColor: '#d4af37' }} /> {opt}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.8rem', letterSpacing: '1px', color: '#d4af37', borderBottom: '1px solid rgba(212, 175, 55, 0.2)', paddingBottom: '5px', marginBottom: '10px' }}>COLOR</h4>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {colors.map(c => (
+                      <div 
+                        key={c.name} onClick={() => handleColorChange(c.name)}
+                        style={{
+                          width: '24px', height: '24px', borderRadius: '50%', background: c.code, cursor: 'pointer',
+                          border: selectedColors.includes(c.name) ? '2px solid #d4af37' : '1px solid #ddd',
+                          boxShadow: selectedColors.includes(c.name) ? '0 0 0 2px #fffdf0 inset' : 'none'
+                        }}
+                        title={c.name}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        </main>
-      </div>
 
-      {/* Product Detail Modal */}
+          {/* GRID TOGGLES */}
+          <div className="grid-toggles" style={{ display: 'flex', gap: '15px', color: '#1a130d' }}>
+            <div onClick={() => setGridColumns(2)} style={{ cursor: 'pointer', opacity: gridColumns === 2 ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '5px' }}>
+               <span style={{ fontSize: '1.2rem', letterSpacing: '-2px' }}>||</span> <span style={{ fontSize: '0.7rem' }}>2</span>
+            </div>
+            <div onClick={() => setGridColumns(3)} style={{ cursor: 'pointer', opacity: gridColumns === 3 ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '5px' }}>
+               <span style={{ fontSize: '1.2rem', letterSpacing: '-2px' }}>|||</span> <span style={{ fontSize: '0.7rem' }}>3</span>
+            </div>
+            <div onClick={() => setGridColumns(4)} style={{ cursor: 'pointer', opacity: gridColumns === 4 ? 1 : 0.4, display: 'flex', alignItems: 'center', gap: '5px' }}>
+               <span style={{ fontSize: '1.2rem', letterSpacing: '-2px' }}>||||</span> <span style={{ fontSize: '0.7rem' }}>4</span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* 5. PRODUCT COUNT */}
+        <p style={{ color: '#d4af37', fontSize: '0.85rem', marginBottom: '30px', fontWeight: 'bold' }}>{filteredProducts.length} products</p>
+
+        {/* 6. FULL WIDTH PRODUCT GRID */}
+        <div className="product-grid" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`, 
+          gap: '30px' 
+        }}>
+          {filteredProducts.map((p, i) => (
+            <div 
+              key={i} 
+              onClick={() => { setSelectedProduct(p); setCurrentColor('Default'); }}
+              style={{ cursor: 'pointer', transition: 'all 0.3s ease', position: 'relative' }}
+              className="product-card"
+            >
+              <div style={{ position: 'absolute', top: '15px', left: '15px', background: '#1a130d', padding: '5px 10px', fontSize: '0.7rem', fontWeight: 'bold', color: '#d4af37', zIndex: 2 }}>
+                Luxe
+              </div>
+              
+              <div style={{ height: gridColumns === 2 ? '500px' : gridColumns === 3 ? '400px' : '300px', overflow: 'hidden', background: '#fff' }}>
+                <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} className="product-img" />
+              </div>
+              <div style={{ padding: '15px 0', textAlign: 'center' }}>
+                <h3 style={{ fontSize: '0.9rem', margin: '0 0 5px', color: '#1a130d', fontWeight: '600', textTransform: 'uppercase' }}>{p.name}</h3>
+                <p style={{ fontSize: '1.1rem', margin: 0, color: '#d4af37', fontWeight: 'bold' }}>{p.price}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {filteredProducts.length === 0 && (
+           <div style={{ textAlign: 'center', padding: '100px 0', color: '#d4af37', fontSize: '1.2rem', fontWeight: 'bold' }}>
+             No products found for the selected filters.
+           </div>
+        )}
+      </div> {/* Close collection-main-content */}
+      </div> {/* Close collection-page-layout */}
+
+      {/* PRODUCT DETAIL MODAL */}
       {selectedProduct && (
         <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9999,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(0px, 2vw, 20px)'
-        }} onClick={closeProduct}>
-          <div className="modal-content" style={{
-            background: '#fff', maxWidth: '1100px', width: '100%', maxHeight: '95vh', borderRadius: '30px',
-            overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', position: 'relative'
+          position: 'fixed', inset: 0, background: 'rgba(26,19,13,0.8)', backdropFilter: 'blur(5px)', zIndex: 9999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
+        }} onClick={() => setSelectedProduct(null)}>
+          <div className="modal-content-wrapper" style={{
+            background: '#fffdf0', maxWidth: '900px', width: '100%', maxHeight: '90vh', overflowY: 'auto',
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', position: 'relative',
+            boxShadow: '0 30px 60px rgba(0,0,0,0.5)', border: '1px solid rgba(212, 175, 55, 0.3)'
           }} onClick={e => e.stopPropagation()}>
             
             <button 
-              onClick={closeProduct}
-              style={{ position: 'absolute', top: '20px', right: '20px', background: 'rgba(0,0,0,0.05)', border: 'none', width: '40px', height: '40px', borderRadius: '50%', cursor: 'pointer', fontSize: '1.2rem', zIndex: 10 }}
+              onClick={() => setSelectedProduct(null)}
+              style={{ position: 'absolute', top: '15px', right: '15px', background: '#fffdf0', border: '1px solid rgba(212,175,55,0.5)', borderRadius: '50%', width: '40px', height: '40px', fontSize: '1.8rem', cursor: 'pointer', zIndex: 10, color: '#1a130d', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}
             >×</button>
 
-            {/* Image Section */}
-            <div style={{ background: '#fcfaf0', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+            <div className="modal-img-container" style={{ background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px', borderRight: '1px solid rgba(212,175,55,0.2)' }}>
                <img 
-                 src={currentColor === 'Default' ? selectedProduct.image : colors.find(c => c.name === currentColor).image} 
+                 src={currentColor === 'Default' ? selectedProduct.image : colors.find(c => c.name === currentColor)?.image || selectedProduct.image} 
                  alt={selectedProduct.name} 
-                 style={{ width: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '20px' }}
+                 style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }}
                />
             </div>
 
-            {/* Info Section */}
-            <div style={{ padding: 'clamp(30px, 5vw, 60px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <span style={{ color: '#d4af37', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '2px', marginBottom: '10px' }}>PREMIUM CHOICE</span>
-              <h2 style={{ fontSize: 'clamp(1.5rem, 5vw, 2.5rem)', fontFamily: 'Cinzel', marginBottom: '10px', color: '#1a130d' }}>{selectedProduct.name}</h2>
-              <p style={{ fontSize: '1.5rem', color: '#d4af37', fontWeight: 'bold', marginBottom: '20px' }}>{selectedProduct.price}</p>
-              
-              <p style={{ color: '#666', lineHeight: '1.6', marginBottom: '30px', fontSize: '0.9rem' }}>
-                {selectedProduct.description || "Our exquisite floral collection brings nature's finest beauty to your space with unmatched luxury."}
-              </p>
+            <div style={{ padding: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <span style={{ color: '#d4af37', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>{selectedProduct.category}</span>
+                <h2 style={{ fontSize: '2rem', fontFamily: 'Cinzel, serif', marginTop: '10px', marginBottom: '15px', color: '#1a130d' }}>{selectedProduct.name}</h2>
+                <p style={{ fontSize: '1.5rem', color: '#d4af37', fontWeight: 'bold', marginBottom: '25px' }}>{selectedProduct.price}</p>
+                
+                <p style={{ color: '#1a130d', lineHeight: '1.6', marginBottom: '40px', fontSize: '0.95rem' }}>
+                  {selectedProduct.description || "Our exquisite floral collection brings nature's finest beauty to your space with unmatched luxury."}
+                </p>
 
-              <div style={{ marginBottom: '30px' }}>
-                <h4 style={{ fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', marginBottom: '15px' }}>Color Variation:</h4>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                   {colors.map((c, idx) => (
-                      <div 
-                        key={idx}
-                        onClick={() => setCurrentColor(c.name)}
-                        style={{ 
-                          width: '45px', height: '45px', borderRadius: '10px', cursor: 'pointer',
-                          border: currentColor === c.name ? '3px solid #d4af37' : '1px solid rgba(0,0,0,0.1)',
-                          overflow: 'hidden', padding: '2px', transition: '0.2s'
-                        }}
-                      >
-                         <div style={{ width: '100%', height: '100%', borderRadius: '6px', background: c.code, backgroundImage: `url(${c.image})`, backgroundSize: 'cover' }}></div>
-                      </div>
-                   ))}
+                <div style={{ marginBottom: '30px' }}>
+                  <h4 style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '15px' }}>AVAILABLE COLORS</h4>
+                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                     {colors.map((c, idx) => (
+                        <div 
+                          key={idx} onClick={() => setCurrentColor(c.name)}
+                          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
+                        >
+                          <div style={{ 
+                            width: '40px', height: '40px', borderRadius: '50%',
+                            border: currentColor === c.name ? '2px solid #d4af37' : '1px solid rgba(0,0,0,0.1)',
+                            padding: '3px', transition: '0.2s'
+                          }}>
+                            <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: c.code, backgroundImage: `url(${c.image})`, backgroundSize: 'cover' }}></div>
+                          </div>
+                          <span style={{ fontSize: '0.7rem', color: '#1a130d', fontWeight: currentColor === c.name ? 'bold' : 'normal' }}>{c.name}</span>
+                        </div>
+                     ))}
+                  </div>
                 </div>
               </div>
 
               <button 
-                onClick={() => { addToCart({...selectedProduct}); closeProduct(); }}
-                style={{ width: '100%', background: '#1a130d', color: '#fff', border: 'none', padding: '15px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}
-              >ADD TO CART</button>
+                onClick={() => { 
+                  const selectedImage = currentColor === 'Default' ? selectedProduct.image : colors.find(c => c.name === currentColor)?.image || selectedProduct.image;
+                  addToCart({
+                    ...selectedProduct, 
+                    selectedColor: currentColor === 'Default' ? null : currentColor,
+                    image: selectedImage
+                  }); 
+                  setSelectedProduct(null); 
+                }}
+                style={{ width: '100%', background: '#1a130d', color: '#d4af37', border: '1px solid #d4af37', padding: '18px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer', letterSpacing: '1px', transition: '0.3s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#d4af37'; e.currentTarget.style.color = '#1a130d'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = '#1a130d'; e.currentTarget.style.color = '#d4af37'; }}
+              >ADD TO BAG</button>
             </div>
           </div>
         </div>
       )}
 
       <style>{`
-        .boutique-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(212, 175, 55, 0.1); }
+        .product-card:hover .product-img { transform: scale(1.05); }
+        .product-img { transition: transform 0.6s ease; }
+        
+        .collection-page-layout {
+          display: flex;
+          padding-top: 80px;
+          max-width: 1600px;
+          margin: 0 auto;
+        }
+
+        .collection-sidebar {
+          width: 280px;
+          flex-shrink: 0;
+          padding: 40px 20px;
+          border-right: 1px solid rgba(212, 175, 55, 0.2);
+          background: #fffdf0;
+          height: calc(100vh - 80px);
+          position: sticky;
+          top: 80px;
+          overflow-y: auto;
+        }
+
+        .collection-main-content {
+          flex: 1;
+          padding: 0 5% 60px;
+          min-width: 0; /* Prevents flex children from blowing out */
+        }
+
+        .mobile-sidebar-toggle {
+          display: none;
+        }
+
+        .mobile-close-btn {
+          display: none;
+        }
         
         @media (max-width: 992px) {
-          .collection-layout { grid-template-columns: 1fr !important; gap: 30px !important; }
-          .sidebar { 
-            position: relative !important; 
-            top: 0 !important; 
-            display: flex !important; 
-            overflow-x: auto !important; 
-            padding: 10px !important; 
-            border-radius: 15px !important;
-            scrollbar-width: none;
-          }
-          .sidebar > div { flex-direction: row !important; white-space: nowrap !important; }
-          .sidebar::-webkit-scrollbar { display: none; }
-          .sidebar > div > div { display: inline-block !important; margin-right: 10px; }
+           .filter-container { flex-direction: column; width: 100%; }
+           
+           .collection-sidebar {
+             position: fixed;
+             top: 0;
+             left: -100%;
+             width: 80%;
+             max-width: 350px;
+             height: 100vh;
+             z-index: 2000;
+             transition: left 0.4s ease;
+             box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+           }
+           
+           .collection-sidebar.open {
+             left: 0;
+           }
+
+           .mobile-sidebar-toggle {
+             display: block;
+             margin-top: 10px;
+             margin-bottom: 10px;
+             border-bottom: 1px solid rgba(212,175,55,0.2);
+             padding-bottom: 15px;
+           }
+
+           .mobile-close-btn {
+             display: block;
+             position: absolute;
+             top: 20px;
+             right: 20px;
+             background: none;
+             border: none;
+             font-size: 2rem;
+             color: #1a130d;
+             cursor: pointer;
+           }
+        }
+        
+        @media (max-width: 768px) {
+           .modal-img-container {
+             padding: 20px !important;
+             border-right: none !important;
+             border-bottom: 1px solid rgba(212,175,55,0.2);
+           }
+           .modal-content-wrapper > div:nth-child(3) { /* The text container */
+             padding: 30px 20px !important;
+           }
+
+           .sub-category-scroll {
+             justify-content: flex-start !important;
+             overflow-x: auto;
+             -webkit-overflow-scrolling: touch;
+             padding-bottom: 15px !important;
+           }
+           .sub-category-scroll::-webkit-scrollbar { display: none; }
+           .sub-category-scroll > div { flex-shrink: 0; }
+           
+           .filter-sort-bar {
+             flex-direction: column;
+             align-items: flex-start !important;
+             gap: 15px;
+           }
+           
+           .grid-toggles {
+             display: none !important;
+           }
+           
+           .product-grid {
+             grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+             gap: 10px !important;
+           }
         }
       `}</style>
+      
+      {/* OVERLAY FOR MOBILE SIDEBAR */}
+      {isSidebarOpen && (
+        <div 
+          onClick={() => setIsSidebarOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1999, backdropFilter: 'blur(3px)'
+          }}
+        />
+      )}
     </div>
   );
 };

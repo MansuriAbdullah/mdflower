@@ -44,7 +44,7 @@ const Reviews = () => {
 
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(280px, 30vw, 380px), 1fr))',
         gap: '20px',
         justifyContent: 'center',
         position: 'relative',
@@ -60,7 +60,7 @@ const Reviews = () => {
             }}
           >
             <div className="glass-card" style={{ 
-              padding: '10px 10px', 
+              padding: '45px 30px', 
               textAlign: 'center', 
               height: '100%',
               display: 'flex',
@@ -74,8 +74,8 @@ const Reviews = () => {
               <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '60px', height: '4px', background: '#d4af37', borderRadius: '0 0 10px 10px' }}></div>
               
               <div style={{
-                width: '50px',
-                height: '50px',
+                width: '85px',
+                height: '85px',
                 borderRadius: '50%',
                 margin: '15px auto 10px',
                 padding: '5px',

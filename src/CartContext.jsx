@@ -7,37 +7,38 @@ export const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const addToCart = (product) => {
+    const cartId = `${product.name}_${product.selectedColor || 'Default'}`;
     setCartItems(prev => {
-      const existing = prev.find(item => item.name === product.name);
+      const existing = prev.find(item => item.cartId === cartId);
       if (existing) {
         return prev.map(item =>
-          item.name === product.name ? { ...item, qty: item.qty + 1 } : item
+          item.cartId === cartId ? { ...item, qty: item.qty + 1 } : item
         );
       }
-      return [...prev, { ...product, qty: 1 }];
+      return [...prev, { ...product, cartId, qty: 1 }];
     });
   };
 
-  const increaseQty = (name) => {
+  const increaseQty = (cartId) => {
     setCartItems(prev =>
       prev.map(item =>
-        item.name === name ? { ...item, qty: item.qty + 1 } : item
+        item.cartId === cartId ? { ...item, qty: item.qty + 1 } : item
       )
     );
   };
 
-  const decreaseQty = (name) => {
+  const decreaseQty = (cartId) => {
     setCartItems(prev =>
       prev
         .map(item =>
-          item.name === name ? { ...item, qty: item.qty - 1 } : item
+          item.cartId === cartId ? { ...item, qty: item.qty - 1 } : item
         )
         .filter(item => item.qty > 0)
     );
   };
 
-  const removeFromCart = (name) => {
-    setCartItems(prev => prev.filter(item => item.name !== name));
+  const removeFromCart = (cartId) => {
+    setCartItems(prev => prev.filter(item => item.cartId !== cartId));
   };
 
   const clearCart = () => setCartItems([]);

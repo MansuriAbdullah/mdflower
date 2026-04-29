@@ -289,74 +289,54 @@ const SummerBanner = () => (
 
 const TrustedClients = () => {
   const clients = [
-    { name: 'TANISHQ', img: '/client_trust_1.png' },
-    { name: 'ADANI', img: '/client_trust_2.png' },
-    { name: 'RELIANCE', img: '/client_trust_3.png' },
-    { name: 'TATA', img: '/client_trust_4.png' },
-    { name: 'RAFFLES', img: '/client_trust_5.png' }
+    { name: 'TANISHQ', img: '/trust_tanishq.png' },
+    { name: 'ADANI', img: '/trust_adani.png' },
+    { name: 'RELIANCE', img: '/trust_reliance.png' },
+    { name: 'TATA', img: '/trust_tata.png' },
+    { name: 'RAFFLES', img: '/trust_raffles.png' }
   ];
 
   const displayClients = [...clients, ...clients, ...clients];
 
   return (
-    <section style={{ padding: '60px 0', textAlign: 'center', overflow: 'hidden', background: '#fff' }}>
-      <h4 style={{ color: '#d4af37', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.78rem', fontWeight: '700', marginBottom: '10px' }}>
-        Brands That Trust Us
-      </h4>
-      <h2 style={{ fontSize: '2rem', color: '#1a130d', marginBottom: '10px', fontFamily: 'Cinzel', letterSpacing: '2px' }}>Our Trusted Clients</h2>
-      <div style={{ width: '50px', height: '3px', background: '#d4af37', margin: '0 auto 40px' }}></div>
+    <section style={{ padding: '80px 0', textAlign: 'center', overflow: 'hidden', background: '#fff' }}>
+      <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', color: '#1a130d', marginBottom: '50px', fontWeight: 'bold' }}>Our Trusted Clients</h2>
 
       <div className="client-slider-container" style={{
         width: '100%',
         padding: '20px 0',
-        background: 'linear-gradient(135deg, rgba(212,175,55,0.02) 0%, rgba(255,253,240,0.4) 100%)',
         position: 'relative'
       }}>
         <div style={{
           display: 'flex',
+          alignItems: 'center',
           width: 'max-content',
-          animation: 'scrollLeft 30s linear infinite',
+          animation: 'scrollLeft 25s linear infinite',
         }}>
           {displayClients.map((client, idx) => (
             <div
               key={idx}
-              className="fancy-client-box"
+              className="client-logo-wrapper"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '15px',
-                background: '#fff',
-                padding: '12px 25px',
-                borderRadius: '15px',
-                position: 'relative',
-                minWidth: '220px',
-                marginRight: '30px',
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                cursor: 'pointer',
-                border: '1px solid rgba(212, 175, 55, 0.3)'
+                justifyContent: 'center',
+                marginRight: '120px',
+                height: '180px', /* Huge height for logos */
+                minWidth: '300px', /* Huge width for logos */
+                transition: 'transform 0.3s ease',
               }}
             >
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '8px',
-                overflow: 'hidden',
-                flexShrink: 0,
-                border: '1px solid rgba(212, 175, 55, 0.2)',
-                background: '#fffdf0',
-                padding: '4px'
-              }}>
-                <img src={client.img} alt={client.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-              </div>
-              <span style={{
-                fontSize: '0.8rem',
-                fontWeight: '900',
-                color: '#1a130d',
-                letterSpacing: '1px',
-                fontFamily: 'Cinzel'
-              }}>
-                {client.name}
-              </span>
+              <img 
+                src={client.img} 
+                alt={client.name} 
+                style={{ 
+                  maxHeight: '130%', /* Allows image to grow larger than container slightly if needed */
+                  maxWidth: '130%',
+                  objectFit: 'contain',
+                  transform: 'scale(1.2)', /* Scales up the image inside the container to reduce white space */
+                }} 
+              />
             </div>
           ))}
         </div>
@@ -367,11 +347,54 @@ const TrustedClients = () => {
           0% { transform: translateX(0); }
           100% { transform: translateX(-33.3333%); }
         }
-        .fancy-client-box:hover {
-          transform: translateY(-5px) scale(1.02);
-          box-shadow: 0 15px 35px rgba(212, 175, 55, 0.15);
+        .client-logo-wrapper:hover {
+          transform: scale(1.05);
         }
       `}</style>
+    </section>
+  );
+};
+
+const ShopByCategory = () => {
+  const categories = [
+    { name: 'FLOOR PLANTS', img: '/cat_floor.png' },
+    { name: 'PLANTERS & VASES', img: '/cat_planters.png' },
+    { name: 'HANGING PLANTS', img: '/cat_hanging.png' },
+    { name: 'TABLE DÉCOR', img: '/cat_table.png' },
+    { name: 'WALL DÉCOR', img: '/cat_wall.png' }
+  ];
+
+  return (
+    <section style={{ padding: '60px 8%', background: '#fff', textAlign: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', flexWrap: 'wrap' }}>
+        {categories.map((cat, i) => (
+          <div key={i} style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => window.location.href = '/top-selling'}>
+            <div style={{ 
+              width: '180px', 
+              height: '180px', 
+              borderRadius: '50%', 
+              overflow: 'hidden', 
+              marginBottom: '20px',
+              border: '2px solid rgba(212, 175, 55, 0.2)',
+              transition: 'transform 0.4s ease',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              <img src={cat.img} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+            <h3 style={{ 
+              fontSize: '0.85rem', 
+              fontWeight: '900', 
+              letterSpacing: '1px', 
+              color: '#1a130d',
+              borderBottom: '2px solid #1a130d',
+              display: 'inline-block',
+              paddingBottom: '5px'
+            }}>{cat.name}</h3>
+          </div>
+        ))}
+      </div>
     </section>
   );
 };
@@ -492,21 +515,20 @@ const IndiaDelivery = () => {
       </div>
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
         gap: '20px'
       }}>
         {locations.map((loc, i) => (
           <div key={loc.name} className="glass-card" style={{
             animationDelay: `${i * 0.05}s`,
-            transform: 'scale(0.75)',
             background: '#fff',
-            padding: '5px'
+            padding: '10px'
           }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ width: '100%', aspectRatio: '1/1', borderRadius: '15px', overflow: 'hidden', marginBottom: '10px' }}>
                 <img src={loc.img} alt={loc.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
-              <p style={{ fontWeight: '900', fontSize: '0.6rem', letterSpacing: '1px', color: '#1a130d' }}>{loc.name}</p>
+              <p style={{ fontWeight: '900', fontSize: '0.7rem', letterSpacing: '1px', color: '#1a130d' }}>{loc.name}</p>
             </div>
           </div>
         ))}
@@ -631,12 +653,12 @@ const Testimonials = () => {
         <div style={{ width: '80px', height: '2px', background: 'linear-gradient(90deg, transparent, #d4af37, transparent)', margin: '0 auto' }}></div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', justifyContent: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px', justifyContent: 'center' }}>
         {reviews.map((rev, i) => (
-          <div key={i} className="glass-card" style={{ padding: '20px 15px', textAlign: 'center', background: '#fff', boxShadow: '0 15px 35px rgba(0,0,0,0.05)' }}>
+          <div key={i} className="glass-card" style={{ padding: '40px 25px', textAlign: 'center', background: '#fff', boxShadow: '0 15px 35px rgba(0,0,0,0.05)' }}>
               <div style={{
-                width: '50px',
-                height: '50px',
+                width: '75px',
+                height: '75px',
                 borderRadius: '50%',
                 margin: '0 auto 20px',
                 overflow: 'hidden',
@@ -682,6 +704,7 @@ const Home = () => {
         </div>
       </section>
       <SummerBanner />
+      <ShopByCategory />
       <TopSelling />
       <TrustedClients />
       <IndiaDelivery />

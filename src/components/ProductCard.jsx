@@ -21,11 +21,11 @@ const ProductCard = ({ id, name, price, image }) => {
       animation: 'revealText 0.8s ease'
     }}>
       <Link to={`/product/${id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-        <div style={{ padding: '8px' }}>
+        <div style={{ padding: '15px' }}>
           <div style={{ 
-            height: '130px', 
+            height: '180px', 
             overflow: 'hidden', 
-            borderRadius: '12px', 
+            borderRadius: '15px', 
             position: 'relative' 
           }}>
             <img 
@@ -35,11 +35,11 @@ const ProductCard = ({ id, name, price, image }) => {
               onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
               onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
             />
-            <div style={{ position: 'absolute', top: '8px', left: '8px', background: 'rgba(255,255,255,0.9)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.5rem', fontWeight: '900', color: '#1a130d', letterSpacing: '1px' }}>PREMIUM</div>
+            <div style={{ position: 'absolute', top: '10px', left: '10px', background: 'rgba(255,255,255,0.9)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.6rem', fontWeight: '900', color: '#1a130d', letterSpacing: '1px' }}>PREMIUM</div>
           </div>
         </div>
 
-        <div style={{ padding: '0 10px 10px', textAlign: 'left' }}>
+        <div style={{ padding: '0 20px 20px', textAlign: 'left' }}>
           <h3 style={{ 
             fontSize: '1rem', 
             color: '#1a130d', // Dark font
