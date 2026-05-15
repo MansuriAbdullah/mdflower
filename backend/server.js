@@ -39,6 +39,11 @@ mongoose.connect(process.env.MONGO_URI)
 
 // --- ROUTES ---
 
+// Root Route
+app.get('/', (req, res) => {
+  res.send('MDFlowers API is running...');
+});
+
 // Image Upload Route
 app.post('/api/upload', upload.single('image'), async (req, res) => {
   if (!req.file) {
