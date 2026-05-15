@@ -299,7 +299,7 @@ const TrustedClients = () => {
   const displayClients = [...clients, ...clients, ...clients];
 
   return (
-    <section style={{ padding: '80px 0', textAlign: 'center', overflow: 'hidden', background: '#fff' }}>
+    <section style={{ padding: '80px 0', textAlign: 'center', overflow: 'hidden', background: '#fffdf0' }}>
       <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', color: '#1a130d', marginBottom: '50px', fontWeight: 'bold' }}>Our Trusted Clients</h2>
 
       <div className="client-slider-container" style={{
@@ -361,17 +361,32 @@ const ShopByCategory = () => {
     { name: 'PLANTERS & VASES', img: '/cat_planters.png' },
     { name: 'HANGING PLANTS', img: '/cat_hanging.png' },
     { name: 'TABLE DÉCOR', img: '/cat_table.png' },
-    { name: 'WALL DÉCOR', img: '/cat_wall.png' }
+    { name: 'WALL DÉCOR', img: '/cat_wall.png' },
+    { name: 'HANGING FLOWERS', img: '/cat_hanging_flowers.png' },
+    { name: 'LED LIGHTS', img: '/cat_led_lights.png' }
   ];
 
   return (
-    <section style={{ padding: '60px 8%', background: '#fff', textAlign: 'center' }}>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', flexWrap: 'wrap' }}>
+    <section style={{ padding: '60px 8%', background: '#fffdf0', textAlign: 'center' }}>
+      <style>{`
+        .categories-scroll {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .categories-scroll::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+        <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', marginBottom: '10px' }}>Top Selling <span className="gold-gradient-text">Product</span></h2>
+        <div style={{ width: '60px', height: '3px', background: '#d4af37', margin: '0 auto' }}></div>
+      </div>
+      <div className="categories-scroll" style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(15px, 2vw, 30px)', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '20px' }}>
         {categories.map((cat, i) => (
-          <div key={i} style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => window.location.href = '/top-selling'}>
+          <div key={i} style={{ textAlign: 'center', cursor: 'pointer', flexShrink: 0 }} onClick={() => window.location.href = '/top-selling'}>
             <div style={{ 
-              width: '180px', 
-              height: '180px', 
+              width: 'clamp(120px, 10vw, 160px)', 
+              height: 'clamp(120px, 10vw, 160px)', 
               borderRadius: '50%', 
               overflow: 'hidden', 
               marginBottom: '20px',
@@ -399,93 +414,6 @@ const ShopByCategory = () => {
   );
 };
 
-const TopSelling = () => {
-  const categories = [
-    'LED Items', 'Bunches', 'Flower Sticks',
-    'Hanging', 'Loose Flower', 'Candles', 'Decorative Items'
-  ];
-
-  const [activeTab, setActiveTab] = useState('LED Items');
-
-  const products = {
-    'LED Items': [
-      { id: 'led1', name: "Crystal LED Base", price: "$85", image: "/led_stands.png" },
-      { id: 'led2', name: "Golden Pillar Stand", price: "$120", image: "/led_stands.png" }
-    ],
-    'Bunches': [
-      { id: 'bunch1', name: "Velvet Rose Bunch", price: "$45", image: "/bunches.png" },
-      { id: 'bunch2', name: "Spring Tulip Mix", price: "$55", image: "/bunches.png" }
-    ],
-    'Flower Sticks': [
-      { id: 'stick1', name: "Golden Willow", price: "$30", image: "/sticks.png" },
-      { id: 'stick2', name: "Silver Birch Rod", price: "$35", image: "/sticks.png" }
-    ],
-    'Hanging': [
-      { id: 'hang1', name: "Wisteria Drape", price: "$75", image: "/hangings.png" },
-      { id: 'hang2', name: "Ivy Wall Decor", price: "$65", image: "/hangings.png" }
-    ],
-    'Loose Flower': [
-      { id: 'loose1', name: "Premium Jasmine Head", price: "$20", image: "/loose_flowers.png" },
-      { id: 'loose2', name: "Royal Marigold", price: "$15", image: "/loose_flowers.png" }
-    ],
-    'Candles': [
-      { id: 'candle1', name: "Scented Gold Wax", price: "$40", image: "/candles.png" },
-      { id: 'candle2', name: "Vanilla Bloom Pillar", price: "$38", image: "/candles.png" }
-    ],
-    'Decorative Items': [
-      { id: 'decor1', name: "Abstract Petal Vase", price: "$200", image: "/showpiece.png" },
-      { id: 'decor2', name: "Swan Floral Statue", price: "$350", image: "/showpiece.png" }
-    ]
-  };
-
-  return (
-    <section style={{ padding: '60px 8%', background: '#fffdf0' }}>
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', marginBottom: '10px' }}>Top Selling <span className="gold-gradient-text">Product</span></h2>
-        <div style={{ width: '60px', height: '3px', background: '#d4af37', margin: '0 auto 30px' }}></div>
-
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '10px',
-          flexWrap: 'wrap',
-          marginBottom: '35px'
-        }}>
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveTab(cat)}
-              style={{
-                padding: '10px 20px',
-                borderRadius: '50px',
-                border: activeTab === cat ? 'none' : '1px solid rgba(212, 175, 55, 0.4)',
-                background: activeTab === cat ? '#d4af37' : 'transparent',
-                color: activeTab === cat ? '#1a130d' : '#1a130d',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '0.75rem',
-                letterSpacing: '1px',
-                transition: 'all 0.4s ease',
-              }}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: '30px'
-      }}>
-        {(products[activeTab] || []).map((p, i) => (
-          <ProductCard key={i} {...p} />
-        ))}
-      </div>
-    </section>
-  );
-};
 
 const IndiaDelivery = () => {
   const locations = [
@@ -509,15 +437,30 @@ const IndiaDelivery = () => {
 
   return (
     <section id="delivery" style={{ padding: '30px 8%' }}>
+      <style>{`
+        .delivery-grid-8 {
+          display: grid;
+          grid-template-columns: repeat(8, 1fr);
+          gap: 20px;
+        }
+        @media (max-width: 1200px) {
+          .delivery-grid-8 { grid-template-columns: repeat(6, 1fr); }
+        }
+        @media (max-width: 900px) {
+          .delivery-grid-8 { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (max-width: 600px) {
+          .delivery-grid-8 { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        }
+        @media (max-width: 400px) {
+          .delivery-grid-8 { grid-template-columns: repeat(2, 1fr); }
+        }
+      `}</style>
       <div style={{ marginBottom: '30px', textAlign: 'center' }}>
         <h2 style={{ fontSize: '2rem', color: '#1a130d' }}>All Over India Delivery</h2>
         <p style={{ color: '#1a130d', fontSize: '1rem' }}>Across 500+ Cities & Towns</p>
       </div>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
-        gap: '20px'
-      }}>
+      <div className="delivery-grid-8">
         {locations.map((loc, i) => (
           <div key={loc.name} className="glass-card" style={{
             animationDelay: `${i * 0.05}s`,
@@ -538,33 +481,89 @@ const IndiaDelivery = () => {
 };
 
 const ContactSection = () => (
-  <section id="contact" style={{ padding: '80px 8%', background: '#fffdf0' }}>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '50px', alignItems: 'center' }}>
+  <section id="contact" style={{ 
+    padding: '60px 8%', 
+    background: '#fffdf0', 
+    position: 'relative', 
+    overflow: 'hidden',
+  }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '50px', alignItems: 'center', width: '100%', position: 'relative', zIndex: 2 }}>
       <div>
-        <h2 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', marginBottom: '20px', lineHeight: '1' }}>Get In <span className="gold-gradient-text">Touch</span></h2>
-        <p style={{ fontSize: '1.1rem', color: '#5c4b22', marginBottom: '40px' }}>Whether it's for a wedding, corporate event, or a personal gift, we're here to make it golden.</p>
+        <h4 style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', marginBottom: '10px', fontWeight: 'bold' }}>Contact Us</h4>
+        <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', marginBottom: '15px', lineHeight: '1', color: '#1a130d', fontFamily: 'Playfair Display, serif' }}>
+          Get In <span style={{ color: '#d4af37', fontStyle: 'italic' }}>Touch</span>
+        </h2>
+        <p style={{ fontSize: '1.05rem', color: '#5c4b22', marginBottom: '30px', lineHeight: '1.6', maxWidth: '500px' }}>
+          Whether it's for a wedding, corporate event, or a personal gift, we're here to make your vision golden.
+        </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {[
             { icon: '📍', title: 'Head Office', text: '4455/SF/1, Niraj House, Fuvara Gandhi Road, Ahmedabad, Gujarat 380001' },
             { icon: '📍', title: 'Showroom', text: 'HS Landmark-2, Aaree Denim, Narol, Ahmedabad, Gujarat-382405' },
             { icon: '✉️', title: 'Email Us', text: 'info@mdflowers.in' }
           ].map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '15px' }}>
-              <span style={{ fontSize: '1.2rem', background: '#fcf9e1', padding: '10px', borderRadius: '12px' }}>{item.icon}</span>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <span style={{ 
+                fontSize: '1.2rem', 
+                background: '#fff', 
+                border: '1px solid rgba(212,175,55,0.3)',
+                width: '45px',
+                height: '45px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                color: '#d4af37',
+                boxShadow: '0 5px 15px rgba(212,175,55,0.1)'
+              }}>{item.icon}</span>
               <div>
-                <p style={{ fontWeight: 'bold', color: '#1a130d', fontSize: '0.9rem' }}>{item.title}</p>
-                <p style={{ color: '#1a130d', fontSize: '0.85rem' }}>{item.text}</p>
+                <p style={{ fontWeight: 'bold', color: '#1a130d', fontSize: '0.95rem', marginBottom: '3px' }}>{item.title}</p>
+                <p style={{ color: '#5c4b22', fontSize: '0.85rem', lineHeight: '1.4', maxWidth: '280px' }}>{item.text}</p>
               </div>
             </div>
           ))}
         </div>
       </div>
-      <div className="glass-card" style={{ padding: 'clamp(25px, 5vw, 50px)' }}>
+      
+      <div style={{ 
+        padding: '30px 40px', 
+        background: '#fff', 
+        borderRadius: '15px', 
+        border: '1px solid rgba(212,175,55,0.2)',
+        boxShadow: '0 15px 40px rgba(0,0,0,0.05)'
+      }}>
+        <h3 style={{ fontSize: '1.5rem', color: '#1a130d', marginBottom: '25px', fontFamily: 'Playfair Display, serif' }}>Send a Message</h3>
         <form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <input type="text" placeholder="Your Name" style={{ padding: '12px 18px', borderRadius: '12px', border: '1px solid #d4af37', background: 'transparent', width: '100%', outline: 'none' }} />
-          <input type="email" placeholder="Your Email" style={{ padding: '12px 18px', borderRadius: '12px', border: '1px solid #d4af37', background: 'transparent', width: '100%', outline: 'none' }} />
-          <textarea placeholder="Your Message" rows="4" style={{ padding: '12px 18px', borderRadius: '12px', border: '1px solid #d4af37', background: 'transparent', width: '100%', outline: 'none' }}></textarea>
-          <button className="btn-gold" style={{ width: '100%' }}>Send Message</button>
+          <div style={{ position: 'relative' }}>
+            <input type="text" placeholder="Your Name" style={{ 
+              padding: '12px 15px', borderRadius: '8px', border: '1px solid #e0e0e0', 
+              background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
+              transition: 'border 0.3s ease'
+            }} onFocus={(e) => e.target.style.border = '1px solid #d4af37'} onBlur={(e) => e.target.style.border = '1px solid #e0e0e0'}/>
+          </div>
+          <div style={{ position: 'relative' }}>
+            <input type="email" placeholder="Your Email" style={{ 
+               padding: '12px 15px', borderRadius: '8px', border: '1px solid #e0e0e0', 
+               background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
+               transition: 'border 0.3s ease'
+            }} onFocus={(e) => e.target.style.border = '1px solid #d4af37'} onBlur={(e) => e.target.style.border = '1px solid #e0e0e0'}/>
+          </div>
+          <div style={{ position: 'relative' }}>
+            <textarea placeholder="Your Message" rows="4" style={{ 
+               padding: '12px 15px', borderRadius: '8px', border: '1px solid #e0e0e0', 
+               background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
+               resize: 'none', transition: 'border 0.3s ease'
+            }} onFocus={(e) => e.target.style.border = '1px solid #d4af37'} onBlur={(e) => e.target.style.border = '1px solid #e0e0e0'}></textarea>
+          </div>
+          <button style={{ 
+            width: '100%', padding: '15px', background: '#d4af37', color: '#fff', 
+            border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', 
+            cursor: 'pointer', letterSpacing: '1px', textTransform: 'uppercase', transition: 'all 0.3s ease',
+            boxShadow: '0 8px 15px rgba(212,175,55,0.3)'
+          }} onMouseEnter={(e) => {e.target.style.background = '#1a130d'; e.target.style.boxShadow = '0 8px 15px rgba(26,19,13,0.3)';}} 
+             onMouseLeave={(e) => {e.target.style.background = '#d4af37'; e.target.style.boxShadow = '0 8px 15px rgba(212,175,55,0.3)';}}>
+            Send Request
+          </button>
         </form>
       </div>
     </div>
@@ -644,7 +643,7 @@ const Testimonials = () => {
   ];
 
   return (
-    <section style={{ padding: '30px 8%', background: '#fff', position: 'relative', overflow: 'hidden' }}>
+    <section style={{ padding: '30px 8%', background: '#fffdf0', position: 'relative', overflow: 'hidden' }}>
       <div style={{ textAlign: 'center', marginBottom: '50px' }}>
         <h4 style={{ color: '#d4af37', textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '15px', fontWeight: 'bold', fontSize: '0.8rem' }}>
           Customer Stories
@@ -691,21 +690,20 @@ const Home = () => {
           <div style={{ width: '80px', height: '3px', background: '#d4af37', margin: '0 auto' }}></div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px' }}>
-          <ProductCard id="p1" name="Warm Bloomscape" price="$145.00" image="/warm_bloomscape.png" />
-          <ProductCard id="p2" name="Grand Amour" price="$280.00" image="/grand_amour.png" />
-          <ProductCard id="p3" name="Golden Aura" price="$195.00" image="/golden_aura.png" />
-          <ProductCard id="p4" name="Sun Kissed" price="$110.00" image="/sun_kissed.png" />
-          <ProductCard id="p5" name="Royal Blush" price="$210.00" image="/royal_blush.png" />
-          <ProductCard id="p6" name="Pure Ivory" price="$165.00" image="/pure_ivory.png" />
-          <ProductCard id="p7" name="Midnight Velvet" price="$185.00" image="/midnight_velvet.png" />
-          <ProductCard id="p8" name="Aurora Orchids" price="$225.00" image="/aurora_orchids.png" />
-          <ProductCard id="p9" name="Champagne Peonies" price="$155.00" image="/champagne_peonies.png" />
-          <ProductCard id="p10" name="Enchanted Lilies" price="$140.00" image="/enchanted_lilies.png" />
+          <ProductCard id="p1" name="Warm Bloomscape" price="₹145.00" image="/warm_bloomscape.png" />
+          <ProductCard id="p2" name="Grand Amour" price="₹280.00" image="/grand_amour.png" />
+          <ProductCard id="p3" name="Golden Aura" price="₹195.00" image="/golden_aura.png" />
+          <ProductCard id="p4" name="Sun Kissed" price="₹110.00" image="/sun_kissed.png" />
+          <ProductCard id="p5" name="Royal Blush" price="₹210.00" image="/royal_blush.png" />
+          <ProductCard id="p6" name="Pure Ivory" price="₹165.00" image="/pure_ivory.png" />
+          <ProductCard id="p7" name="Midnight Velvet" price="₹185.00" image="/midnight_velvet.png" />
+          <ProductCard id="p8" name="Aurora Orchids" price="₹225.00" image="/aurora_orchids.png" />
+          <ProductCard id="p9" name="Champagne Peonies" price="₹155.00" image="/champagne_peonies.png" />
+          <ProductCard id="p10" name="Enchanted Lilies" price="₹140.00" image="/enchanted_lilies.png" />
         </div>
       </section>
       <SummerBanner />
       <ShopByCategory />
-      <TopSelling />
       <TrustedClients />
       <IndiaDelivery />
       <Testimonials />

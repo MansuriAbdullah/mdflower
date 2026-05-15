@@ -1,35 +1,6 @@
 import React, { useState, useMemo, useEffect, useContext } from 'react';
-import { productsData } from '../data/products';
+import { DataContext } from '../DataContext';
 import { CartContext } from '../CartContext';
-
-// --- DATA STRUCTURE ---
-const mainCategories = [
-  'SHOP ALL',
-  'Loose Flower Heads',
-  'Leaves',
-  'Bunches',
-  'Hangings',
-  'Chandeliers',
-  'LED Item',
-  'Flower Walls',
-  'Flower Sticks',
-  'Candles & Showpieces',
-  'Pots'
-];
-
-const categoryStructure = [
-  { name: 'SHOP ALL', subs: [] },
-  { name: 'Loose Flower Heads', subs: [{name: 'Premium Flower Heads', img: '/premium_orchid_blue_1777448990406.png'}, {name: 'Regular Flower Heads', img: '/premium_tulip_white_1777449008658.png'}] },
-  { name: 'Leaves', subs: [{name: 'Artificial Leaves', img: '/monstera_leaf_1777449184102.png'}, {name: 'Tropical Leaves', img: '/eucalyptus_bunch_1777449087274.png'}] },
-  { name: 'Bunches', subs: [{name: 'Flower Bunches', img: '/cherry_blossom_pink_1777449042427.png'}, {name: 'Green Bunches', img: '/eucalyptus_bunch_1777449087274.png'}, {name: 'Lavender Bunches', img: '/lavender_bunch_1777449072375.png'}] },
-  { name: 'Hangings', subs: [{name: 'Flower Hangings', img: '/lavender_bunch_1777449072375.png'}, {name: 'Wisteria Hangings', img: '/premium_orchid_blue_1777448990406.png'}] },
-  { name: 'Chandeliers', subs: [{name: 'Crystal Chandeliers', img: '/crystal_chandelier_1777449108874.png'}, {name: 'Glass Chandeliers', img: '/crystal_chandelier_1777449108874.png'}] },
-  { name: 'LED Item', subs: [{name: 'LED Stands', img: '/led_flower_stand_1777449127985.png'}, {name: 'Glow Frames', img: '/led_flower_stand_1777449127985.png'}] },
-  { name: 'Flower Walls', subs: [{name: 'Rose Walls', img: '/red_rose_wall_1777449145657.png'}, {name: 'Flower Mats', img: '/white_flower_mat_1777449163130.png'}] },
-  { name: 'Flower Sticks', subs: [{name: 'Elegant Sticks', img: '/gold_rose_1777449057426.png'}] },
-  { name: 'Candles & Showpieces', subs: [{name: 'Candles', img: '/premium_daisy_yellow_1777449025841.png'}, {name: 'Showpieces', img: '/led_flower_stand_1777449127985.png'}] },
-  { name: 'Pots', subs: [{name: 'Ceramic Pots', img: '/gold_rose_1777449057426.png'}] }
-];
 
 const colors = [
   { name: 'Blue', image: '/premium_orchid_blue_1777448990406.png', code: '#0000FF' },
@@ -53,11 +24,13 @@ const Collection = () => {
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
   const [sortOption, setSortOption] = useState('Bestsellers');
+  const [searchQuery, setSearchQuery] = useState('');
   
   const [gridColumns, setGridColumns] = useState(4); // 2, 3, or 4
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [currentColor, setCurrentColor] = useState('Default');
   const { addToCart } = useContext(CartContext);
+  const { products, categories, loading } = useContext(DataContext);
 
   const handleTypeChange = (type) => setSelectedTypes(prev => prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]);
   const handlePriceChange = (price) => setSelectedPrices(prev => prev.includes(price) ? prev.filter(p => p !== price) : [...prev, price]);
@@ -75,7 +48,20 @@ const Collection = () => {
   }, [showFilterDropdown]);
 
   const filteredProducts = useMemo(() => {
-    let filtered = productsData.filter(p => {
+    let filtered = products.filter(p => {
+      // Search logic
+      let matchesSearch = true;
+      if (searchQuery) {
+        let normalizedQuery = searchQuery.toLowerCase();
+        // Handle specific misspellings for Hydrangea
+        if (normalizedQuery.includes('hydenga') || normalizedQuery.includes('hydenja')) {
+          normalizedQuery = 'hydrangea';
+        }
+        
+        const searchTarget = `${p.name || ''} ${p.variety || ''} ${p.sub || ''} ${p.category || ''} ${p.description || ''}`.toLowerCase();
+        matchesSearch = searchTarget.includes(normalizedQuery);
+      }
+
       let matchesMain = true;
       if (activeMainCategory !== 'SHOP ALL') {
         if (activeMainCategory === 'Candles & Showpieces') {
@@ -97,7 +83,7 @@ const Collection = () => {
       });
 
       const matchesColor = selectedColors.length === 0 || selectedColors.includes(p.color);
-      return matchesMain && matchesSub && matchesType && matchesPrice && matchesColor;
+      return matchesSearch && matchesMain && matchesSub && matchesType && matchesPrice && matchesColor;
     });
 
     if (sortOption === 'Price: Low to High') {
@@ -106,10 +92,15 @@ const Collection = () => {
       filtered.sort((a, b) => parseFloat(b.price.replace(/[^0-9.]/g, '')) - parseFloat(a.price.replace(/[^0-9.]/g, '')));
     }
     return filtered;
-  }, [activeMainCategory, activeSubCategory, selectedTypes, selectedPrices, selectedColors, sortOption]);
+  }, [searchQuery, activeMainCategory, activeSubCategory, selectedTypes, selectedPrices, selectedColors, sortOption, products]);
 
-  const activeCategoryObj = categoryStructure.find(c => c.name === activeMainCategory) || categoryStructure[0];
+  const activeCategoryObj = categories.find(c => c.name === activeMainCategory) || { name: 'SHOP ALL', subs: [] };
   const typeOptions = activeCategoryObj.subs.map(s => s.name);
+  const mainCategories = ['SHOP ALL', ...categories.map(c => c.name)];
+
+  if (loading) {
+    return <div style={{ padding: '150px', textAlign: 'center' }}>Loading products...</div>;
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: '#fffdf0', fontFamily: 'Montserrat, sans-serif' }}>
@@ -201,7 +192,24 @@ const Collection = () => {
         {/* 4. FILTER, SORT & GRID TOGGLE BAR */}
         <div className="filter-sort-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '20px', borderBottom: '1px solid rgba(212, 175, 55, 0.3)', paddingBottom: '20px' }}>
           
-          <div style={{ display: 'flex', gap: '10px', position: 'relative' }} className="filter-container">
+          <div style={{ display: 'flex', gap: '10px', position: 'relative', flexWrap: 'wrap' }} className="filter-container">
+            {/* SEARCH INPUT */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input 
+                type="text" 
+                placeholder="Search (e.g. Hydrangea)..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  background: '#fffdf0', border: '1px solid rgba(212, 175, 55, 0.5)', padding: '10px 35px 10px 15px', borderRadius: '5px',
+                  color: '#1a130d', outline: 'none', width: '220px', fontSize: '0.85rem'
+                }}
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} style={{ position: 'absolute', right: '10px', background: 'none', border: 'none', cursor: 'pointer', color: '#d4af37', fontSize: '1.2rem' }}>×</button>
+              )}
+            </div>
+
             {/* FILTER BUTTON */}
             <button 
               onClick={() => setShowFilterDropdown(!showFilterDropdown)}
@@ -334,7 +342,31 @@ const Collection = () => {
       </div> {/* Close collection-page-layout */}
 
       {/* PRODUCT DETAIL MODAL */}
-      {selectedProduct && (
+      {selectedProduct && (() => {
+        // Find available colors by grouping by variety (with typo handling) or fallback to name
+        const relatedProducts = products.filter(p => {
+            if (p.variety && selectedProduct.variety) {
+                let v1 = p.variety.toLowerCase().trim();
+                let v2 = selectedProduct.variety.toLowerCase().trim();
+                if (v1 === 'hydenga' || v1 === 'hydenja') v1 = 'hydrangea';
+                if (v2 === 'hydenga' || v2 === 'hydenja') v2 = 'hydrangea';
+                return v1 === v2;
+            }
+            return p.name === selectedProduct.name;
+        });
+        const uniqueColorNames = [...new Set(relatedProducts.map(p => p.color).filter(Boolean))];
+        let productColors = uniqueColorNames.map(colorName => {
+           const existing = colors.find(c => c.name === colorName);
+           if (existing) return existing;
+           const prodWithColor = relatedProducts.find(p => p.color === colorName);
+           return { name: colorName, code: '#ccc', image: prodWithColor?.image || selectedProduct.image };
+        });
+
+        if (productColors.length === 0 && selectedProduct.color) {
+            productColors = [{ name: selectedProduct.color, code: '#ccc', image: selectedProduct.image }];
+        }
+
+        return (
         <div style={{
           position: 'fixed', inset: 0, background: 'rgba(26,19,13,0.8)', backdropFilter: 'blur(5px)', zIndex: 9999,
           display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
@@ -352,7 +384,7 @@ const Collection = () => {
 
             <div className="modal-img-container" style={{ background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px', borderRight: '1px solid rgba(212,175,55,0.2)' }}>
                <img 
-                 src={currentColor === 'Default' ? selectedProduct.image : colors.find(c => c.name === currentColor)?.image || selectedProduct.image} 
+                 src={currentColor === 'Default' ? selectedProduct.image : productColors.find(c => c.name === currentColor)?.image || selectedProduct.image} 
                  alt={selectedProduct.name} 
                  style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }}
                />
@@ -360,39 +392,57 @@ const Collection = () => {
 
             <div style={{ padding: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
-                <span style={{ color: '#d4af37', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>{selectedProduct.category}</span>
-                <h2 style={{ fontSize: '2rem', fontFamily: 'Cinzel, serif', marginTop: '10px', marginBottom: '15px', color: '#1a130d' }}>{selectedProduct.name}</h2>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
+                  <span style={{ color: '#d4af37', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 'bold' }}>{selectedProduct.category}</span>
+                  {selectedProduct.sub && <span style={{ color: '#8a6d3b', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>• {selectedProduct.sub}</span>}
+                  {selectedProduct.variety && <span style={{ color: '#8a6d3b', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>• {selectedProduct.variety}</span>}
+                </div>
+                <h2 style={{ fontSize: '2rem', fontFamily: 'Cinzel, serif', marginTop: '5px', marginBottom: '15px', color: '#1a130d' }}>{selectedProduct.name}</h2>
                 <p style={{ fontSize: '1.5rem', color: '#d4af37', fontWeight: 'bold', marginBottom: '25px' }}>{selectedProduct.price}</p>
                 
                 <p style={{ color: '#1a130d', lineHeight: '1.6', marginBottom: '40px', fontSize: '0.95rem' }}>
                   {selectedProduct.description || "Our exquisite floral collection brings nature's finest beauty to your space with unmatched luxury."}
                 </p>
 
-                <div style={{ marginBottom: '30px' }}>
-                  <h4 style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '15px' }}>AVAILABLE COLORS</h4>
-                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                     {colors.map((c, idx) => (
-                        <div 
-                          key={idx} onClick={() => setCurrentColor(c.name)}
-                          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
-                        >
-                          <div style={{ 
-                            width: '40px', height: '40px', borderRadius: '50%',
-                            border: currentColor === c.name ? '2px solid #d4af37' : '1px solid rgba(0,0,0,0.1)',
-                            padding: '3px', transition: '0.2s'
-                          }}>
-                            <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: c.code, backgroundImage: `url(${c.image})`, backgroundSize: 'cover' }}></div>
-                          </div>
-                          <span style={{ fontSize: '0.7rem', color: '#1a130d', fontWeight: currentColor === c.name ? 'bold' : 'normal' }}>{c.name}</span>
-                        </div>
-                     ))}
+                {productColors.length > 0 && (
+                  <div style={{ marginBottom: '30px' }}>
+                    <h4 style={{ fontSize: '0.9rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '15px' }}>AVAILABLE COLORS</h4>
+                    <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                       {productColors.map((c, idx) => {
+                          const isActive = (currentColor === 'Default' && selectedProduct.color === c.name) || currentColor === c.name;
+                          return (
+                            <div 
+                              key={idx} 
+                              onClick={() => {
+                                  const matchingProd = relatedProducts.find(p => p.color === c.name);
+                                  if (matchingProd) {
+                                      setSelectedProduct(matchingProd);
+                                      setCurrentColor('Default');
+                                  } else {
+                                      setCurrentColor(c.name);
+                                  }
+                              }}
+                              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
+                            >
+                              <div style={{ 
+                                width: '40px', height: '40px', borderRadius: '50%',
+                                border: isActive ? '2px solid #d4af37' : '1px solid rgba(0,0,0,0.1)',
+                                padding: '3px', transition: '0.2s'
+                              }}>
+                                <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: c.code, backgroundImage: `url(${c.image})`, backgroundSize: 'cover' }}></div>
+                              </div>
+                              <span style={{ fontSize: '0.7rem', color: '#1a130d', fontWeight: isActive ? 'bold' : 'normal' }}>{c.name}</span>
+                            </div>
+                          );
+                       })}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               <button 
                 onClick={() => { 
-                  const selectedImage = currentColor === 'Default' ? selectedProduct.image : colors.find(c => c.name === currentColor)?.image || selectedProduct.image;
+                  const selectedImage = currentColor === 'Default' ? selectedProduct.image : productColors.find(c => c.name === currentColor)?.image || selectedProduct.image;
                   addToCart({
                     ...selectedProduct, 
                     selectedColor: currentColor === 'Default' ? null : currentColor,
@@ -407,7 +457,8 @@ const Collection = () => {
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       <style>{`
         .product-card:hover .product-img { transform: scale(1.05); }

@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { productsData } from '../data/products';
+import { DataContext } from '../DataContext';
 import { CartContext } from '../CartContext';
 
 const ProductDetails = () => {
@@ -8,9 +8,13 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
 
+  const { products, loading } = useContext(DataContext);
+
   const product = useMemo(() => {
-    return productsData.find(p => p.id === id);
-  }, [id]);
+    return products.find(p => p._id === id || p.id === id); // _id for mongo, id for local/old data
+  }, [id, products]);
+
+  if (loading) return <div style={{ padding: '150px 8%', textAlign: 'center' }}><h2>Loading product...</h2></div>;
 
   if (!product) {
     return (

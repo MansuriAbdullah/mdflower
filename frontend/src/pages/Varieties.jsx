@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { productsData } from '../data/products';
+import { DataContext } from '../DataContext';
 
 const Varieties = () => {
   const [activeTab, setActiveTab] = useState({
@@ -7,48 +7,25 @@ const Varieties = () => {
     sub: 'Premium Flower Heads'
   });
 
-  const categoryTree = [
-    { 
-      name: 'Loose Flower Heads', 
-      subs: ['Premium Flower Heads', 'Regular Flower Heads', 'Vintage Heads', 'Metallic Series'] 
-    },
-    { 
-      name: 'Leaves', 
-      subs: ['Artificial Leaves', 'Tropical Leaves', 'Glitter Leaves', 'Dried Texture'] 
-    },
-    { 
-      name: 'Bunches', 
-      subs: ['Flower Bunches', 'Green Bunches', 'Lavender Bunches', 'Pastel Mix'] 
-    },
-    { 
-      name: 'Wedding Special', 
-      subs: ['Bridal Bouquets', 'Stage Decor', 'Car Decor', 'Table Centerpieces'] 
-    },
-    { 
-      name: 'Home Decor', 
-      subs: ['Table Vases', 'Corner Stands', 'Wall Hangings', 'Aromatic Sets'] 
-    },
-    { 
-      name: 'Corporate Decor', 
-      subs: ['Reception Bouquets', 'Conference Room', 'Office Plants'] 
-    },
-    { 
-      name: 'Collections', 
-      subs: ['The Gold Suite', 'White Wedding', 'Midnight Blue', 'Emerald Forest'] 
-    }
-  ];
+  const { products, categories, loading } = React.useContext(DataContext);
+
+  const categoryTree = categories.map(c => ({
+    name: c.name,
+    subs: c.subs ? c.subs.map(s => s.name || s) : []
+  }));
 
   // Mocking 4 images per specific sub-category for the demo as requested
   const filteredVarieties = useMemo(() => {
-    let items = productsData.filter(p => 
+    const allProducts = products;
+    let items = allProducts.filter(p => 
       p.category === activeTab.main && p.sub === activeTab.sub
     );
     
     if (items.length === 0) {
-      items = productsData.filter(p => p.category === activeTab.main);
+      items = allProducts.filter(p => p.category === activeTab.main);
     }
     if (items.length === 0) {
-      items = productsData.slice(0, 4); 
+      items = allProducts.slice(0, 4); 
     }
 
     while (items.length > 0 && items.length < 4) {
@@ -57,6 +34,8 @@ const Varieties = () => {
     
     return items.slice(0, 12); 
   }, [activeTab]);
+
+  if (loading) return <div style={{ padding: '150px', textAlign: 'center' }}>Loading varieties...</div>;
 
   return (
     <div style={{ 

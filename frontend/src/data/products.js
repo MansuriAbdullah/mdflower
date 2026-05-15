@@ -66,3 +66,13 @@ export const productsData = [
   { id: '40', category: 'Corporate Decor', sub: 'Reception Bouquets', name: 'Executive White Orchid', price: "$155.00", image: "/premium_tulip_white_1777449008658.png", description: 'Sophisticated orchids in a glass vase, perfect for high-end reception desks.' },
   { id: '41', category: 'Corporate Decor', sub: 'Conference Room', name: 'Minimalist Green Spray', price: "$85.00", image: "/eucalyptus_bunch_1777449087274.png", description: 'Fresh and modern greenery for a professional atmosphere.' },
 ];
+
+export const getAllProducts = () => {
+  try {
+    const localProducts = JSON.parse(localStorage.getItem('adminProducts') || '[]');
+    return [...productsData, ...localProducts];
+  } catch (error) {
+    console.error("Error reading products from localStorage", error);
+    return productsData;
+  }
+};

@@ -8,7 +8,9 @@ import Contact from './pages/Contact';
 import Reviews from './pages/Reviews';
 import TopSellingArticles from './pages/TopSellingArticles';
 import Varieties from './pages/Varieties';
+import Admin from './pages/Admin';
 import { CartProvider, CartContext } from './CartContext';
+import { DataProvider } from './DataContext';
 
 // --- Global Styles ---
 const GlobalStyles = () => (
@@ -302,7 +304,7 @@ const CartSidebar = () => {
 
   const handleCheckout = () => {
     const phoneNumber = "9016853590";
-    let message = `Hello MD FLOWER, I would like to place an order:\n\n`;
+    let message = `Hello MD FLOWERS, I would like to place an order:\n\n`;
     cartItems.forEach((item, index) => {
       let itemName = item.name;
       if (item.selectedColor && item.selectedColor !== 'Default') {
@@ -311,7 +313,7 @@ const CartSidebar = () => {
       message += `${index + 1}. ${itemName} - ${item.price} (Qty: ${item.qty})\n`;
       message += `   Image: https://mdflowers.in${item.image}\n`;
     });
-    message += `\n*Total Amount: $${total.toFixed(2)}*\n\nPlease process my order.`;
+    message += `\n*Total Amount: ₹${total.toFixed(2)}*\n\nPlease process my order.`;
 
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/91${phoneNumber}?text=${encodedMessage}`, "_blank");
@@ -395,7 +397,7 @@ const CartSidebar = () => {
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: '700', fontSize: '0.9rem', color: '#1a130d', marginBottom: '3px' }}>
                     {item.name}
-                    {item.selectedColor && item.selectedColor !== 'Default' && <span style={{fontSize: '0.75rem', color: '#888'}}> ({item.selectedColor})</span>}
+                    {item.selectedColor && item.selectedColor !== 'Default' && <span style={{ fontSize: '0.75rem', color: '#888' }}> ({item.selectedColor})</span>}
                   </p>
                   <p style={{ color: '#d4af37', fontWeight: '800', fontSize: '0.9rem' }}>{item.price}</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '5px' }}>
@@ -437,7 +439,7 @@ const CartSidebar = () => {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
               <span style={{ fontWeight: '700', color: '#1a130d', fontSize: '1rem' }}>Total:</span>
-              <span style={{ fontWeight: '900', color: '#d4af37', fontSize: '1.2rem' }}>${total.toFixed(2)}</span>
+              <span style={{ fontWeight: '900', color: '#d4af37', fontSize: '1.2rem' }}>₹{total.toFixed(2)}</span>
             </div>
             <button
               className="btn-gold"
@@ -503,7 +505,7 @@ const Navbar = () => {
       <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer', zIndex: 1001 }}>
         <img src="/logo.png" alt="Logo" style={{ height: 'clamp(40px, 6vw, 60px)', width: 'auto', transition: '0.4s' }} />
         <div className="brand-name" style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 'bold', letterSpacing: '2px' }}>
-          <span className="gold-gradient-text">MD FLOWER</span>
+          <span className="gold-gradient-text">MD FLOWERS</span>
         </div>
       </Link>
 
@@ -658,10 +660,10 @@ const Navbar = () => {
 };
 
 const Footer = () => (
-  <footer style={{ 
-    padding: '60px 8% 30px', 
-    backgroundColor: '#fffdf0', 
-    color: '#1a130d', 
+  <footer style={{
+    padding: '60px 8% 30px',
+    backgroundColor: '#fffdf0',
+    color: '#1a130d',
     borderTop: '2px solid #8a6d3b',
     position: 'relative'
   }}>
@@ -715,31 +717,39 @@ const Footer = () => (
       <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', marginBottom: '15px' }}>
         {['Instagram', 'Facebook', 'WhatsApp', 'YouTube'].map(s => <a key={s} href="#" style={{ color: '#8a6d3b', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.85rem' }}>{s}</a>)}
       </div>
-      <p style={{ fontSize: '0.75rem', color: '#5c4b22' }}>&copy; 2026 MD Flower Boutique. All Rights Reserved. Crafted with Luxury.</p>
+      <p style={{ fontSize: '0.75rem', color: '#5c4b22' }}>&copy; 2026 MD Flowers Boutique. All Rights Reserved. Crafted with Luxury.</p>
     </div>
   </footer>
 );
 
 const App = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
   return (
     <CartProvider>
-      <div style={{ position: 'relative', background: '#fffdf0' }}>
-        <GlobalStyles />
-        <FallingGold />
-        <Navbar />
-        <CartSidebar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/collection" element={<Collection />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/reviews" element={<Reviews />} />
-          <Route path="/top-selling" element={<TopSellingArticles />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/varieties" element={<Varieties />} />
-        </Routes>
-        <Footer />
-      </div>
+      <DataProvider>
+        <div style={{ position: 'relative', background: '#fffdf0' }}>
+          <GlobalStyles />
+          {!isAdminRoute && <FallingGold />}
+          {!isAdminRoute && <Navbar />}
+          {!isAdminRoute && <CartSidebar />}
+          
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/collection" element={<Collection />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/reviews" element={<Reviews />} />
+            <Route path="/top-selling" element={<TopSellingArticles />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/varieties" element={<Varieties />} />
+            <Route path="/admin" element={<Admin />} />
+          </Routes>
+          
+          {!isAdminRoute && <Footer />}
+        </div>
+      </DataProvider>
     </CartProvider>
   );
 };

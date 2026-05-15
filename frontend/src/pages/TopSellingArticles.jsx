@@ -3,14 +3,14 @@ import ProductCard from '../components/ProductCard';
 
 const TopSellingArticles = () => {
   const products = [
-    { id: 'ts1', name: "Luxe Floor Palm", price: "$180", image: "/cat_floor.png", variety: 'Plant' },
-    { id: 'ts2', name: "Marble Geometric Vase", price: "$95", image: "/cat_planters.png", variety: 'Decor' },
-    { id: 'ts3', name: "Emerald Hanging Ivy", price: "$65", image: "/cat_hanging.png", variety: 'Plant' },
-    { id: 'ts4', name: "Golden Elephant Statue", price: "$220", image: "/cat_table.png", variety: 'Decor' },
-    { id: 'ts5', name: "Floral Canvas Art", price: "$140", image: "/cat_wall.png", variety: 'Art' },
-    { id: 'ts6', name: "Crystal Chandelier", price: "$450", image: "/crystal_chandelier_luxe_1776254399476.png", variety: 'Light' },
-    { id: 'ts7', name: "Premium Rose Box", price: "$120", image: "/product1.png", variety: 'Flower' },
-    { id: 'ts8', name: "Autumn Gold Bundle", price: "$85", image: "/product2.png", variety: 'Flower' },
+    { id: 'ts1', name: "Luxe Floor Palm", price: "₹180", image: "/cat_floor.png", variety: 'Plant' },
+    { id: 'ts2', name: "Marble Geometric Vase", price: "₹95", image: "/cat_planters.png", variety: 'Decor' },
+    { id: 'ts3', name: "Emerald Hanging Ivy", price: "₹65", image: "/cat_hanging.png", variety: 'Plant' },
+    { id: 'ts4', name: "Golden Elephant Statue", price: "₹220", image: "/cat_table.png", variety: 'Decor' },
+    { id: 'ts5', name: "Floral Canvas Art", price: "₹140", image: "/cat_wall.png", variety: 'Art' },
+    { id: 'ts6', name: "Crystal Chandelier", price: "₹450", image: "/crystal_chandelier_luxe_1776254399476.png", variety: 'Light' },
+    { id: 'ts7', name: "Premium Rose Box", price: "₹120", image: "/product1.png", variety: 'Flower' },
+    { id: 'ts8', name: "Autumn Gold Bundle", price: "₹85", image: "/product2.png", variety: 'Flower' },
   ];
 
   return (
