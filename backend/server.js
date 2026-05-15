@@ -18,15 +18,8 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Multer Storage Configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
+// Multer Storage Configuration (Memory Storage for Vercel)
+const storage = multer.memoryStorage();
 const upload = multer({ 
   storage,
   limits: { fileSize: 50 * 1024 * 1024 } // 50 MB limit
@@ -51,28 +44,24 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
   }
   
   try {
-    let filename = req.file.filename;
-    let filePath = req.file.path;
+    let fileBuffer = req.file.buffer;
+    let mimeType = req.file.mimetype;
     
     // Check if the uploaded file is a HEIC image (from iPhone)
     const ext = path.extname(req.file.originalname).toLowerCase();
     if (ext === '.heic' || ext === '.heif') {
-      const inputBuffer = fs.readFileSync(filePath);
-      const outputBuffer = await heicConvert({
-        buffer: inputBuffer,
+      fileBuffer = await heicConvert({
+        buffer: fileBuffer,
         format: 'JPEG',
-        quality: 1
+        quality: 0.8 // Slightly reduced quality to keep base64 size manageable
       });
-      
-      filename = filename.replace(/\.heic|\.heif/i, '.jpg');
-      const newFilePath = path.join('uploads', filename);
-      fs.writeFileSync(newFilePath, outputBuffer);
-      
-      // Optionally delete the original .heic file
-      fs.unlinkSync(filePath);
+      mimeType = 'image/jpeg';
     }
     
-    const imageUrl = `https://mdflower-qvjl.vercel.app/uploads/${filename}`;
+    // Convert buffer to base64
+    const base64Image = fileBuffer.toString('base64');
+    const imageUrl = `data:${mimeType};base64,${base64Image}`;
+    
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error processing image:', error);
