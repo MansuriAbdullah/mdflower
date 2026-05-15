@@ -72,7 +72,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
       fs.unlinkSync(filePath);
     }
     
-    const imageUrl = `http://localhost:5000/uploads/${filename}`;
+    const imageUrl = `https://mdflower-qvjl.vercel.app/uploads/${filename}`;
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error processing image:', error);

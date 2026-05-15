@@ -12,8 +12,8 @@ export const DataProvider = ({ children }) => {
     try {
       setLoading(true);
       const [prodRes, catRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/products'),
-        axios.get('http://localhost:5000/api/categories')
+        axios.get('https://mdflower-qvjl.vercel.app/api/products'),
+        axios.get('https://mdflower-qvjl.vercel.app/api/categories')
       ]);
       setProducts(prodRes.data);
       setCategories(catRes.data);
@@ -26,7 +26,7 @@ export const DataProvider = ({ children }) => {
 
   const deleteProduct = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`);
+      await axios.delete(`https://mdflower-qvjl.vercel.app/api/products/${id}`);
       setProducts(products.filter(p => p._id !== id));
     } catch (err) {
       console.error("Error deleting product", err);
@@ -36,7 +36,7 @@ export const DataProvider = ({ children }) => {
 
   const deleteCategory = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/categories/${id}`);
+      await axios.delete(`https://mdflower-qvjl.vercel.app/api/categories/${id}`);
       setCategories(categories.filter(c => c._id !== id));
     } catch (err) {
       console.error("Error deleting category", err);
@@ -46,7 +46,7 @@ export const DataProvider = ({ children }) => {
 
   const updateProduct = async (id, updatedData) => {
     try {
-      await axios.put(`http://localhost:5000/api/products/${id}`, updatedData);
+      await axios.put(`https://mdflower-qvjl.vercel.app/api/products/${id}`, updatedData);
       fetchData();
     } catch (err) {
       console.error("Error updating product", err);
@@ -56,7 +56,7 @@ export const DataProvider = ({ children }) => {
 
   const updateCategory = async (id, updatedData) => {
     try {
-      await axios.put(`http://localhost:5000/api/categories/${id}`, updatedData);
+      await axios.put(`https://mdflower-qvjl.vercel.app/api/categories/${id}`, updatedData);
       fetchData();
     } catch (err) {
       console.error("Error updating category", err);

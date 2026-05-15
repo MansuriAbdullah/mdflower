@@ -65,7 +65,7 @@ const Admin = () => {
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append('image', file);
-    const res = await axios.post('http://localhost:5000/api/upload', formData, {
+    const res = await axios.post('https://mdflower-qvjl.vercel.app/api/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return res.data.imageUrl;
@@ -90,7 +90,7 @@ const Admin = () => {
         await updateProduct(editingProductId, newProduct);
         showMsg('Product updated successfully!');
       } else {
-        await axios.post('http://localhost:5000/api/products', newProduct);
+        await axios.post('https://mdflower-qvjl.vercel.app/api/products', newProduct);
         showMsg('Product added successfully!');
       }
       
@@ -127,7 +127,7 @@ const Admin = () => {
         await updateCategory(editingCategoryId, { name: categoryData.name, subs: validSubs });
         showMsg('Category updated successfully!');
       } else {
-        await axios.post('http://localhost:5000/api/categories', { name: categoryData.name, subs: validSubs });
+        await axios.post('https://mdflower-qvjl.vercel.app/api/categories', { name: categoryData.name, subs: validSubs });
         showMsg('Category added successfully!');
       }
       
