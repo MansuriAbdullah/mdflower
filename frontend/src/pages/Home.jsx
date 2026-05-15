@@ -350,6 +350,20 @@ const TrustedClients = () => {
         .client-logo-wrapper:hover {
           transform: scale(1.05);
         }
+        @media (max-width: 768px) {
+          .client-logo-wrapper {
+            margin-right: 60px !important;
+            height: 100px !important;
+            min-width: 180px !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .client-logo-wrapper {
+            margin-right: 40px !important;
+            height: 80px !important;
+            min-width: 140px !important;
+          }
+        }
       `}</style>
     </section>
   );
@@ -487,7 +501,7 @@ const ContactSection = () => (
     position: 'relative', 
     overflow: 'hidden',
   }}>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '50px', alignItems: 'center', width: '100%', position: 'relative', zIndex: 2 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '50px', alignItems: 'center', width: '100%', position: 'relative', zIndex: 2 }}>
       <div>
         <h4 style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', marginBottom: '10px', fontWeight: 'bold' }}>Contact Us</h4>
         <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', marginBottom: '15px', lineHeight: '1', color: '#1a130d', fontFamily: 'Playfair Display, serif' }}>

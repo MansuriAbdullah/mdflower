@@ -322,7 +322,7 @@ const Collection = () => {
                 Luxe
               </div>
               
-              <div style={{ height: gridColumns === 2 ? '500px' : gridColumns === 3 ? '400px' : '300px', overflow: 'hidden', background: '#fff' }}>
+              <div className="product-img-container" style={{ height: gridColumns === 2 ? '500px' : gridColumns === 3 ? '400px' : '300px', overflow: 'hidden', background: '#fff', borderRadius: '15px' }}>
                 <img src={p.image} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} className="product-img" />
               </div>
               <div style={{ padding: '15px 0', textAlign: 'center' }}>
@@ -568,7 +568,47 @@ const Collection = () => {
            
            .product-grid {
              grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-             gap: 10px !important;
+             gap: 15px 10px !important;
+           }
+
+           .product-img-container {
+             height: 180px !important;
+             border-radius: 12px !important;
+           }
+           
+           .product-card h3 {
+             font-size: 0.75rem !important;
+             white-space: nowrap;
+             overflow: hidden;
+             text-overflow: ellipsis;
+             padding: 0 5px;
+           }
+           
+           .product-card p {
+             font-size: 0.9rem !important;
+           }
+
+           .modal-content-wrapper {
+             max-height: 85vh !important;
+           }
+           
+           .modal-content-wrapper > div:nth-child(3) { /* Text container */
+             padding: 20px !important;
+           }
+           
+           .modal-img-container {
+             padding: 10px !important;
+             height: 380px; /* Increased from 250px */
+           }
+           
+           .modal-img-container img {
+             max-height: 360px !important; /* Increased from 230px */
+             width: 100%;
+             object-fit: cover !important; /* Changed from contain to cover to make it fill the space better if needed, or leave contain but bigger */
+           }
+           
+           .collection-sidebar {
+             max-width: 300px;
            }
         }
       `}</style>

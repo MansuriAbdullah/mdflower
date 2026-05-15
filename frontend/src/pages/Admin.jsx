@@ -9,6 +9,7 @@ const Admin = () => {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
   const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // States
   const [productData, setProductData] = useState({ name: '', category: '', sub: '', variety: '', price: '', color: '', description: '' });
@@ -193,23 +194,45 @@ const Admin = () => {
   const allVarieties = Array.from(new Set([...defaultVarieties, ...existingVarieties])).sort();
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#fdfbf7', color: '#1a130d', fontFamily: 'Montserrat, sans-serif' }}>
+    <div className="admin-layout" style={{ display: 'flex', minHeight: '100vh', background: '#fdfbf7', color: '#1a130d', fontFamily: 'Montserrat, sans-serif' }}>
       
-      {/* PREMIUM LIGHT SIDEBAR */}
-      <div style={{ width: '280px', background: '#ffffff', padding: '40px 20px', flexShrink: 0, borderRight: '1px solid rgba(212, 175, 55, 0.2)', boxShadow: '5px 0 20px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', zIndex: 10 }}>
-        <h2 style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', marginBottom: '5px', letterSpacing: '3px', textAlign: 'center', fontSize: '1.8rem', fontWeight: 'bold' }}>
+      {/* MOBILE HEADER (Only visible on small screens) */}
+      <div className="admin-mobile-header" style={{ display: 'none', padding: '15px 5%', background: '#fff', borderBottom: '1px solid rgba(212,175,55,0.2)', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100 }}>
+        <h2 style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', margin: 0, fontSize: '1.2rem', fontWeight: 'bold' }}>
           ADMIN <span style={{ color: '#d4af37' }}>PANEL</span>
         </h2>
-        <p style={{ textAlign: 'center', fontSize: '0.7rem', color: '#d4af37', letterSpacing: '2px', fontWeight: 'bold', marginBottom: '50px' }}>BOUTIQUE DASHBOARD</p>
+        <button onClick={() => setIsMobileMenuOpen(true)} style={{ background: 'none', border: 'none', fontSize: '1.8rem', color: '#1a130d', cursor: 'pointer' }}>
+          ☰
+        </button>
+      </div>
+
+      {/* MOBILE OVERLAY */}
+      {isMobileMenuOpen && (
+        <div 
+          onClick={() => setIsMobileMenuOpen(false)} 
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 999 }} 
+        />
+      )}
+
+      {/* PREMIUM LIGHT SIDEBAR */}
+      <div className={`admin-sidebar ${isMobileMenuOpen ? 'open' : ''}`} style={{ width: '280px', background: '#ffffff', padding: '40px 20px', flexShrink: 0, borderRight: '1px solid rgba(212, 175, 55, 0.2)', boxShadow: '5px 0 20px rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', zIndex: 1000 }}>
+        <div className="sidebar-close-btn" style={{ display: 'none', textAlign: 'right', marginBottom: '20px' }}>
+          <button onClick={() => setIsMobileMenuOpen(false)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#1a130d' }}>✕</button>
+        </div>
+        
+        <h2 className="sidebar-title" style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', marginBottom: '5px', letterSpacing: '3px', textAlign: 'center', fontSize: '1.8rem', fontWeight: 'bold' }}>
+          ADMIN <span style={{ color: '#d4af37' }}>PANEL</span>
+        </h2>
+        <p className="sidebar-subtitle" style={{ textAlign: 'center', fontSize: '0.7rem', color: '#d4af37', letterSpacing: '2px', fontWeight: 'bold', marginBottom: '50px' }}>BOUTIQUE DASHBOARD</p>
         
         <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <li onClick={() => { setActiveTab('OVERVIEW'); setShowAddProduct(false); setShowAddCategory(false); }} style={{ ...sidebarItem, background: activeTab === 'OVERVIEW' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'OVERVIEW' ? '#1a130d' : '#666', borderLeft: activeTab === 'OVERVIEW' ? '4px solid #d4af37' : '4px solid transparent' }}>
+          <li onClick={() => { setActiveTab('OVERVIEW'); setShowAddProduct(false); setShowAddCategory(false); setIsMobileMenuOpen(false); }} style={{ ...sidebarItem, background: activeTab === 'OVERVIEW' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'OVERVIEW' ? '#1a130d' : '#666', borderLeft: activeTab === 'OVERVIEW' ? '4px solid #d4af37' : '4px solid transparent' }}>
             <span style={{ fontSize: '1.2rem', marginRight: '15px' }}>📊</span> Dashboard
           </li>
-          <li onClick={() => { setActiveTab('PRODUCTS'); setShowAddProduct(false); setShowAddCategory(false); }} style={{ ...sidebarItem, background: activeTab === 'PRODUCTS' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'PRODUCTS' ? '#1a130d' : '#666', borderLeft: activeTab === 'PRODUCTS' ? '4px solid #d4af37' : '4px solid transparent' }}>
+          <li onClick={() => { setActiveTab('PRODUCTS'); setShowAddProduct(false); setShowAddCategory(false); setIsMobileMenuOpen(false); }} style={{ ...sidebarItem, background: activeTab === 'PRODUCTS' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'PRODUCTS' ? '#1a130d' : '#666', borderLeft: activeTab === 'PRODUCTS' ? '4px solid #d4af37' : '4px solid transparent' }}>
             <span style={{ fontSize: '1.2rem', marginRight: '15px' }}>🌸</span> Products
           </li>
-          <li onClick={() => { setActiveTab('CATEGORIES'); setShowAddProduct(false); setShowAddCategory(false); }} style={{ ...sidebarItem, background: activeTab === 'CATEGORIES' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'CATEGORIES' ? '#1a130d' : '#666', borderLeft: activeTab === 'CATEGORIES' ? '4px solid #d4af37' : '4px solid transparent' }}>
+          <li onClick={() => { setActiveTab('CATEGORIES'); setShowAddProduct(false); setShowAddCategory(false); setIsMobileMenuOpen(false); }} style={{ ...sidebarItem, background: activeTab === 'CATEGORIES' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'CATEGORIES' ? '#1a130d' : '#666', borderLeft: activeTab === 'CATEGORIES' ? '4px solid #d4af37' : '4px solid transparent' }}>
             <span style={{ fontSize: '1.2rem', marginRight: '15px' }}>📁</span> Categories
           </li>
         </ul>
@@ -220,7 +243,7 @@ const Admin = () => {
       </div>
 
       {/* MAIN CONTENT AREA */}
-      <div style={{ flex: 1, padding: '50px 6%', overflowY: 'auto', background: '#fdfbf7', position: 'relative' }}>
+      <div className="admin-main" style={{ flex: 1, padding: '50px 6%', overflowY: 'auto', background: '#fdfbf7', position: 'relative', minWidth: 0 }}>
         
         {/* Decorative Gold Elements */}
         <div style={{ position: 'absolute', top: 0, right: 0, width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%)', zIndex: 0, pointerEvents: 'none' }} />
@@ -261,7 +284,7 @@ const Admin = () => {
           {/* --- PRODUCTS TAB --- */}
           {activeTab === 'PRODUCTS' && !showAddProduct && (
             <div className="fade-in">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+              <div className="admin-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '15px' }}>
                 <div>
                   <h1 style={headerStyle}>Product Inventory</h1>
                   <p style={{ color: '#666' }}>Manage your luxury flower collections.</p>
@@ -401,7 +424,7 @@ const Admin = () => {
           {/* --- CATEGORIES TAB --- */}
           {activeTab === 'CATEGORIES' && !showAddCategory && (
             <div className="fade-in">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
+              <div className="admin-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '15px' }}>
                 <div>
                   <h1 style={headerStyle}>Category Structure</h1>
                   <p style={{ color: '#666' }}>Organize your shop's navigation.</p>
@@ -469,7 +492,7 @@ const Admin = () => {
                     <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '25px' }}>Add specific sub-categories and upload their display images from your gallery.</p>
                     
                     {categoryData.subs.map((sub, index) => (
-                      <div key={index} style={{ display: 'flex', gap: '25px', alignItems: 'center', marginBottom: '20px', padding: '25px', background: '#fafafa', borderRadius: '12px', border: '1px solid #eaeaea', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
+                      <div className="sub-cat-row" key={index} style={{ display: 'flex', gap: '25px', alignItems: 'center', marginBottom: '20px', padding: '25px', background: '#fafafa', borderRadius: '12px', border: '1px solid #eaeaea', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
                         
                         <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#fff', border: '1px solid #ddd', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textAlign: 'center' }}>
                           {sub.imgPreview === 'HEIC_PLACEHOLDER' ? (
@@ -585,8 +608,32 @@ const Admin = () => {
         .stat-card:hover {
           transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.08) !important;
         }
+        table th, table td { white-space: nowrap; }
+        
         @media (max-width: 992px) {
           form { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 768px) {
+          .admin-layout { flex-direction: column !important; }
+          .admin-mobile-header { display: flex !important; }
+          .admin-sidebar { 
+            position: fixed; top: 0; left: -100%; height: 100vh; width: 280px !important; 
+            padding: 20px !important; transition: 0.3s; 
+          }
+          .admin-sidebar.open { left: 0; }
+          .sidebar-close-btn { display: block !important; }
+          .sidebar-title { display: none !important; }
+          .sidebar-subtitle { display: none !important; }
+          .admin-main { padding: 25px 5% !important; }
+          h1 { font-size: 1.6rem !important; line-height: 1.2; }
+          .admin-header-flex { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
+          .admin-header-flex button { width: 100%; }
+          .form-container { padding: 20px !important; }
+          
+          /* Form stack fixes */
+          .sub-cat-row { flex-direction: column !important; align-items: flex-start !important; gap: 15px !important; padding: 15px !important; }
+          .sub-cat-row > div { width: 100% !important; }
+          .sub-cat-row .delete-btn { width: 100%; margin-top: 10px; }
         }
       `}</style>
     </div>
@@ -607,7 +654,7 @@ const statIconBox = {
   width: '70px', height: '70px', borderRadius: '15px', background: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem'
 };
 const tableContainer = {
-  background: '#fff', borderRadius: '15px', border: '1px solid #eaeaea', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.03)'
+  background: '#fff', borderRadius: '15px', border: '1px solid #eaeaea', overflowX: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.03)'
 };
 const formContainer = {
   background: '#fff', padding: '40px', borderRadius: '15px', border: '1px solid #eaeaea', boxShadow: '0 10px 40px rgba(0,0,0,0.03)'

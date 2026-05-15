@@ -146,6 +146,16 @@ const GlobalStyles = () => (
       }
     }
 
+    @media (max-width: 480px) {
+      section {
+        padding: 40px 4%;
+      }
+      h1 { font-size: clamp(1.8rem, 8vw, 2.5rem); }
+      h2 { font-size: clamp(1.5rem, 6vw, 2rem); }
+      h3 { font-size: clamp(1.2rem, 4vw, 1.5rem); }
+      .glass-card { padding: 20px 15px !important; }
+    }
+
     @keyframes floatGlow {
       from { transform: translateY(0) translateX(0); opacity: 0.4; }
       to { transform: translateY(-20px) translateX(15px); opacity: 0.8; }

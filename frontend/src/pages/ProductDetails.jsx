@@ -26,7 +26,7 @@ const ProductDetails = () => {
   }
 
   return (
-    <div style={{ padding: 'clamp(100px, 15vw, 150px) 8% 100px', minHeight: '100vh', background: '#fffdf0' }}>
+    <div className="product-details-container" style={{ padding: 'clamp(100px, 15vw, 150px) 8% 100px', minHeight: '100vh', background: '#fffdf0' }}>
       <button 
         onClick={() => navigate(-1)} 
         style={{ 
@@ -51,12 +51,12 @@ const ProductDetails = () => {
         </div>
 
         {/* Product Info */}
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div className="product-info-text" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <p style={{ color: '#d4af37', textTransform: 'uppercase', letterSpacing: '4px', fontWeight: '900', marginBottom: '10px', fontSize: '0.75rem' }}>
             {product.variety || product.sub || product.category}
           </p>
           <h1 style={{ fontSize: 'clamp(2rem, 8vw, 3.5rem)', marginBottom: '15px', lineHeight: '1.1' }}>{product.name}</h1>
-          <p style={{ color: '#d4af37', fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', fontWeight: '800', marginBottom: '25px' }}>{product.price}</p>
+          <p className="price" style={{ color: '#d4af37', fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', fontWeight: '800', marginBottom: '25px' }}>{product.price}</p>
           
           <div style={{ borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '25px', marginBottom: '35px' }}>
             <h4 style={{ textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '10px', color: '#1a130d', fontSize: '0.85rem' }}>Details & Description</h4>
@@ -87,7 +87,7 @@ const ProductDetails = () => {
              )}
           </div>
 
-          <div style={{ marginTop: '40px', display: 'flex', gap: '20px', opacity: 0.7 }}>
+          <div className="feature-icons" style={{ marginTop: '40px', display: 'flex', gap: '20px', opacity: 0.7 }}>
              {[
                { icon: '🚚', label: 'Fast Delivery' },
                { icon: '✨', label: 'Premium Quality' },
@@ -101,6 +101,31 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+      
+      <style>{`
+        @media (max-width: 768px) {
+           .product-details-container {
+             padding: 80px 5% 60px !important;
+           }
+           .product-info-text h1 {
+             font-size: 2rem !important;
+           }
+           .product-info-text p.price {
+             font-size: 1.5rem !important;
+             margin-bottom: 15px !important;
+           }
+           .product-info-text button {
+             width: 100%;
+             margin-bottom: 10px;
+           }
+           .product-info-text .feature-icons {
+             flex-wrap: wrap;
+             gap: 15px !important;
+             justify-content: center;
+             margin-top: 20px !important;
+           }
+        }
+      `}</style>
     </div>
   );
 };
