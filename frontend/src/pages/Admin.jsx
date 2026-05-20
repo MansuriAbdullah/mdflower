@@ -1,6 +1,7 @@
 import React, { useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import { DataContext } from '../DataContext';
+import { compressImage } from '../utils/imageCompressor';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://mdflower-qvjl.vercel.app';
 
@@ -66,8 +67,10 @@ const Admin = () => {
 
   // Upload Function
   const uploadImage = async (file) => {
+    // Compress the image before uploading
+    const compressedFile = await compressImage(file);
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append('image', compressedFile);
     const res = await axios.post(`${API_URL}/api/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
