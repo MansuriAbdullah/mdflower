@@ -2,6 +2,8 @@ import React, { useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import { DataContext } from '../DataContext';
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://mdflower-qvjl.vercel.app';
+
 const Admin = () => {
   const { products, categories, refetchData, deleteProduct, deleteCategory, updateProduct, updateCategory } = useContext(DataContext);
   const [activeTab, setActiveTab] = useState('OVERVIEW'); 
@@ -66,7 +68,7 @@ const Admin = () => {
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append('image', file);
-    const res = await axios.post('https://mdflower-qvjl.vercel.app/api/upload', formData, {
+    const res = await axios.post(`${API_URL}/api/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return res.data.imageUrl;
@@ -80,7 +82,7 @@ const Admin = () => {
     if (!finalPrice.startsWith('₹') && !finalPrice.toLowerCase().includes('rs')) finalPrice = '₹' + finalPrice;
 
     try {
-      let imageUrl = '/premium_orchid_blue_1777448990406.png'; // fallback
+      let imageUrl = productImagePreview || '/premium_orchid_blue_1777448990406.png'; // use existing image or fallback
       if (productImageFile) {
         imageUrl = await uploadImage(productImageFile);
       }
@@ -91,7 +93,7 @@ const Admin = () => {
         await updateProduct(editingProductId, newProduct);
         showMsg('Product updated successfully!');
       } else {
-        await axios.post('https://mdflower-qvjl.vercel.app/api/products', newProduct);
+        await axios.post(`${API_URL}/api/products`, newProduct);
         showMsg('Product added successfully!');
       }
       
@@ -116,7 +118,7 @@ const Admin = () => {
       const validSubs = [];
       for (const sub of categoryData.subs) {
         if (sub.name.trim() !== '') {
-          let imageUrl = '';
+          let imageUrl = sub.imgPreview || '';
           if (sub.imgFile) {
              imageUrl = await uploadImage(sub.imgFile);
           }
@@ -128,7 +130,7 @@ const Admin = () => {
         await updateCategory(editingCategoryId, { name: categoryData.name, subs: validSubs });
         showMsg('Category updated successfully!');
       } else {
-        await axios.post('https://mdflower-qvjl.vercel.app/api/categories', { name: categoryData.name, subs: validSubs });
+        await axios.post(`${API_URL}/api/categories`, { name: categoryData.name, subs: validSubs });
         showMsg('Category added successfully!');
       }
       

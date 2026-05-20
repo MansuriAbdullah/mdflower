@@ -3,6 +3,8 @@ import axios from 'axios';
 
 export const DataContext = createContext();
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://mdflower-qvjl.vercel.app';
+
 export const DataProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -12,8 +14,8 @@ export const DataProvider = ({ children }) => {
     try {
       setLoading(true);
       const [prodRes, catRes] = await Promise.all([
-        axios.get('https://mdflower-qvjl.vercel.app/api/products'),
-        axios.get('https://mdflower-qvjl.vercel.app/api/categories')
+        axios.get(`${API_URL}/api/products`),
+        axios.get(`${API_URL}/api/categories`)
       ]);
       setProducts(prodRes.data);
       setCategories(catRes.data);
@@ -26,7 +28,7 @@ export const DataProvider = ({ children }) => {
 
   const deleteProduct = async (id) => {
     try {
-      await axios.delete(`https://mdflower-qvjl.vercel.app/api/products/${id}`);
+      await axios.delete(`${API_URL}/api/products/${id}`);
       setProducts(products.filter(p => p._id !== id));
     } catch (err) {
       console.error("Error deleting product", err);
@@ -36,7 +38,7 @@ export const DataProvider = ({ children }) => {
 
   const deleteCategory = async (id) => {
     try {
-      await axios.delete(`https://mdflower-qvjl.vercel.app/api/categories/${id}`);
+      await axios.delete(`${API_URL}/api/categories/${id}`);
       setCategories(categories.filter(c => c._id !== id));
     } catch (err) {
       console.error("Error deleting category", err);
@@ -46,7 +48,7 @@ export const DataProvider = ({ children }) => {
 
   const updateProduct = async (id, updatedData) => {
     try {
-      await axios.put(`https://mdflower-qvjl.vercel.app/api/products/${id}`, updatedData);
+      await axios.put(`${API_URL}/api/products/${id}`, updatedData);
       fetchData();
     } catch (err) {
       console.error("Error updating product", err);
@@ -56,7 +58,7 @@ export const DataProvider = ({ children }) => {
 
   const updateCategory = async (id, updatedData) => {
     try {
-      await axios.put(`https://mdflower-qvjl.vercel.app/api/categories/${id}`, updatedData);
+      await axios.put(`${API_URL}/api/categories/${id}`, updatedData);
       fetchData();
     } catch (err) {
       console.error("Error updating category", err);
