@@ -1,24 +1,80 @@
+// Helper function to dynamically load heic2any library from CDN only when needed
+const loadHeic2Any = () => {
+  return new Promise((resolve, reject) => {
+    if (window.heic2any) {
+      return resolve(window.heic2any);
+    }
+    // Check if script is already added
+    let script = document.querySelector('script[src*="heic2any"]');
+    if (!script) {
+      script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+    
+    // Wait for the script to load
+    script.addEventListener('load', () => {
+      if (window.heic2any) {
+        resolve(window.heic2any);
+      } else {
+        reject(new Error('heic2any script loaded but global object not found.'));
+      }
+    });
+    script.addEventListener('error', (err) => reject(err));
+  });
+};
+
 /**
  * Compresses an image file in the browser using HTML5 Canvas.
+ * Supports HEIC/HEIF (iPhone) conversion using dynamic heic2any loading.
  * @param {File} file - The original image file.
  * @param {number} maxWidth - Maximum width of the compressed image.
  * @param {number} maxHeight - Maximum height of the compressed image.
  * @param {number} quality - Quality of compression (0.0 to 1.0).
- * @returns {Promise<File>} A promise that resolves to the compressed File object.
+ * @returns {Promise<File|Blob>} A promise that resolves to the compressed File or Blob object.
  */
 export const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.7) => {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     // Safety check: if file is not valid or has no name, return it immediately
     if (!file || !file.name) {
       console.warn('Invalid file object provided to compressor.');
       return resolve(file);
     }
 
-    // If it's HEIC or HEIF, we let the backend handle it because canvas cannot render it natively
-    const ext = file.name.split('.').pop().toLowerCase();
+    let ext = file.name.split('.').pop().toLowerCase();
+    
+    // If it's HEIC or HEIF, convert it to JPEG on the client side
     if (ext === 'heic' || ext === 'heif') {
-      console.log('Skipping client-side compression for HEIC file; letting backend handle it.');
-      return resolve(file);
+      try {
+        console.log('HEIC/HEIF file detected. Loading heic2any converter from CDN...');
+        const heic2any = await loadHeic2Any();
+        
+        console.log('Converting HEIC to JPEG on client side...');
+        const convertedBlob = await heic2any({
+          blob: file,
+          toType: 'image/jpeg',
+          quality: 0.7
+        });
+        
+        const jpegBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+        
+        // Re-create file as a JPEG file/blob
+        const newName = file.name.replace(/\.(heic|heif)$/i, '.jpg');
+        try {
+          file = new File([jpegBlob], newName, { type: 'image/jpeg' });
+        } catch (e) {
+          jpegBlob.name = newName;
+          file = jpegBlob;
+        }
+        
+        // Set extension to JPEG to proceed with canvas compression/resizing
+        ext = 'jpg';
+        console.log('HEIC successfully converted to JPEG!');
+      } catch (err) {
+        console.error('Failed to convert HEIC on client side, uploading raw HEIC:', err);
+        // Fallback: let the canvas/reader try to process it, or let the backend handle it
+      }
     }
 
     const reader = new FileReader();
