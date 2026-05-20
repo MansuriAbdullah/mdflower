@@ -297,7 +297,7 @@ const Admin = () => {
                 <button onClick={() => setShowAddProduct(true)} className="premium-btn">+ ADD NEW PRODUCT</button>
               </div>
               
-              <div style={tableContainer}>
+              <div className="table-container" style={tableContainer}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead style={{ background: '#f8f9fa', borderBottom: '1px solid #eaeaea' }}>
                     <tr>
@@ -342,7 +342,7 @@ const Admin = () => {
                 <button onClick={resetProductForm} className="back-btn">← Back to Inventory</button>
               </div>
 
-              <div style={formContainer}>
+              <div className="form-container" style={formContainer}>
                 <form onSubmit={submitProduct} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
                   
                   {/* Image Upload Section */}
@@ -437,7 +437,7 @@ const Admin = () => {
                 <button onClick={() => setShowAddCategory(true)} className="premium-btn">+ ADD NEW CATEGORY</button>
               </div>
               
-              <div style={tableContainer}>
+              <div className="table-container" style={tableContainer}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                   <thead style={{ background: '#f8f9fa', borderBottom: '1px solid #eaeaea' }}>
                     <tr>
@@ -485,7 +485,7 @@ const Admin = () => {
                 <button onClick={resetCategoryForm} className="back-btn">← Back to Categories</button>
               </div>
               
-              <div style={formContainer}>
+              <div className="form-container" style={formContainer}>
                 <form onSubmit={submitCategory}>
                   <div style={{ marginBottom: '40px' }}>
                     <label style={labelStyle}>Main Category Name *</label>
@@ -634,15 +634,14 @@ const Admin = () => {
           .admin-header-flex { flex-direction: column !important; align-items: flex-start !important; gap: 20px !important; }
           .admin-header-flex button { width: 100%; }
           .form-container { padding: 20px !important; }
+          .table-container { padding: 15px !important; border-radius: 8px !important; }
+          .image-upload-section { flex-direction: column !important; text-align: center !important; gap: 15px !important; padding: 15px !important; }
           
           /* Form stack fixes */
           .sub-cat-row { flex-direction: column !important; align-items: flex-start !important; gap: 15px !important; padding: 15px !important; }
           .sub-cat-row > div { width: 100% !important; }
           .sub-cat-preview { width: 80px !important; height: 80px !important; border-radius: 50% !important; margin: 0 auto !important; }
           .sub-cat-row .delete-btn { width: 100%; margin-top: 10px; }
-        }
-        @media (max-width: 576px) {
-          .image-upload-section { flex-direction: column !important; text-align: center !important; gap: 15px !important; }
         }
       `}</style>
     </div>
