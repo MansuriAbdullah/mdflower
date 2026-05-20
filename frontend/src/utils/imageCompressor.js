@@ -8,6 +8,12 @@
  */
 export const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.7) => {
   return new Promise((resolve) => {
+    // Safety check: if file is not valid or has no name, return it immediately
+    if (!file || !file.name) {
+      console.warn('Invalid file object provided to compressor.');
+      return resolve(file);
+    }
+
     // If it's HEIC or HEIF, we let the backend handle it because canvas cannot render it natively
     const ext = file.name.split('.').pop().toLowerCase();
     if (ext === 'heic' || ext === 'heif') {
@@ -22,6 +28,13 @@ export const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0
       img.src = event.target.result;
       img.onload = () => {
         const canvas = document.createElement('canvas');
+        
+        // Safety check for browser support of Canvas and toBlob
+        if (!canvas || !canvas.getContext || !canvas.toBlob) {
+          console.warn('Canvas or toBlob is not supported in this browser; falling back to original file.');
+          return resolve(file);
+        }
+
         let width = img.width;
         let height = img.height;
 
@@ -42,20 +55,33 @@ export const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0
         canvas.height = height;
 
         const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          console.warn('Failed to get 2D context; falling back to original file.');
+          return resolve(file);
+        }
+        
         ctx.drawImage(img, 0, 0, width, height);
 
         // Convert the canvas drawing back to a Blob, then to a File
         canvas.toBlob(
           (blob) => {
             if (blob) {
-              const compressedFile = new File([blob], file.name, {
-                type: 'image/jpeg',
-                lastModified: Date.now(),
-              });
-              console.log(
-                `Compressed: ${file.name} | Original: ${(file.size / 1024).toFixed(1)} KB -> Compressed: ${(compressedFile.size / 1024).toFixed(1)} KB`
-              );
-              resolve(compressedFile);
+              try {
+                // Attempt to create a File object (preferred)
+                const compressedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                console.log(
+                  `Compressed: ${file.name} | Original: ${(file.size / 1024).toFixed(1)} KB -> Compressed: ${(compressedFile.size / 1024).toFixed(1)} KB`
+                );
+                resolve(compressedFile);
+              } catch (e) {
+                // Fallback for older iOS Safari/in-app webviews that don't support "new File()" constructor
+                console.log('File constructor failed, falling back to Blob object.');
+                blob.name = file.name;
+                resolve(blob);
+              }
             } else {
               console.warn('Canvas blob generation failed; falling back to original file.');
               resolve(file); // fallback

@@ -70,7 +70,7 @@ const Admin = () => {
     // Compress the image before uploading
     const compressedFile = await compressImage(file);
     const formData = new FormData();
-    formData.append('image', compressedFile);
+    formData.append('image', compressedFile, compressedFile.name || file.name);
     const res = await axios.post(`${API_URL}/api/upload`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
@@ -346,8 +346,8 @@ const Admin = () => {
                 <form onSubmit={submitProduct} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
                   
                   {/* Image Upload Section */}
-                  <div style={{ gridColumn: '1 / -1', display: 'flex', gap: '30px', alignItems: 'center', padding: '25px', background: '#fafafa', borderRadius: '12px', border: '2px dashed #e0e0e0', transition: '0.3s' }} onMouseEnter={e => e.currentTarget.style.borderColor = '#d4af37'} onMouseLeave={e => e.currentTarget.style.borderColor = '#e0e0e0'}>
-                    <div style={{ width: '120px', height: '120px', borderRadius: '10px', background: '#fff', border: '1px solid #eee', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', textAlign: 'center' }}>
+                  <div className="image-upload-section" style={{ gridColumn: '1 / -1', display: 'flex', gap: '30px', alignItems: 'center', padding: '25px', background: '#fafafa', borderRadius: '12px', border: '2px dashed #e0e0e0', transition: '0.3s' }} onMouseEnter={e => e.currentTarget.style.borderColor = '#d4af37'} onMouseLeave={e => e.currentTarget.style.borderColor = '#e0e0e0'}>
+                    <div style={{ width: '120px', height: '120px', borderRadius: '10px', background: '#fff', border: '1px solid #eee', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', flexShrink: 0, textAlign: 'center' }}>
                       {productImagePreview === 'HEIC_PLACEHOLDER' ? (
                         <div style={{ padding: '10px' }}>
                           <span style={{ fontSize: '2rem' }}>📱</span>
@@ -499,7 +499,7 @@ const Admin = () => {
                     {categoryData.subs.map((sub, index) => (
                       <div className="sub-cat-row" key={index} style={{ display: 'flex', gap: '25px', alignItems: 'center', marginBottom: '20px', padding: '25px', background: '#fafafa', borderRadius: '12px', border: '1px solid #eaeaea', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
                         
-                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#fff', border: '1px solid #ddd', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textAlign: 'center' }}>
+                        <div className="sub-cat-preview" style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#fff', border: '1px solid #ddd', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, textAlign: 'center' }}>
                           {sub.imgPreview === 'HEIC_PLACEHOLDER' ? (
                             <div>
                               <span style={{ fontSize: '1.5rem' }}>📱</span>
@@ -638,7 +638,11 @@ const Admin = () => {
           /* Form stack fixes */
           .sub-cat-row { flex-direction: column !important; align-items: flex-start !important; gap: 15px !important; padding: 15px !important; }
           .sub-cat-row > div { width: 100% !important; }
+          .sub-cat-preview { width: 80px !important; height: 80px !important; border-radius: 50% !important; margin: 0 auto !important; }
           .sub-cat-row .delete-btn { width: 100%; margin-top: 10px; }
+        }
+        @media (max-width: 576px) {
+          .image-upload-section { flex-direction: column !important; text-align: center !important; gap: 15px !important; }
         }
       `}</style>
     </div>
