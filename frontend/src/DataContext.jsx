@@ -6,12 +6,8 @@ export const DataContext = createContext();
 const getApiUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
   const hostname = window.location.hostname;
-  const isLocal = hostname.startsWith('192.168.') || 
-                  hostname.startsWith('10.') || 
-                  hostname.startsWith('172.16.') || 
-                  hostname === 'localhost' || 
-                  hostname === '127.0.0.1';
-  return isLocal ? `http://${hostname}:5000` : 'https://mdflower-qvjl.vercel.app';
+  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+  return isLocalHost ? 'http://localhost:5000' : 'https://mdflower-qvjl.vercel.app';
 };
 const API_URL = getApiUrl();
 
