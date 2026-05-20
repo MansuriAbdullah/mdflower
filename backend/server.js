@@ -37,6 +37,15 @@ app.get('/', (req, res) => {
   res.send('MDFlowers API is running...');
 });
 
+// Health/Debug Route
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    mongoUriDefined: !!process.env.MONGO_URI,
+    mongoUriPrefix: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 15) : null
+  });
+});
+
 // Image Upload Route
 app.post('/api/upload', upload.single('image'), async (req, res) => {
   if (!req.file) {
