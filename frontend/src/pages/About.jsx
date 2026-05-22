@@ -5,7 +5,7 @@ const About = () => {
     <div style={{ background: '#fffdf0', minHeight: '100vh' }}>
 
       {/* SECTION 1: Heritage & Philosophy (Original Content) - Compact */}
-      <div style={{ padding: '100px 8% 60px' }}>
+      <div style={{ padding: 'clamp(100px, 12vw, 140px) 5% 40px' }}>
         <div style={{ textAlign: 'center', marginBottom: '50px' }}>
           <h1 style={{ fontSize: '3.5rem', marginBottom: '15px' }}>Our <span className="gold-gradient-text">Heritage</span></h1>
           <p style={{ fontSize: '1.1rem', color: '#1a130d', maxWidth: '750px', margin: '0 auto' }}>
@@ -13,7 +13,7 @@ const About = () => {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '50px', alignItems: 'center', marginBottom: '60px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '50px', alignItems: 'center', marginBottom: '60px' }}>
           <div className="glass-card" style={{ padding: '0', overflow: 'hidden', height: 'clamp(250px, 40vw, 400px)' }}>
             <img src="/hero_banner.png" alt="Our Story" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
@@ -28,7 +28,7 @@ const About = () => {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '30px', marginTop: '60px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '30px', marginTop: '60px' }}>
           {[
             { title: 'Quality', text: 'Sourcing only the rarest and freshest blooms from across the globe.' },
             { title: 'Artistry', text: 'Our floral designers are master artists with decades of experience.' },
@@ -43,7 +43,7 @@ const About = () => {
       </div>
 
       {/* SECTION 2: Legacy & Artistry (New Content from Image) - Compact Version */}
-      <div style={{ padding: '40px 8% 40px', background: '#fffdf0', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ padding: '40px 5% 40px', background: '#fffdf0', position: 'relative', overflow: 'hidden' }}>
         {/* Subtle floating petals background effect */}
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}>
           {Array.from({ length: 15 }).map((_, i) => (
@@ -61,7 +61,7 @@ const About = () => {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
           gap: '60px',
           alignItems: 'center',
           position: 'relative',
@@ -86,7 +86,7 @@ const About = () => {
               />
             </div>
 
-            <div style={{
+            <div className="about-decor-sub" style={{
               position: 'absolute',
               bottom: '0',
               right: '0',
@@ -105,7 +105,7 @@ const About = () => {
               />
             </div>
 
-            <div style={{
+            <div className="about-badge" style={{
               position: 'absolute',
               top: '20%',
               right: '-10px',
@@ -162,6 +162,23 @@ const About = () => {
             10% { opacity: 0.3; }
             90% { opacity: 0.3; }
             100% { transform: translate(100px, 1000px) rotate(360deg); opacity: 0; }
+        }
+        @media (max-width: 576px) {
+          .about-decor-sub {
+            width: 120px !important;
+            height: 120px !important;
+          }
+          .about-badge {
+            width: 50px !important;
+            height: 50px !important;
+            top: 10% !important;
+          }
+          .about-badge span:first-child {
+            font-size: 0.9rem !important;
+          }
+          .about-badge span:last-child {
+            font-size: 0.35rem !important;
+          }
         }
       `}</style>
     </div>

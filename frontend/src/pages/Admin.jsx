@@ -1181,7 +1181,7 @@ const Admin = () => {
             <div className="fade-in" style={{ maxWidth: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid rgba(212,175,55,0.15)', paddingBottom: '20px' }}>
                 <div>
-                  <h2 style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', margin: 0, fontSize: '2.4rem', fontWeight: 'bold', letterSpacing: '1px' }}>
+                  <h2 className="signature-title" style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', margin: 0, fontSize: '2.4rem', fontWeight: 'bold', letterSpacing: '1px' }}>
                     SIGNATURE <span style={{ color: '#d4af37' }}>PIECES</span>
                   </h2>
                   <p style={{ color: '#666', fontSize: '0.95rem', marginTop: '6px', fontFamily: 'Montserrat, sans-serif' }}>
@@ -1191,8 +1191,8 @@ const Admin = () => {
               </div>
 
               {/* Progress and status */}
-              <div style={{ background: '#fff', padding: '20px 24px', borderRadius: '16px', border: '1px solid rgba(212,175,55,0.18)', boxShadow: '0 10px 30px rgba(0,0,0,0.02)', marginBottom: '35px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div className="signature-status-card" style={{ background: '#fff', padding: '20px 24px', borderRadius: '16px', border: '1px solid rgba(212,175,55,0.18)', boxShadow: '0 10px 30px rgba(0,0,0,0.02)', marginBottom: '35px' }}>
+                <div className="showcase-status-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                   <span style={{ fontWeight: '800', fontSize: '1rem', color: '#1a130d', letterSpacing: '0.5px' }}>
                     Masterpiece Showcase Status
                   </span>
@@ -1212,8 +1212,8 @@ const Admin = () => {
 
               <div className="signature-pieces-grid">
                 {/* CURRENT LIST WITH REORDERING & REMOVAL */}
-                <div style={{ background: '#fff', borderRadius: '16px', padding: '20px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 45px rgba(0,0,0,0.02)' }}>
-                  <h3 style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', fontSize: '1.4rem', borderBottom: '2px solid #fcf9f2', paddingBottom: '18px', marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold' }}>
+                <div className="signature-card" style={{ background: '#fff', borderRadius: '16px', padding: '20px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 45px rgba(0,0,0,0.02)' }}>
+                  <h3 className="card-header-flex" style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', fontSize: '1.4rem', borderBottom: '2px solid #fcf9f2', paddingBottom: '18px', marginBottom: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold' }}>
                     <span>Selected Masterpieces</span>
                     <span style={{ fontSize: '0.8rem', color: '#888', textTransform: 'none', fontFamily: 'Montserrat, sans-serif', fontWeight: 'normal' }}>Adjust homepage display order</span>
                   </h3>
@@ -1228,6 +1228,7 @@ const Admin = () => {
                       {signatureMasterpieces.map((item, idx) => (
                         <div 
                           key={item._id} 
+                          className="masterpiece-item"
                           style={{ 
                             display: 'flex', 
                             alignItems: 'center', 
@@ -1250,46 +1251,48 @@ const Admin = () => {
                             e.currentTarget.style.transform = 'translateY(0)';
                           }}
                         >
-                          {/* Thumbnail with Index Rank */}
-                          <div style={{ position: 'relative', marginRight: '20px', flexShrink: 0 }}>
-                            <img 
-                              src={item.image ? (item.image.startsWith('/') && !item.image.startsWith('/uploads') ? item.image : item.image.startsWith('http') || item.image.startsWith('data:') ? item.image : `${API_URL}${item.image}`) : ''} 
-                              alt="" 
-                              style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.2)', display: 'block' }}
-                            />
-                            <div style={{
-                              position: 'absolute',
-                              top: '-6px',
-                              left: '-6px',
-                              background: '#1a130d',
-                              color: '#d4af37',
-                              border: '1px solid #d4af37',
-                              width: '22px',
-                              height: '22px',
-                              borderRadius: '50%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '0.7rem',
-                              fontWeight: 'bold',
-                              boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-                            }}>
-                              {idx + 1}
+                          <div className="masterpiece-info-wrapper" style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                            {/* Thumbnail with Index Rank */}
+                            <div style={{ position: 'relative', marginRight: '20px', flexShrink: 0 }}>
+                              <img 
+                                src={item.image ? (item.image.startsWith('/') && !item.image.startsWith('/uploads') ? item.image : item.image.startsWith('http') || item.image.startsWith('data:') ? item.image : `${API_URL}${item.image}`) : ''} 
+                                alt="" 
+                                style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.2)', display: 'block' }}
+                              />
+                              <div style={{
+                                position: 'absolute',
+                                top: '-6px',
+                                left: '-6px',
+                                background: '#1a130d',
+                                color: '#d4af37',
+                                border: '1px solid #d4af37',
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '0.7rem',
+                                fontWeight: 'bold',
+                                boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+                              }}>
+                                {idx + 1}
+                              </div>
+                            </div>
+
+                            <div style={{ flex: 1, minWidth: 0, marginRight: '15px' }}>
+                              <p style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#1a130d', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Montserrat, sans-serif' }}>
+                                {item.name}
+                              </p>
+                              <p style={{ fontSize: '0.8rem', color: '#666', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ background: '#f5f5f5', padding: '2px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>{item.category}</span>
+                                <span style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '0.9rem' }}>{item.price}</span>
+                              </p>
                             </div>
                           </div>
 
-                          <div style={{ flex: 1, minWidth: 0, marginRight: '15px' }}>
-                            <p style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#1a130d', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Montserrat, sans-serif' }}>
-                              {item.name}
-                            </p>
-                            <p style={{ fontSize: '0.8rem', color: '#666', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span style={{ background: '#f5f5f5', padding: '2px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>{item.category}</span>
-                              <span style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '0.9rem' }}>{item.price}</span>
-                            </p>
-                          </div>
-
                           {/* Reordering and removal controls */}
-                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <div className="masterpiece-controls-wrapper" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <button
                               disabled={idx === 0}
                               onClick={async () => {
@@ -1400,7 +1403,7 @@ const Admin = () => {
                 </div>
 
                 {/* SEARCH CATALOG & ADD PRODUCTS */}
-                <div style={{ background: '#fff', borderRadius: '16px', padding: '20px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 45px rgba(0,0,0,0.02)' }}>
+                <div className="signature-card" style={{ background: '#fff', borderRadius: '16px', padding: '20px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 45px rgba(0,0,0,0.02)' }}>
                   <h3 style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', fontSize: '1.4rem', borderBottom: '2px solid #fcf9f2', paddingBottom: '18px', marginBottom: '25px', fontWeight: 'bold' }}>
                     Add from Collection
                   </h3>
@@ -1477,6 +1480,7 @@ const Admin = () => {
                         return (
                           <div 
                             key={product._id} 
+                            className="catalog-item"
                             style={{ 
                               display: 'flex', 
                               alignItems: 'center', 
@@ -1489,63 +1493,67 @@ const Admin = () => {
                             onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(212,175,55,0.3)'; e.currentTarget.style.background = '#fff'; }}
                             onMouseLeave={e => { e.currentTarget.style.borderColor = '#eeeeee'; e.currentTarget.style.background = '#fafafa'; }}
                           >
-                            <img 
-                              src={product.image ? (product.image.startsWith('/') && !product.image.startsWith('/uploads') ? product.image : product.image.startsWith('http') || product.image.startsWith('data:') ? product.image : `${API_URL}${product.image}`) : ''} 
-                              alt="" 
-                              style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '6px', marginRight: '15px', border: '1px solid rgba(0,0,0,0.05)' }}
-                            />
-                            <div style={{ flex: 1, minWidth: 0, marginRight: '10px' }}>
-                              <p style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#1a130d', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
-                              <p style={{ fontSize: '0.75rem', color: '#888', margin: '2px 0 0' }}>{product.category} • <strong style={{ color: '#d4af37' }}>{product.price}</strong></p>
+                            <div className="catalog-info-wrapper" style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                              <img 
+                                src={product.image ? (product.image.startsWith('/') && !product.image.startsWith('/uploads') ? product.image : product.image.startsWith('http') || product.image.startsWith('data:') ? product.image : `${API_URL}${product.image}`) : ''} 
+                                alt="" 
+                                style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '6px', marginRight: '15px', border: '1px solid rgba(0,0,0,0.05)' }}
+                              />
+                              <div style={{ flex: 1, minWidth: 0, marginRight: '10px' }}>
+                                <p style={{ fontWeight: 'bold', fontSize: '0.85rem', color: '#1a130d', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
+                                <p style={{ fontSize: '0.75rem', color: '#888', margin: '2px 0 0' }}>{product.category} • <strong style={{ color: '#d4af37' }}>{product.price}</strong></p>
+                              </div>
                             </div>
                             
-                            {isAlreadySelected ? (
-                              <button 
-                                disabled 
-                                style={{ 
-                                  padding: '8px 14px', 
-                                  background: 'rgba(212,175,55,0.08)', 
-                                  color: '#b8860b', 
-                                  border: '1px solid rgba(212,175,55,0.2)', 
-                                  borderRadius: '6px', 
-                                  fontSize: '0.75rem', 
-                                  fontWeight: 'bold',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px'
-                                }}
-                              >
-                                ✓ Added
-                              </button>
-                            ) : (
-                              <button
-                                disabled={isLimitReached}
-                                onClick={async () => {
-                                  const newIds = [...signatureMasterpieces.map(p => p._id), product._id];
-                                  try {
-                                    await updateSignatureMasterpieces(newIds);
-                                    showMsg('Product added to masterpieces!');
-                                  } catch (err) {
-                                    showMsg('Failed to add product.', 'error');
-                                  }
-                                }}
-                                style={{ 
-                                  padding: '8px 14px', 
-                                  background: isLimitReached ? '#f5f5f5' : '#1a130d', 
-                                  color: isLimitReached ? '#ccc' : '#d4af37', 
-                                  border: isLimitReached ? '1px solid #ddd' : '1px solid #1a130d', 
-                                  borderRadius: '6px', 
-                                  fontSize: '0.75rem', 
-                                  fontWeight: 'bold', 
-                                  cursor: isLimitReached ? 'not-allowed' : 'pointer', 
-                                  transition: 'all 0.2s ease' 
-                                }}
-                                onMouseEnter={e => { if (!isLimitReached) { e.currentTarget.style.background = '#d4af37'; e.currentTarget.style.color = '#1a130d'; e.currentTarget.style.borderColor = '#d4af37'; } }}
-                                onMouseLeave={e => { if (!isLimitReached) { e.currentTarget.style.background = '#1a130d'; e.currentTarget.style.color = '#d4af37'; e.currentTarget.style.borderColor = '#1a130d'; } }}
-                              >
-                                {isLimitReached ? 'Full' : '+ Add'}
-                              </button>
-                            )}
+                            <div className="catalog-button-wrapper" style={{ display: 'flex', alignItems: 'center' }}>
+                              {isAlreadySelected ? (
+                                <button 
+                                  disabled 
+                                  style={{ 
+                                    padding: '8px 14px', 
+                                    background: 'rgba(212,175,55,0.08)', 
+                                    color: '#b8860b', 
+                                    border: '1px solid rgba(212,175,55,0.2)', 
+                                    borderRadius: '6px', 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 'bold',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                  }}
+                                >
+                                  ✓ Added
+                                </button>
+                              ) : (
+                                <button
+                                  disabled={isLimitReached}
+                                  onClick={async () => {
+                                    const newIds = [...signatureMasterpieces.map(p => p._id), product._id];
+                                    try {
+                                      await updateSignatureMasterpieces(newIds);
+                                      showMsg('Product added to masterpieces!');
+                                    } catch (err) {
+                                      showMsg('Failed to add product.', 'error');
+                                    }
+                                  }}
+                                  style={{ 
+                                    padding: '8px 14px', 
+                                    background: isLimitReached ? '#f5f5f5' : '#1a130d', 
+                                    color: isLimitReached ? '#ccc' : '#d4af37', 
+                                    border: isLimitReached ? '1px solid #ddd' : '1px solid #1a130d', 
+                                    borderRadius: '6px', 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 'bold', 
+                                    cursor: isLimitReached ? 'not-allowed' : 'pointer', 
+                                    transition: 'all 0.2s ease' 
+                                  }}
+                                  onMouseEnter={e => { if (!isLimitReached) { e.currentTarget.style.background = '#d4af37'; e.currentTarget.style.color = '#1a130d'; e.currentTarget.style.borderColor = '#d4af37'; } }}
+                                  onMouseLeave={e => { if (!isLimitReached) { e.currentTarget.style.background = '#1a130d'; e.currentTarget.style.color = '#d4af37'; e.currentTarget.style.borderColor = '#1a130d'; } }}
+                                >
+                                  {isLimitReached ? 'Full' : '+ Add'}
+                                </button>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
@@ -1741,6 +1749,22 @@ const Admin = () => {
             gap: 24px;
           }
         }
+        .signature-card {
+          padding: 20px !important;
+        }
+        .signature-status-card {
+          padding: 20px 24px !important;
+        }
+        .catalog-info-wrapper {
+          display: flex;
+          align-items: center;
+          flex: 1;
+          min-width: 0;
+        }
+        .catalog-button-wrapper {
+          display: flex;
+          align-items: center;
+        }
         .catalog-filters {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1842,6 +1866,72 @@ const Admin = () => {
           .sub-cat-row > div { width: 100% !important; }
           .sub-cat-preview { width: 80px !important; height: 80px !important; border-radius: 50% !important; margin: 0 auto !important; }
           .sub-cat-row .delete-btn { width: 100%; margin-top: 10px; }
+        }
+        
+        @media (max-width: 576px) {
+          .showcase-status-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+          .showcase-status-header span {
+            width: 100% !important;
+          }
+          .showcase-status-header span:last-child {
+            text-align: center !important;
+            box-sizing: border-box !important;
+          }
+          .card-header-flex {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+          }
+          .card-header-flex span {
+            width: 100% !important;
+          }
+          .card-header-flex span:last-child {
+            text-align: left !important;
+          }
+          .masterpiece-item {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 12px !important;
+          }
+          .masterpiece-info-wrapper {
+            width: 100% !important;
+            margin-bottom: 12px !important;
+          }
+          .masterpiece-controls-wrapper {
+            justify-content: flex-end !important;
+            border-top: 1px solid #f5f5f5 !important;
+            padding-top: 10px !important;
+          }
+          .catalog-filters {
+            grid-template-columns: 1fr !important;
+          }
+          .catalog-item {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            padding: 12px !important;
+          }
+          .catalog-info-wrapper {
+            width: 100% !important;
+            margin-bottom: 12px !important;
+          }
+          .catalog-button-wrapper {
+            justify-content: flex-end !important;
+            border-top: 1px solid #f5f5f5 !important;
+            padding-top: 10px !important;
+          }
+          .signature-card {
+            padding: 12px !important;
+          }
+          .signature-status-card {
+            padding: 12px !important;
+          }
+          .signature-title {
+            font-size: clamp(1.6rem, 5vw, 2.4rem) !important;
+          }
         }
       `}</style>
     </div>

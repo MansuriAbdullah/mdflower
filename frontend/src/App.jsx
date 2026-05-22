@@ -156,6 +156,46 @@ const GlobalStyles = () => (
       .glass-card { padding: 20px 15px !important; }
     }
 
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
+    }
+    @media (max-width: 576px) {
+      .product-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px 10px !important;
+      }
+      .product-grid .glass-card {
+        border-radius: 12px !important;
+      }
+      .product-grid .glass-card > a > div:first-child {
+        padding: 8px !important;
+      }
+      .product-grid .glass-card > a > div:first-child > div {
+        height: 120px !important;
+        border-radius: 8px !important;
+      }
+      .product-grid .glass-card > a > div:nth-child(2) {
+        padding: 0 10px 10px !important;
+      }
+      .product-grid .glass-card h3 {
+        font-size: 0.8rem !important;
+        margin-bottom: 4px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .product-grid .glass-card p {
+        font-size: 0.9rem !important;
+      }
+      .product-grid .glass-card button {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.8rem !important;
+      }
+    }
+
     @keyframes floatGlow {
       from { transform: translateY(0) translateX(0); opacity: 0.4; }
       to { transform: translateY(-20px) translateX(15px); opacity: 0.8; }
@@ -661,7 +701,7 @@ const Navbar = () => {
       <style>{`
         @media (max-width: 992px) {
           .desktop-menu { display: none !important; }
-          .mobile-toggle-container { display: flex !important; align-items: center; }
+          .mobile-toggle-container { display: flex !important; align-items: center; z-index: 1001; }
           nav { padding: 15px 5% !important; }
         }
       `}</style>

@@ -51,7 +51,7 @@ const TopSellingArticles = () => {
   const activeCategory = topSellingCategories[activeTabIdx] || null;
 
   return (
-    <div style={{ padding: '120px 8% 60px', background: '#fffdf0', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif' }}>
+    <div style={{ padding: 'clamp(100px, 12vw, 140px) 5% 40px', background: '#fffdf0', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif' }}>
       <div style={{ textAlign: 'center', marginBottom: '50px' }}>
         <h4 style={{ color: '#d4af37', textTransform: 'uppercase', letterSpacing: '5px', fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '15px' }}>
           Curated Excellence
@@ -167,7 +167,7 @@ const TopSellingArticles = () => {
                   <div key={sub._id || subIdx} style={{
                     background: 'rgba(255, 255, 255, 0.6)',
                     borderRadius: '20px',
-                    padding: '40px 30px',
+                    padding: 'clamp(15px, 4vw, 40px) clamp(10px, 3vw, 30px)',
                     border: '1px solid rgba(212, 175, 55, 0.12)',
                     boxShadow: '0 10px 30px rgba(0, 0, 0, 0.02)'
                   }}>
@@ -209,7 +209,7 @@ const TopSellingArticles = () => {
                     </div>
 
                     {/* Products Grid */}
-                    <div style={{
+                    <div className="product-grid" style={{
                       display: 'grid',
                       gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                       gap: '30px'

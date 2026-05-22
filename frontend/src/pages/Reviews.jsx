@@ -12,9 +12,11 @@ const Reviews = () => {
     { name: "Deepika P.", city: "Bangalore", img: "https://picsum.photos/seed/d/100/100", text: "Elegant, luxury, and classy. Exactly what I wanted.", stars: 5 },
   ];
 
+  const displayReviews = [...reviews, ...reviews, ...reviews];
+
   return (
     <div style={{ 
-      padding: '40px 8% 40px', 
+      padding: 'clamp(100px, 12vw, 140px) 5% 40px', 
       minHeight: '100vh', 
       background: '#fffdf0',
       position: 'relative',
@@ -42,75 +44,115 @@ const Reviews = () => {
         </p>
       </div>
 
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(280px, 30vw, 380px), 1fr))',
-        gap: '20px',
-        justifyContent: 'center',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        {reviews.map((rev, i) => (
-          <div 
-            key={i} 
-            className="reveal-anim" 
-            style={{ 
-              animationDelay: `${i * 0.1}s`,
-              transition: '0.4s ease'
-            }}
-          >
-            <div className="glass-card" style={{ 
-              padding: '45px 30px', 
-              textAlign: 'center', 
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              background: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid #8a6d3b',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              {/* Top accent line */}
-              <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '60px', height: '4px', background: '#d4af37', borderRadius: '0 0 10px 10px' }}></div>
-              
-              <div style={{
-                width: '85px',
-                height: '85px',
-                borderRadius: '50%',
-                margin: '15px auto 10px',
-                padding: '5px',
-                background: 'linear-gradient(45deg, #d4af37, #fdf08d)',
-                boxShadow: '0 10px 25px rgba(212, 175, 55, 0.2)'
-              }}>
-                <img src={rev.img} alt={rev.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', border: '2px solid white' }} />
-              </div>
+      <style>{`
+        .reviews-slider-container {
+          width: 100%;
+          position: relative;
+          overflow: hidden;
+          padding: 20px 0;
+          z-index: 1;
+        }
+        .reviews-track {
+          display: flex;
+          align-items: stretch;
+          width: max-content;
+          animation: scrollRightReviewsPage 55s linear infinite;
+        }
+        .reviews-slider-container:hover .reviews-track {
+          animation-play-state: paused;
+        }
+        .reviews-card-wrapper {
+          width: 400px;
+          margin-right: 30px;
+          flex-shrink: 0;
+          display: flex;
+          transition: transform 0.3s ease;
+        }
+        .reviews-card-wrapper:hover {
+          transform: translateY(-8px) scale(1.02);
+        }
+        .reviews-card {
+          background: rgba(255, 255, 255, 0.95);
+          padding: 45px 30px;
+          border-radius: 25px;
+          border: 1.5px solid rgba(138, 109, 59, 0.35);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          text-align: center;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          position: relative;
+          overflow: hidden;
+        }
+        .reviews-card-wrapper:hover .reviews-card {
+          border-color: #8a6d3b;
+          box-shadow: 0 15px 30px rgba(138, 109, 59, 0.15);
+        }
+        @keyframes scrollRightReviewsPage {
+          0% { transform: translateX(-33.3333%); }
+          100% { transform: translateX(0); }
+        }
+        @media (max-width: 768px) {
+          .reviews-card-wrapper {
+            width: 320px;
+            margin-right: 15px;
+          }
+          .reviews-card {
+            padding: 30px 20px;
+          }
+        }
+      `}</style>
 
-              <div style={{ color: '#d4af37', marginBottom: '10px', fontSize: '1rem', letterSpacing: '2px' }}>
-                {"★".repeat(rev.stars)}
-              </div>
-              
-              <p style={{ 
-                fontStyle: 'italic', 
-                color: '#2c241e', 
-                marginBottom: '15px', 
-                lineHeight: '1.6', 
-                fontSize: '0.9rem',
-                flexGrow: 1
-              }}>
-                "{rev.text}"
-              </p>
-              
-              <div style={{ marginBottom: '10px' }}>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '5px', color: '#1a130d', fontFamily: 'Montserrat, sans-serif', fontWeight: '900' }}>{rev.name}</h3>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                  <div style={{ width: '15px', height: '1px', background: '#d4af37' }}></div>
-                  <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px' }}>{rev.city}</p>
-                  <div style={{ width: '15px', height: '1px', background: '#d4af37' }}></div>
+      <div className="reviews-slider-container">
+        <div className="reviews-track">
+          {displayReviews.map((rev, i) => (
+            <div key={i} className="reviews-card-wrapper">
+              <div className="reviews-card">
+                {/* Top accent line */}
+                <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '60px', height: '4px', background: '#d4af37', borderRadius: '0 0 10px 10px' }}></div>
+                
+                <div style={{
+                  width: '85px',
+                  height: '85px',
+                  borderRadius: '50%',
+                  margin: '15px auto 10px',
+                  padding: '5px',
+                  background: 'linear-gradient(45deg, #d4af37, #fdf08d)',
+                  boxShadow: '0 10px 25px rgba(212, 175, 55, 0.2)',
+                  overflow: 'hidden'
+                }}>
+                  <img src={rev.img} alt={rev.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', border: '2px solid white' }} />
+                </div>
+
+                <div style={{ color: '#d4af37', marginBottom: '10px', fontSize: '1rem', letterSpacing: '2px' }}>
+                  {"★".repeat(rev.stars)}
+                </div>
+                
+                <p style={{ 
+                  fontStyle: 'italic', 
+                  color: '#2c241e', 
+                  marginBottom: '15px', 
+                  lineHeight: '1.6', 
+                  fontSize: '0.9rem',
+                  flexGrow: 1
+                }}>
+                  "{rev.text}"
+                </p>
+                
+                <div style={{ marginBottom: '10px' }}>
+                  <h3 style={{ fontSize: '1.1rem', marginBottom: '5px', color: '#1a130d', fontFamily: 'Montserrat, sans-serif', fontWeight: '900' }}>{rev.name}</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                    <div style={{ width: '15px', height: '1px', background: '#d4af37' }}></div>
+                    <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px' }}>{rev.city}</p>
+                    <div style={{ width: '15px', height: '1px', background: '#d4af37' }}></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Review Submission Form Section */}
@@ -130,7 +172,7 @@ const Reviews = () => {
           boxShadow: '0 20px 40px rgba(138, 109, 59, 0.1)',
           position: 'relative'
         }}>
-          <form style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '15px' }}>
+          <form style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '15px' }}>
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', marginBottom: '5px', color: '#1a130d' }}>YOUR NAME</label>
               <input type="text" placeholder="Enter your full name" style={{ width: '100%', padding: '12px 15px', borderRadius: '12px', border: '1px solid rgba(138, 109, 59, 0.3)', background: '#fffdf0', outline: 'none' }} />

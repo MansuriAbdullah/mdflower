@@ -3,7 +3,7 @@ import React from 'react';
 const Contact = () => {
   return (
     <div style={{ 
-      padding: 'clamp(60px, 10vw, 100px) 8% 60px', 
+      padding: 'clamp(100px, 12vw, 140px) 5% 40px', 
       minHeight: '100vh', 
       background: '#fffdf0',
       position: 'relative',
@@ -20,13 +20,13 @@ const Contact = () => {
 
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(clamp(280px, 40vw, 450px), 1fr))', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', 
         gap: '30px', 
         alignItems: 'start',
         position: 'relative',
         zIndex: 1
       }}>
-        <div className="glass-card" style={{ padding: '30px', background: '#fff', border: '1px solid #8a6d3b' }}>
+        <div className="glass-card" style={{ padding: 'clamp(15px, 4vw, 30px)', background: '#fff', border: '1px solid #8a6d3b' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '25px', color: '#1a130d', fontFamily: 'Cinzel' }}>Send a Message</h2>
           <form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <div>

@@ -391,6 +391,13 @@ const ShopByCategory = () => {
         .categories-scroll::-webkit-scrollbar {
           display: none;
         }
+        @media (max-width: 1024px) {
+          .categories-scroll {
+            justify-content: flex-start !important;
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+          }
+        }
       `}</style>
       <div style={{ textAlign: 'center', marginBottom: '50px' }}>
         <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', marginBottom: '10px' }}>Top Selling <span className="gold-gradient-text">Product</span></h2>
@@ -450,46 +457,77 @@ const IndiaDelivery = () => {
     { name: 'PATNA', img: 'https://picsum.photos/seed/patna/400/400' },
   ];
 
+  const displayLocations = [...locations, ...locations, ...locations];
+
   return (
-    <section id="delivery" style={{ padding: '30px 8%' }}>
+    <section id="delivery" style={{ padding: '60px 0', overflow: 'hidden', background: '#fffdf0' }}>
       <style>{`
-        .delivery-grid-8 {
-          display: grid;
-          grid-template-columns: repeat(8, 1fr);
-          gap: 20px;
+        .delivery-slider-container {
+          width: 100%;
+          position: relative;
+          overflow: hidden;
+          padding: 20px 0;
         }
-        @media (max-width: 1200px) {
-          .delivery-grid-8 { grid-template-columns: repeat(6, 1fr); }
+        .delivery-track {
+          display: flex;
+          align-items: center;
+          width: max-content;
+          animation: scrollRight 40s linear infinite;
         }
-        @media (max-width: 900px) {
-          .delivery-grid-8 { grid-template-columns: repeat(4, 1fr); }
+        .delivery-slider-container:hover .delivery-track {
+          animation-play-state: paused;
         }
-        @media (max-width: 600px) {
-          .delivery-grid-8 { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .delivery-card-wrapper {
+          width: 250px;
+          margin-right: 30px;
+          flex-shrink: 0;
+          transition: transform 0.3s ease;
         }
-        @media (max-width: 400px) {
-          .delivery-grid-8 { grid-template-columns: repeat(2, 1fr); }
+        .delivery-card-wrapper:hover {
+          transform: translateY(-8px) scale(1.02);
+        }
+        .delivery-card {
+          background: #fff;
+          padding: 15px;
+          border-radius: 25px;
+          border: 1.5px solid rgba(138, 109, 59, 0.35);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          text-align: center;
+        }
+        .delivery-card-wrapper:hover .delivery-card {
+          border-color: #8a6d3b;
+          box-shadow: 0 15px 30px rgba(138, 109, 59, 0.15);
+        }
+        @keyframes scrollRight {
+          0% { transform: translateX(-33.3333%); }
+          100% { transform: translateX(0); }
+        }
+        @media (max-width: 768px) {
+          .delivery-card-wrapper {
+            width: 180px;
+            margin-right: 15px;
+          }
         }
       `}</style>
-      <div style={{ marginBottom: '30px', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '2rem', color: '#1a130d' }}>All Over India Delivery</h2>
-        <p style={{ color: '#1a130d', fontSize: '1rem' }}>Across 500+ Cities & Towns</p>
+      <div style={{ marginBottom: '30px', textAlign: 'center', padding: '0 8%' }}>
+        <h2 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', color: '#1a130d', fontFamily: 'Cinzel, serif', marginBottom: '10px' }}>All Over India Delivery</h2>
+        <div style={{ width: '80px', height: '2px', background: 'linear-gradient(90deg, transparent, #d4af37, transparent)', margin: '0 auto 15px' }}></div>
+        <p style={{ color: '#5c4b22', fontSize: '1.05rem', fontWeight: '500' }}>Across 500+ Cities & Towns</p>
       </div>
-      <div className="delivery-grid-8">
-        {locations.map((loc, i) => (
-          <div key={loc.name} className="glass-card" style={{
-            animationDelay: `${i * 0.05}s`,
-            background: '#fff',
-            padding: '10px'
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ width: '100%', aspectRatio: '1/1', borderRadius: '15px', overflow: 'hidden', marginBottom: '10px' }}>
-                <img src={loc.img} alt={loc.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div className="delivery-slider-container">
+        <div className="delivery-track">
+          {displayLocations.map((loc, i) => (
+            <div key={i} className="delivery-card-wrapper">
+              <div className="delivery-card">
+                <div style={{ width: '100%', aspectRatio: '1/1', borderRadius: '18px', overflow: 'hidden', marginBottom: '15px' }}>
+                  <img src={loc.img} alt={loc.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <p style={{ fontWeight: '900', fontSize: '0.85rem', letterSpacing: '2px', color: '#1a130d', margin: 0, textTransform: 'uppercase' }}>{loc.name}</p>
               </div>
-              <p style={{ fontWeight: '900', fontSize: '0.7rem', letterSpacing: '1px', color: '#1a130d' }}>{loc.name}</p>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -657,9 +695,69 @@ const Testimonials = () => {
     { name: "Ananya Iyer", city: "Bangalore", img: "/client3.png", text: "Changed my home. Magical aura every evening. The LED hangings are simply divine.", stars: 5 }
   ];
 
+  const displayReviews = [...reviews, ...reviews, ...reviews, ...reviews];
+
   return (
-    <section style={{ padding: '30px 8%', background: '#fffdf0', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+    <section style={{ padding: '60px 0', background: '#fffdf0', position: 'relative', overflow: 'hidden' }}>
+      <style>{`
+        .testimonial-slider-container {
+          width: 100%;
+          position: relative;
+          overflow: hidden;
+          padding: 20px 0;
+        }
+        .testimonial-track {
+          display: flex;
+          align-items: stretch;
+          width: max-content;
+          animation: scrollRightReviews 55s linear infinite;
+        }
+        .testimonial-slider-container:hover .testimonial-track {
+          animation-play-state: paused;
+        }
+        .testimonial-card-wrapper {
+          width: 400px;
+          margin-right: 30px;
+          flex-shrink: 0;
+          display: flex;
+          transition: transform 0.3s ease;
+        }
+        .testimonial-card-wrapper:hover {
+          transform: translateY(-8px) scale(1.02);
+        }
+        .testimonial-card {
+          background: #fff;
+          padding: 40px 30px;
+          border-radius: 25px;
+          border: 1.5px solid rgba(138, 109, 59, 0.35);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+          transition: border-color 0.3s ease, box-shadow 0.3s ease;
+          text-align: center;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .testimonial-card-wrapper:hover .testimonial-card {
+          border-color: #8a6d3b;
+          box-shadow: 0 15px 30px rgba(138, 109, 59, 0.15);
+        }
+        @keyframes scrollRightReviews {
+          0% { transform: translateX(-25%); }
+          100% { transform: translateX(0); }
+        }
+        @media (max-width: 768px) {
+          .testimonial-card-wrapper {
+            width: 320px;
+            margin-right: 15px;
+          }
+          .testimonial-card {
+            padding: 30px 20px;
+          }
+        }
+      `}</style>
+      <div style={{ textAlign: 'center', marginBottom: '40px', padding: '0 8%' }}>
         <h4 style={{ color: '#d4af37', textTransform: 'uppercase', letterSpacing: '4px', marginBottom: '15px', fontWeight: 'bold', fontSize: '0.8rem' }}>
           Customer Stories
         </h4>
@@ -667,28 +765,32 @@ const Testimonials = () => {
         <div style={{ width: '80px', height: '2px', background: 'linear-gradient(90deg, transparent, #d4af37, transparent)', margin: '0 auto' }}></div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px', justifyContent: 'center' }}>
-        {reviews.map((rev, i) => (
-          <div key={i} className="glass-card" style={{ padding: '40px 25px', textAlign: 'center', background: '#fff', boxShadow: '0 15px 35px rgba(0,0,0,0.05)' }}>
-              <div style={{
-                width: '75px',
-                height: '75px',
-                borderRadius: '50%',
-                margin: '0 auto 20px',
-                overflow: 'hidden',
-                border: '3px solid #d4af37',
-                boxShadow: '0 10px 20px rgba(212, 175, 55, 0.2)'
-              }}>
-                <img src={rev.img} alt={rev.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div className="testimonial-slider-container">
+        <div className="testimonial-track">
+          {displayReviews.map((rev, i) => (
+            <div key={i} className="testimonial-card-wrapper">
+              <div className="testimonial-card">
+                <div style={{
+                  width: '85px',
+                  height: '85px',
+                  borderRadius: '50%',
+                  margin: '0 auto 20px',
+                  overflow: 'hidden',
+                  border: '3px solid #d4af37',
+                  boxShadow: '0 10px 20px rgba(212, 175, 55, 0.2)'
+                }}>
+                  <img src={rev.img} alt={rev.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ color: '#d4af37', marginBottom: '15px', fontSize: '1rem' }}>{"★".repeat(rev.stars)}</div>
+                <p style={{ fontStyle: 'italic', color: '#1a130d', marginBottom: '20px', lineHeight: '1.6', fontSize: '0.9rem' }}>"{rev.text}"</p>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '5px', color: '#1a130d' }}>{rev.name}</h3>
+                <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px' }}>{rev.city}</p>
               </div>
-              <div style={{ color: '#d4af37', marginBottom: '15px', fontSize: '1rem' }}>{"★".repeat(rev.stars)}</div>
-              <p style={{ fontStyle: 'italic', color: '#1a130d', marginBottom: '20px', lineHeight: '1.6', fontSize: '0.9rem' }}>"{rev.text}"</p>
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '5px', color: '#1a130d' }}>{rev.name}</h3>
-              <p style={{ color: '#d4af37', fontWeight: 'bold', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px' }}>{rev.city}</p>
             </div>
-        ))}
+          ))}
+        </div>
       </div>
-      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      <div style={{ textAlign: 'center', marginTop: '40px' }}>
         <button className="btn-gold" style={{ padding: '12px 35px' }} onClick={() => window.location.href = '/reviews'}>View All Stories</button>
       </div>
     </section>
@@ -701,32 +803,73 @@ const Home = () => {
   return (
     <>
       <Hero />
-      <section id="collection" style={{ padding: '80px 8%' }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+      <section id="collection" style={{ padding: '80px 0', position: 'relative', overflow: 'hidden' }}>
+        <style>{`
+          .masterpieces-slider-container {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            padding: 20px 0;
+          }
+          .masterpieces-track {
+            display: flex;
+            align-items: stretch;
+            width: max-content;
+            animation: scrollRightMasterpieces 45s linear infinite;
+          }
+          .masterpieces-slider-container:hover .masterpieces-track {
+            animation-play-state: paused;
+          }
+          .masterpieces-card-wrapper {
+            width: 250px;
+            margin-right: 30px;
+            flex-shrink: 0;
+            display: flex;
+            transition: transform 0.3s ease;
+          }
+          .masterpieces-card-wrapper:hover {
+            transform: translateY(-8px) scale(1.02);
+          }
+          @keyframes scrollRightMasterpieces {
+            0% { transform: translateX(-25%); }
+            100% { transform: translateX(0); }
+          }
+          @media (max-width: 768px) {
+            .masterpieces-card-wrapper {
+              width: 190px;
+              margin-right: 15px;
+            }
+          }
+        `}</style>
+        <div style={{ textAlign: 'center', marginBottom: '40px', padding: '0 8%' }}>
           <h2 style={{ fontSize: 'clamp(2rem, 6vw, 2.8rem)', marginBottom: '15px' }}>Signature <span className="gold-gradient-text">Masterpieces</span></h2>
           <div style={{ width: '80px', height: '3px', background: '#d4af37', margin: '0 auto' }}></div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px' }}>
-          {loading ? (
-            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#1a130d', fontFamily: 'Cinzel, serif', fontSize: '1.2rem', letterSpacing: '1px' }}>
-              LOADING MASTERPIECES...
+
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#1a130d', fontFamily: 'Cinzel, serif', fontSize: '1.2rem', letterSpacing: '1px' }}>
+            LOADING MASTERPIECES...
+          </div>
+        ) : signatureMasterpieces && signatureMasterpieces.length > 0 ? (
+          <div className="masterpieces-slider-container">
+            <div className="masterpieces-track">
+              {[...signatureMasterpieces, ...signatureMasterpieces, ...signatureMasterpieces, ...signatureMasterpieces].map((item, index) => (
+                <div key={`${item._id}-${index}`} className="masterpieces-card-wrapper">
+                  <ProductCard 
+                    id={item._id} 
+                    name={item.name} 
+                    price={item.price} 
+                    image={item.image} 
+                  />
+                </div>
+              ))}
             </div>
-          ) : signatureMasterpieces && signatureMasterpieces.length > 0 ? (
-            signatureMasterpieces.map((item) => (
-              <ProductCard 
-                key={item._id} 
-                id={item._id} 
-                name={item.name} 
-                price={item.price} 
-                image={item.image} 
-              />
-            ))
-          ) : (
-            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#1a130d', fontFamily: 'Cinzel, serif', fontSize: '1.1rem', letterSpacing: '1px' }}>
-              NO SIGNATURE PIECES CONFIGURED
-            </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#1a130d', fontFamily: 'Cinzel, serif', fontSize: '1.1rem', letterSpacing: '1px' }}>
+            NO SIGNATURE PIECES CONFIGURED
+          </div>
+        )}
       </section>
       <SummerBanner />
       <ShopByCategory />

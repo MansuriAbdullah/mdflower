@@ -39,7 +39,7 @@ const Varieties = () => {
 
   return (
     <div style={{ 
-      padding: '120px 5% 50px', 
+      padding: 'clamp(100px, 12vw, 140px) 5% 50px', 
       minHeight: '100vh', 
       background: 'linear-gradient(to bottom, #fffdf0, #f8f4e1)',
       fontFamily: 'Montserrat, sans-serif'
@@ -48,25 +48,20 @@ const Varieties = () => {
       {/* Page Title */}
       <div style={{ textAlign: 'center', marginBottom: '80px' }}>
         <h1 className="reveal-anim" style={{ 
-          fontSize: '3.5rem', 
+          fontSize: 'clamp(2rem, 8vw, 3.5rem)', 
           fontFamily: 'Cinzel, serif', 
           color: '#1a130d', 
-          letterSpacing: '12px',
+          letterSpacing: 'clamp(4px, 2vw, 12px)',
           textTransform: 'uppercase',
           margin: 0
         }}>Luxury <span className="gold-gradient-text">Varieties</span></h1>
         <p style={{ letterSpacing: '5px', fontSize: '0.8rem', color: '#8b6914', marginTop: '10px', fontWeight: 'bold' }}>CURATED FOR THE EXTRAORDINARY</p>
       </div>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: '300px 300px 1fr', 
-        gap: '40px',
-        alignItems: 'start'
-      }}>
+      <div className="varieties-grid">
         
         {/* Sidebar 1: Main Category - Luxury Glassmorphism */}
-        <div className="luxury-sidebar" style={{ 
+        <div className="luxury-sidebar main-sidebar" style={{ 
           padding: '40px 30px',
           maxHeight: '80vh',
           overflowY: 'auto',
@@ -102,7 +97,7 @@ const Varieties = () => {
         </div>
 
         {/* Sidebar 2: Sub Category - Minimalist Floating */}
-        <div className="luxury-sidebar" style={{ 
+        <div className="luxury-sidebar sub-sidebar" style={{ 
           padding: '40px 30px',
           maxHeight: '70vh',
           overflowY: 'auto',
@@ -114,6 +109,7 @@ const Varieties = () => {
             {(categoryTree.find(c => c.name === activeTab.main)?.subs || []).map((sub, i) => (
               <div 
                 key={i}
+                className={`sub-sidebar-item ${activeTab.sub === sub ? 'active' : ''}`}
                 onClick={() => setActiveTab({ ...activeTab, sub: sub })}
                 style={{
                   padding: '15px 20px',
@@ -135,13 +131,13 @@ const Varieties = () => {
         </div>
 
         {/* Main Content Area: Products (Varieties) */}
-        <div style={{ padding: '0 30px', animation: 'revealText 1s ease' }}>
+        <div className="varieties-content" style={{ padding: '0 30px', animation: 'revealText 1s ease' }}>
           <div style={{ marginBottom: '50px', borderBottom: '1px solid rgba(212,175,55,0.2)', paddingBottom: '20px', textAlign: 'right' }}>
             <h2 style={{ fontSize: '2.5rem', fontFamily: 'Cinzel', color: '#1a130d', margin: 0, textTransform: 'uppercase' }}>{activeTab.sub}</h2>
             <p style={{ fontSize: '0.9rem', color: '#8b6914', marginTop: '8px', letterSpacing: '2px' }}>PREMIUM CHOICE • {activeTab.main.toUpperCase()}</p>
           </div>
 
-          <div style={{ 
+          <div className="product-grid" style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
             gap: '40px' 
@@ -189,6 +185,91 @@ const Varieties = () => {
         .luxury-sidebar::-webkit-scrollbar-track { background: transparent; }
         .luxury-sidebar::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); border-radius: 10px; }
         .luxury-sidebar::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.6); }
+
+        .varieties-grid {
+          display: grid;
+          grid-template-columns: 300px 300px 1fr;
+          gap: 40px;
+          align-items: start;
+        }
+
+        @media (max-width: 992px) {
+          .varieties-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+          .main-sidebar, .sub-sidebar {
+            position: static !important;
+            max-height: none !important;
+            padding: 15px 20px !important;
+            border-radius: 20px !important;
+          }
+          .main-sidebar h3, .sub-sidebar h3 {
+            display: none !important;
+          }
+          .main-sidebar > div, .sub-sidebar > div {
+            flex-direction: row !important;
+            overflow-x: auto !important;
+            padding-bottom: 5px !important;
+            scrollbar-width: none !important; /* Firefox */
+          }
+          .main-sidebar > div::-webkit-scrollbar, .sub-sidebar > div::-webkit-scrollbar {
+            display: none !important; /* Chrome, Safari */
+          }
+          .main-sidebar > div > div {
+            flex-shrink: 0 !important;
+            padding: 12px 20px !important;
+            font-size: 0.8rem !important;
+            transform: none !important;
+          }
+          .sub-sidebar > div > div {
+            flex-shrink: 0 !important;
+            padding: 10px 15px !important;
+            font-size: 0.8rem !important;
+            border-left: none !important;
+            border-bottom: 3px solid transparent !important;
+            padding-left: 15px !important;
+          }
+          .sub-sidebar > div > div.active {
+            border-bottom: 3px solid #d4af37 !important;
+            background: rgba(212, 175, 55, 0.1) !important;
+          }
+          .varieties-content {
+            padding: 0 !important;
+          }
+          .varieties-content > div:first-child {
+            margin-bottom: 30px !important;
+            text-align: center !important;
+          }
+          .varieties-content h2 {
+            font-size: 1.8rem !important;
+          }
+        }
+
+        @media (max-width: 576px) {
+          .variety-card {
+            border-radius: 12px !important;
+          }
+          .variety-card > div:first-child {
+            height: 145px !important;
+          }
+          .variety-card > div:first-child > div {
+            padding: 12px !important;
+          }
+          .variety-card h4 {
+            font-size: 0.85rem !important;
+          }
+          .variety-card > div:last-child {
+            padding: 12px 15px !important;
+          }
+          .variety-card > div:last-child span {
+            font-size: 0.95rem !important;
+          }
+          .variety-card > div:last-child button {
+            padding: 5px 12px !important;
+            font-size: 0.65rem !important;
+          }
+        }
       `}</style>
     </div>
   );
