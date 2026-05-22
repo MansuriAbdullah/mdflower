@@ -739,7 +739,7 @@ const App = () => {
   return (
     <CartProvider>
       <DataProvider>
-        <div style={{ position: 'relative', background: '#fffdf0' }}>
+        <div style={{ position: 'relative', background: isAdminRoute ? '#ffffff' : '#fffdf0', minHeight: '100vh' }}>
           <GlobalStyles />
           {!isAdminRoute && <FallingGold />}
           {!isAdminRoute && <Navbar />}

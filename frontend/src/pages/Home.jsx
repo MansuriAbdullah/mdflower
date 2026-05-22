@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import ProductCard from '../components/ProductCard';
+import { DataContext } from '../DataContext';
 
 const ColorfulGlow = () => {
   const particles = useMemo(() => Array.from({ length: 40 }).map((_, i) => ({
@@ -695,6 +696,8 @@ const Testimonials = () => {
 };
 
 const Home = () => {
+  const { signatureMasterpieces, loading } = useContext(DataContext);
+
   return (
     <>
       <Hero />
@@ -704,16 +707,25 @@ const Home = () => {
           <div style={{ width: '80px', height: '3px', background: '#d4af37', margin: '0 auto' }}></div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px' }}>
-          <ProductCard id="p1" name="Warm Bloomscape" price="₹145.00" image="/warm_bloomscape.png" />
-          <ProductCard id="p2" name="Grand Amour" price="₹280.00" image="/grand_amour.png" />
-          <ProductCard id="p3" name="Golden Aura" price="₹195.00" image="/golden_aura.png" />
-          <ProductCard id="p4" name="Sun Kissed" price="₹110.00" image="/sun_kissed.png" />
-          <ProductCard id="p5" name="Royal Blush" price="₹210.00" image="/royal_blush.png" />
-          <ProductCard id="p6" name="Pure Ivory" price="₹165.00" image="/pure_ivory.png" />
-          <ProductCard id="p7" name="Midnight Velvet" price="₹185.00" image="/midnight_velvet.png" />
-          <ProductCard id="p8" name="Aurora Orchids" price="₹225.00" image="/aurora_orchids.png" />
-          <ProductCard id="p9" name="Champagne Peonies" price="₹155.00" image="/champagne_peonies.png" />
-          <ProductCard id="p10" name="Enchanted Lilies" price="₹140.00" image="/enchanted_lilies.png" />
+          {loading ? (
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#1a130d', fontFamily: 'Cinzel, serif', fontSize: '1.2rem', letterSpacing: '1px' }}>
+              LOADING MASTERPIECES...
+            </div>
+          ) : signatureMasterpieces && signatureMasterpieces.length > 0 ? (
+            signatureMasterpieces.map((item) => (
+              <ProductCard 
+                key={item._id} 
+                id={item._id} 
+                name={item.name} 
+                price={item.price} 
+                image={item.image} 
+              />
+            ))
+          ) : (
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#1a130d', fontFamily: 'Cinzel, serif', fontSize: '1.1rem', letterSpacing: '1px' }}>
+              NO SIGNATURE PIECES CONFIGURED
+            </div>
+          )}
         </div>
       </section>
       <SummerBanner />

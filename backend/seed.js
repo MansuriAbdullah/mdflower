@@ -3,6 +3,8 @@ require('dotenv').config();
 
 const Product = require('./models/Product');
 const Category = require('./models/Category');
+const TopSellingCategory = require('./models/TopSellingCategory');
+const SignatureMasterpiece = require('./models/SignatureMasterpiece');
 
 const productsData = [
   // Loose Flower Heads -> Premium
@@ -90,6 +92,58 @@ const categoryStructure = [
   { name: 'Corporate Decor', subs: [{name: 'Reception Bouquets', img: ''}, {name: 'Conference Room', img: ''}] }
 ];
 
+const topSellingData = [
+  {
+    name: 'FLOOR PLANTS',
+    subs: [{
+      name: 'Luxe Palms',
+      products: [{ name: 'Luxe Floor Palm', price: '₹180', image: '/cat_floor.png' }]
+    }]
+  },
+  {
+    name: 'PLANTERS & VASES',
+    subs: [{
+      name: 'Geometric',
+      products: [{ name: 'Marble Geometric Vase', price: '₹95', image: '/cat_planters.png' }]
+    }]
+  },
+  {
+    name: 'HANGING PLANTS',
+    subs: [{
+      name: 'Ivies',
+      products: [{ name: 'Emerald Hanging Ivy', price: '₹65', image: '/cat_hanging.png' }]
+    }]
+  },
+  {
+    name: 'TABLE DÉCOR',
+    subs: [{
+      name: 'Statues',
+      products: [{ name: 'Golden Elephant Statue', price: '₹220', image: '/cat_table.png' }]
+    }]
+  },
+  {
+    name: 'WALL DÉCOR',
+    subs: [{
+      name: 'Canvas Art',
+      products: [{ name: 'Floral Canvas Art', price: '₹140', image: '/cat_wall.png' }]
+    }]
+  },
+  {
+    name: 'HANGING FLOWERS',
+    subs: [{
+      name: 'Premium Boxes',
+      products: [{ name: 'Premium Rose Box', price: '₹120', image: '/product1.png' }]
+    }]
+  },
+  {
+    name: 'LED LIGHTS',
+    subs: [{
+      name: 'Chandeliers',
+      products: [{ name: 'Crystal Chandelier', price: '₹450', image: '/crystal_chandelier_luxe_1776254399476.png' }]
+    }]
+  }
+];
+
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('Connected. Starting Seed...');
@@ -97,6 +151,7 @@ mongoose.connect(process.env.MONGO_URI)
     // Clear existing
     await Product.deleteMany({});
     await Category.deleteMany({});
+    await TopSellingCategory.deleteMany({});
 
     // Insert Categories
     for (const cat of categoryStructure) {
@@ -106,6 +161,12 @@ mongoose.connect(process.env.MONGO_URI)
     }
     console.log('Categories seeded.');
 
+    // Insert Top Selling Categories
+    for (const item of topSellingData) {
+      await TopSellingCategory.create(item);
+    }
+    console.log('Top Selling Categories seeded.');
+
     // Insert Products
     if (productsData.length > 0) {
       await Product.insertMany(productsData);
@@ -113,6 +174,26 @@ mongoose.connect(process.env.MONGO_URI)
     } else {
       console.log("No products found to seed.");
     }
+
+    // Seed Signature Masterpieces
+    const masterpiecesInfo = [
+      { name: "Warm Bloomscape", price: "₹145.00", image: "/warm_bloomscape.png", category: "Home Decor", sub: "Table Vases", description: "A warm and inviting arrangement of blooms to brighten any table decor." },
+      { name: "Grand Amour", price: "₹280.00", image: "/grand_amour.png", category: "Home Decor", sub: "Table Vases", description: "A grand and romantic bouquet of premium red and pink roses." },
+      { name: "Golden Aura", price: "₹195.00", image: "/golden_aura.png", category: "Home Decor", sub: "Table Vases", description: "Exquisite golden-accented floral centerpiece reflecting timeless elegance." },
+      { name: "Sun Kissed", price: "₹110.00", image: "/sun_kissed.png", category: "Home Decor", sub: "Table Vases", description: "Vibrant yellow and orange blossoms that feel like a sunlit garden." },
+      { name: "Royal Blush", price: "₹210.00", image: "/royal_blush.png", category: "Home Decor", sub: "Table Vases", description: "Lush pink peonies and roses curated for regal wedding table decor." },
+      { name: "Pure Ivory", price: "₹165.00", image: "/pure_ivory.png", category: "Home Decor", sub: "Table Vases", description: "Pristine white orchids and lilies styled in a modern ceramic vase." },
+      { name: "Midnight Velvet", price: "₹185.00", image: "/midnight_velvet.png", category: "Home Decor", sub: "Table Vases", description: "Dramatic dark velvet roses with deep blue highlights for premium styling." },
+      { name: "Aurora Orchids", price: "₹225.00", image: "/aurora_orchids.png", category: "Home Decor", sub: "Table Vases", description: "A cascading cascade of ethereal purple orchids reflecting the Aurora lights." },
+      { name: "Champagne Peonies", price: "₹155.00", image: "/champagne_peonies.png", category: "Home Decor", sub: "Table Vases", description: "Soft cream-colored peonies with a touch of golden metallic leaves." },
+      { name: "Enchanted Lilies", price: "₹140.00", image: "/enchanted_lilies.png", category: "Home Decor", sub: "Table Vases", description: "Magical white lilies arranged to create an enchanting home aura." }
+    ];
+
+    await SignatureMasterpiece.deleteMany({});
+    const createdProducts = await Product.create(masterpiecesInfo);
+    const productIds = createdProducts.map(p => p._id);
+    await SignatureMasterpiece.create({ products: productIds });
+    console.log('Signature Masterpieces seeded.');
 
     console.log('Seed Complete!');
     process.exit();

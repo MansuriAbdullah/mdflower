@@ -9,6 +9,8 @@ require('dotenv').config();
 
 const Product = require('./models/Product');
 const Category = require('./models/Category');
+const TopSellingCategory = require('./models/TopSellingCategory');
+const SignatureMasterpiece = require('./models/SignatureMasterpiece');
 
 const app = express();
 
@@ -169,6 +171,153 @@ app.put('/api/products/:id', async (req, res) => {
     );
     if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
     res.json(updatedProduct);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// --- TOP SELLING CATEGORIES ROUTES ---
+
+// GET All Top Selling Categories
+app.get('/api/top-selling', async (req, res) => {
+  try {
+    const topSelling = await TopSellingCategory.find().sort({ createdAt: 1 });
+    res.json(topSelling);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST New Top Selling Category
+app.post('/api/top-selling', async (req, res) => {
+  const { name, image, subs } = req.body;
+  try {
+    const newCat = new TopSellingCategory({ name, image, subs: subs || [] });
+    const savedCat = await newCat.save();
+    res.status(201).json(savedCat);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// DELETE Top Selling Category
+app.delete('/api/top-selling/:id', async (req, res) => {
+  try {
+    const deletedCat = await TopSellingCategory.findByIdAndDelete(req.params.id);
+    if (!deletedCat) return res.status(404).json({ message: 'Top selling category not found' });
+    res.json({ message: 'Top selling category deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// PUT (Update) Top Selling Category
+app.put('/api/top-selling/:id', async (req, res) => {
+  const { name, image, subs } = req.body;
+  try {
+    const updatedCat = await TopSellingCategory.findByIdAndUpdate(
+      req.params.id, 
+      { name, image, subs: subs || [] },
+      { new: true }
+    );
+    if (!updatedCat) return res.status(404).json({ message: 'Top selling category not found' });
+    res.json(updatedCat);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// --- IMAGE GALLERY ROUTE ---
+
+// GET Image Gallery
+app.get('/api/gallery', async (req, res) => {
+  try {
+    const products = await Product.find({}, 'image');
+    const categories = await Category.find({}, 'subs.img');
+    const topCategories = await TopSellingCategory.find({}, 'image subs.products.image');
+    
+    const imageUrls = new Set();
+    
+    products.forEach(p => {
+      if (p.image) imageUrls.add(p.image);
+    });
+    
+    categories.forEach(c => {
+      if (c.subs) {
+        c.subs.forEach(s => {
+          if (s.img) imageUrls.add(s.img);
+        });
+      }
+    });
+
+    topCategories.forEach(tc => {
+      if (tc.image) imageUrls.add(tc.image);
+      if (tc.subs) {
+        tc.subs.forEach(sub => {
+          if (sub.products) {
+            sub.products.forEach(prod => {
+              if (prod.image) imageUrls.add(prod.image);
+            });
+          }
+        });
+      }
+    });
+    
+    // Also list local uploads if any
+    const uploadsDir = path.join(__dirname, 'uploads');
+    if (fs.existsSync(uploadsDir)) {
+      try {
+        const files = fs.readdirSync(uploadsDir);
+        files.forEach(file => {
+          if (/\.(jpg|jpeg|png|gif|webp)$/i.test(file)) {
+            imageUrls.add(`/uploads/${file}`);
+          }
+        });
+      } catch (fsErr) {
+        console.error("Error reading uploads dir:", fsErr);
+      }
+    }
+    
+    res.json(Array.from(imageUrls));
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- SIGNATURE MASTERPIECES ROUTES ---
+
+// GET Signature Masterpieces
+app.get('/api/signature-masterpieces', async (req, res) => {
+  try {
+    const doc = await SignatureMasterpiece.findOne().populate('products');
+    if (!doc) {
+      return res.json([]);
+    }
+    res.json(doc.products || []);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// PUT (Update) Signature Masterpieces
+app.put('/api/signature-masterpieces', async (req, res) => {
+  const { productIds } = req.body;
+  if (!Array.isArray(productIds)) {
+    return res.status(400).json({ message: 'productIds must be an array' });
+  }
+  if (productIds.length > 10) {
+    return res.status(400).json({ message: 'Maximum limit of 10 signature masterpieces exceeded' });
+  }
+  try {
+    let doc = await SignatureMasterpiece.findOne();
+    if (!doc) {
+      doc = new SignatureMasterpiece({ products: productIds });
+    } else {
+      doc.products = productIds;
+    }
+    await doc.save();
+    const populated = await doc.populate('products');
+    res.json(populated.products || []);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }

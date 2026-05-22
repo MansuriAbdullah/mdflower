@@ -2,13 +2,28 @@ import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CartContext } from '../CartContext';
 
+const getApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  const hostname = window.location.hostname;
+  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+  return isLocalHost ? 'http://localhost:5000' : 'https://mdflower-qvjl.vercel.app';
+};
+const API_URL = getApiUrl();
+
+const resolveImageUrl = (img) => {
+  if (!img) return '';
+  if (img.startsWith('/') && !img.startsWith('/uploads')) return img;
+  if (img.startsWith('http') || img.startsWith('data:')) return img;
+  return `${API_URL}${img.startsWith('/') ? img : '/' + img}`;
+};
+
 const ProductCard = ({ id, name, price, image }) => {
   const { addToCart } = useContext(CartContext);
   const [added, setAdded] = useState(false);
 
   const handleAdd = (e) => {
     e.preventDefault(); // Prevent navigating if clicking the button
-    addToCart({ id, name, price, image });
+    addToCart({ id, name, price, image: resolveImageUrl(image) });
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
@@ -29,7 +44,7 @@ const ProductCard = ({ id, name, price, image }) => {
             position: 'relative' 
           }}>
             <img 
-              src={image} 
+              src={resolveImageUrl(image)} 
               alt={name} 
               style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.6s' }}
               onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}

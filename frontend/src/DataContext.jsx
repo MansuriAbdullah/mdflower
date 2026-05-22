@@ -14,17 +14,23 @@ const API_URL = getApiUrl();
 export const DataProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [topSellingCategories, setTopSellingCategories] = useState([]);
+  const [signatureMasterpieces, setSignatureMasterpieces] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [prodRes, catRes] = await Promise.all([
+      const [prodRes, catRes, topSellingRes, masterpiecesRes] = await Promise.all([
         axios.get(`${API_URL}/api/products`),
-        axios.get(`${API_URL}/api/categories`)
+        axios.get(`${API_URL}/api/categories`),
+        axios.get(`${API_URL}/api/top-selling`),
+        axios.get(`${API_URL}/api/signature-masterpieces`)
       ]);
       setProducts(prodRes.data);
       setCategories(catRes.data);
+      setTopSellingCategories(topSellingRes.data);
+      setSignatureMasterpieces(masterpiecesRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -52,6 +58,16 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const deleteTopSellingCategory = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/api/top-selling/${id}`);
+      setTopSellingCategories(topSellingCategories.filter(c => c._id !== id));
+    } catch (err) {
+      console.error("Error deleting top selling category", err);
+      throw err;
+    }
+  };
+
   const updateProduct = async (id, updatedData) => {
     try {
       await axios.put(`${API_URL}/api/products/${id}`, updatedData);
@@ -72,12 +88,46 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  const updateTopSellingCategory = async (id, updatedData) => {
+    try {
+      await axios.put(`${API_URL}/api/top-selling/${id}`, updatedData);
+      fetchData();
+    } catch (err) {
+      console.error("Error updating top selling category", err);
+      throw err;
+    }
+  };
+
+  const updateSignatureMasterpieces = async (productIds) => {
+    try {
+      const res = await axios.put(`${API_URL}/api/signature-masterpieces`, { productIds });
+      setSignatureMasterpieces(res.data);
+    } catch (err) {
+      console.error("Error updating signature masterpieces", err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
 
   return (
-    <DataContext.Provider value={{ products, categories, loading, refetchData: fetchData, deleteProduct, deleteCategory, updateProduct, updateCategory }}>
+    <DataContext.Provider value={{ 
+      products, 
+      categories, 
+      topSellingCategories, 
+      signatureMasterpieces,
+      loading, 
+      refetchData: fetchData, 
+      deleteProduct, 
+      deleteCategory, 
+      deleteTopSellingCategory,
+      updateProduct, 
+      updateCategory,
+      updateTopSellingCategory,
+      updateSignatureMasterpieces
+    }}>
       {children}
     </DataContext.Provider>
   );
