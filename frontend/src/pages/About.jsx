@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const About = () => {
+  const navigate = useNavigate();
   return (
     <div style={{ background: '#fffdf0', minHeight: '100vh' }}>
 
@@ -149,8 +151,8 @@ const About = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-              <button className="btn-gold" style={{ background: '#b08d57', padding: '12px 25px', fontSize: '0.7rem' }}>Our Collections</button>
-              <button className="btn-gold" style={{ background: 'transparent', border: '1px solid #b08d57', color: '#b08d57', padding: '12px 25px', fontSize: '0.7rem' }}>Contact Us</button>
+              <button className="btn-gold" onClick={() => navigate('/collection')} style={{ background: '#b08d57', padding: '12px 25px', fontSize: '0.7rem', cursor: 'pointer' }}>Our Collections</button>
+              <button className="btn-gold" onClick={() => navigate('/contact')} style={{ background: 'transparent', border: '1px solid #b08d57', color: '#b08d57', padding: '12px 25px', fontSize: '0.7rem', cursor: 'pointer' }}>Contact Us</button>
             </div>
           </div>
         </div>

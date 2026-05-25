@@ -1,7 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DataContext } from '../DataContext';
 
 const Varieties = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState({
     main: 'Loose Flower Heads',
     sub: 'Premium Flower Heads'
@@ -146,6 +148,7 @@ const Varieties = () => {
               <div 
                 key={idx}
                 className="variety-card glass-card"
+                onClick={() => navigate(`/product/${v._id}`)}
                 style={{
                   borderRadius: '25px',
                   overflow: 'hidden',
@@ -168,7 +171,7 @@ const Varieties = () => {
                 </div>
                 <div style={{ padding: '25px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff' }}>
                   <span style={{ fontSize: '1.1rem', color: '#1a130d', fontWeight: '900' }}>{v.price}</span>
-                  <button style={{ background: '#d4af37', color: '#fff', border: 'none', padding: '8px 18px', borderRadius: '50px', fontSize: '0.75rem', fontWeight: 'bold' }}>VIEW</button>
+                  <button style={{ background: '#d4af37', color: '#fff', border: 'none', padding: '8px 18px', borderRadius: '50px', fontSize: '0.75rem', fontWeight: 'bold', cursor: 'pointer' }}>VIEW</button>
                 </div>
               </div>
             ))}

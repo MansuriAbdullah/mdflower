@@ -69,13 +69,59 @@ const Admin = () => {
 
   const fileInputRef = useRef(null);
 
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+
+  const fetchAdminReviews = async () => {
+    try {
+      setReviewsLoading(true);
+      const res = await axios.get(`${API_URL}/api/reviews`);
+      setReviews(res.data);
+    } catch (err) {
+      console.error("Error loading reviews", err);
+      showMsg("Failed to load reviews", "error");
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  const handleToggleReviewDisplay = async (review) => {
+    try {
+      const updatedStatus = !review.displayed;
+      await axios.put(`${API_URL}/api/reviews/${review._id}`, { displayed: updatedStatus });
+      showMsg(updatedStatus ? "Review is now displayed!" : "Review is now hidden.");
+      setReviews(prev => prev.map(r => r._id === review._id ? { ...r, displayed: updatedStatus } : r));
+    } catch (err) {
+      showMsg("Failed to update review status", "error");
+    }
+  };
+
+  const handleDeleteReview = async (id) => {
+    if (window.confirm("Are you sure you want to delete this review?")) {
+      try {
+        await axios.delete(`${API_URL}/api/reviews/${id}`);
+        showMsg("Review deleted successfully!");
+        setReviews(prev => prev.filter(r => r._id !== id));
+      } catch (err) {
+        showMsg("Failed to delete review", "error");
+      }
+    }
+  };
+
   useEffect(() => {
     const originalBg = document.body.style.backgroundColor;
     document.body.style.backgroundColor = '#ffffff';
+    fetchAdminReviews();
     return () => {
       document.body.style.backgroundColor = originalBg;
     };
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'REVIEWS') {
+      fetchAdminReviews();
+    }
+  }, [activeTab]);
 
   const showMsg = (text, type = 'success') => {
     setMessage({ text, type });
@@ -128,15 +174,32 @@ const Admin = () => {
     return res.data.imageUrl;
   };
 
-  // Submits
   const submitProduct = async (e) => {
     e.preventDefault();
     setIsUploading(true);
-    let finalPrice = productData.price;
+
+    if (!productData.name.trim() || productData.name.trim().length < 3) {
+      showMsg('Product name must be at least 3 characters.', 'error');
+      setIsUploading(false);
+      return;
+    }
+    const cleanPriceStr = productData.price.replace(/[₹\s,a-zA-Z]/g, '');
+    if (!cleanPriceStr || isNaN(Number(cleanPriceStr)) || Number(cleanPriceStr) <= 0) {
+      showMsg('Price must be a valid positive number.', 'error');
+      setIsUploading(false);
+      return;
+    }
+    if (!productImagePreview && !productImageFile) {
+      showMsg('Product image is required.', 'error');
+      setIsUploading(false);
+      return;
+    }
+
+    let finalPrice = productData.price.trim();
     if (!finalPrice.startsWith('₹') && !finalPrice.toLowerCase().includes('rs')) finalPrice = '₹' + finalPrice;
 
     try {
-      let imageUrl = productImagePreview || '/premium_orchid_blue_1777448990406.png'; // use existing image or fallback
+      let imageUrl = productImagePreview || '';
       if (productImageFile) {
         imageUrl = await uploadImage(productImageFile);
       }
@@ -168,6 +231,30 @@ const Admin = () => {
   const submitCategory = async (e) => {
     e.preventDefault();
     setIsUploading(true);
+
+    if (!categoryData.name.trim() || categoryData.name.trim().length < 3) {
+      showMsg('Category name must be at least 3 characters.', 'error');
+      setIsUploading(false);
+      return;
+    }
+
+    // Check all subcategories added have both a name and an image selected
+    for (let i = 0; i < categoryData.subs.length; i++) {
+      const sub = categoryData.subs[i];
+      if (sub.name.trim()) {
+        if (sub.name.trim().length < 3) {
+          showMsg(`Subcategory name "${sub.name}" must be at least 3 characters.`, 'error');
+          setIsUploading(false);
+          return;
+        }
+        if (!sub.imgFile && !sub.imgPreview) {
+          showMsg(`Please upload or select an image for subcategory: ${sub.name}`, 'error');
+          setIsUploading(false);
+          return;
+        }
+      }
+    }
+
     try {
       const validSubs = [];
       for (const sub of categoryData.subs) {
@@ -254,10 +341,16 @@ const Admin = () => {
       .catch(err => console.error("Error loading gallery", err));
   };
 
-  // Top Selling helpers
   const handleSaveTopCategory = async (e) => {
     e.preventDefault();
-    if (!newTopCatName.trim()) return;
+    if (!newTopCatName.trim() || newTopCatName.trim().length < 3) {
+      showMsg('Category name must be at least 3 characters.', 'error');
+      return;
+    }
+    if (!newTopCatImagePreview && !newTopCatImageFile) {
+      showMsg('Category image is required.', 'error');
+      return;
+    }
     try {
       setIsUploading(true);
       let imageUrl = newTopCatImagePreview || '';
@@ -424,8 +517,25 @@ const Admin = () => {
     e.preventDefault();
     if (!selectedTopCat || targetSubIndex === null) return;
     setIsUploading(true);
+
+    if (!topProductData.name.trim() || topProductData.name.trim().length < 3) {
+      showMsg('Product name must be at least 3 characters.', 'error');
+      setIsUploading(false);
+      return;
+    }
+    const cleanPriceStr = topProductData.price.replace(/[₹\s,a-zA-Z]/g, '');
+    if (!cleanPriceStr || isNaN(Number(cleanPriceStr)) || Number(cleanPriceStr) <= 0) {
+      showMsg('Price must be a valid positive number.', 'error');
+      setIsUploading(false);
+      return;
+    }
+    if (!topProductImagePreview && !topProductImageFile) {
+      showMsg('Product image is required.', 'error');
+      setIsUploading(false);
+      return;
+    }
     
-    let finalPrice = topProductData.price;
+    let finalPrice = topProductData.price.trim();
     if (!finalPrice.startsWith('₹') && !finalPrice.toLowerCase().includes('rs')) finalPrice = '₹' + finalPrice;
 
     try {
@@ -519,6 +629,9 @@ const Admin = () => {
           <li onClick={() => { setActiveTab('SIGNATURE_PIECES'); setShowAddProduct(false); setShowAddCategory(false); setIsMobileMenuOpen(false); }} style={{ ...sidebarItem, background: activeTab === 'SIGNATURE_PIECES' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'SIGNATURE_PIECES' ? '#1a130d' : '#666', borderLeft: activeTab === 'SIGNATURE_PIECES' ? '4px solid #d4af37' : '4px solid transparent' }}>
             <span style={{ fontSize: '1.2rem', marginRight: '15px' }}>💎</span> Signature Pieces
           </li>
+          <li onClick={() => { setActiveTab('REVIEWS'); setShowAddProduct(false); setShowAddCategory(false); setIsMobileMenuOpen(false); }} style={{ ...sidebarItem, background: activeTab === 'REVIEWS' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'REVIEWS' ? '#1a130d' : '#666', borderLeft: activeTab === 'REVIEWS' ? '4px solid #d4af37' : '4px solid transparent' }}>
+            <span style={{ fontSize: '1.2rem', marginRight: '15px' }}>💬</span> Reviews
+          </li>
         </ul>
 
         <div style={{ marginTop: 'auto', textAlign: 'center', padding: '20px', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
@@ -559,6 +672,13 @@ const Admin = () => {
                   <div>
                     <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>TOTAL CATEGORIES</p>
                     <h3 style={{ fontSize: '3rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{categories.length}</h3>
+                  </div>
+                </div>
+                <div className="stat-card" style={{...statCard, cursor: 'pointer'}} onClick={() => setActiveTab('REVIEWS')}>
+                  <div style={statIconBox}>💬</div>
+                  <div>
+                    <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>TOTAL REVIEWS</p>
+                    <h3 style={{ fontSize: '3rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{reviews.length}</h3>
                   </div>
                 </div>
               </div>
@@ -1568,6 +1688,118 @@ const Admin = () => {
                     )}
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* --- REVIEWS TAB --- */}
+          {activeTab === 'REVIEWS' && (
+            <div className="fade-in">
+              <div className="admin-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '15px' }}>
+                <div>
+                  <h1 style={headerStyle}>Reviews Management</h1>
+                  <p style={{ color: '#666' }}>Approve, reject, display, or delete client reviews.</p>
+                </div>
+              </div>
+
+              {/* Statistics */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px', marginBottom: '35px' }}>
+                <div className="stat-card" style={statCard}>
+                  <div style={statIconBox}>💬</div>
+                  <div>
+                    <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>TOTAL REVIEWS</p>
+                    <h3 style={{ fontSize: '2rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{reviews.length}</h3>
+                  </div>
+                </div>
+                <div className="stat-card" style={statCard}>
+                  <div style={{...statIconBox, background: 'rgba(74, 222, 128, 0.1)', borderColor: 'rgba(74, 222, 128, 0.3)'}}>🟢</div>
+                  <div>
+                    <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>DISPLAYED</p>
+                    <h3 style={{ fontSize: '2rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{reviews.filter(r => r.displayed).length}</h3>
+                  </div>
+                </div>
+                <div className="stat-card" style={statCard}>
+                  <div style={{...statIconBox, background: 'rgba(253, 224, 141, 0.15)', borderColor: 'rgba(253, 224, 141, 0.4)'}}>⏳</div>
+                  <div>
+                    <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>PENDING</p>
+                    <h3 style={{ fontSize: '2rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{reviews.filter(r => !r.displayed).length}</h3>
+                  </div>
+                </div>
+              </div>
+
+              {/* Reviews Table */}
+              <div className="table-container" style={tableContainer}>
+                {reviewsLoading ? (
+                  <div style={{ textAlign: 'center', padding: '50px' }}>
+                    <div style={{ display: 'inline-block', width: '35px', height: '35px', border: '3px solid rgba(212,175,55,0.2)', borderTopColor: '#d4af37', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                    <p style={{ color: '#8a6d3b', marginTop: '10px', fontWeight: 'bold' }}>Loading reviews...</p>
+                  </div>
+                ) : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <thead style={{ background: '#f8f9fa', borderBottom: '1px solid #eaeaea' }}>
+                      <tr>
+                        <th style={thStyle}>Date & Time</th>
+                        <th style={thStyle}>Client</th>
+                        <th style={thStyle}>Rating</th>
+                        <th style={thStyle}>Review text</th>
+                        <th style={thStyle}>Status</th>
+                        <th style={thStyle}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reviews.map(rev => (
+                        <tr key={rev._id} style={{ borderBottom: '1px solid #f0f0f0', background: '#fff', transition: 'background 0.3s' }} onMouseEnter={e => e.currentTarget.style.background = '#fcfcfc'} onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
+                          <td style={{...tdStyle, fontSize: '0.85rem', color: '#666'}}>
+                            {new Date(rev.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                          </td>
+                          <td style={tdStyle}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <img src={rev.img} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #d4af37' }} />
+                              <div>
+                                <div style={{ fontWeight: 'bold', color: '#1a130d' }}>{rev.name}</div>
+                                <div style={{ fontSize: '0.75rem', color: '#888' }}>{rev.city || 'India'}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{...tdStyle, color: '#d4af37', letterSpacing: '1px', fontWeight: 'bold'}}>
+                            {"★".repeat(rev.stars) + "☆".repeat(5 - rev.stars)}
+                          </td>
+                          <td style={{...tdStyle, whiteSpace: 'normal', maxWidth: '300px', fontSize: '0.9rem', lineHeight: '1.4'}}>
+                            "{rev.text}"
+                          </td>
+                          <td style={tdStyle}>
+                            {rev.displayed ? (
+                              <span style={{...badgeStyle, background: 'rgba(74, 222, 128, 0.1)', color: '#16a34a', borderColor: 'rgba(74, 222, 128, 0.3)'}}>Displayed</span>
+                            ) : (
+                              <span style={{...badgeStyle, background: 'rgba(253, 224, 141, 0.1)', color: '#d97706', borderColor: 'rgba(253, 224, 141, 0.3)'}}>Pending Approval</span>
+                            )}
+                          </td>
+                          <td style={tdStyle}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <button 
+                                onClick={() => handleToggleReviewDisplay(rev)} 
+                                className="edit-btn"
+                                style={{
+                                  background: rev.displayed ? 'rgba(0,0,0,0.03)' : 'rgba(212, 175, 55, 0.15)',
+                                  color: rev.displayed ? '#666' : '#b8860b',
+                                  borderColor: rev.displayed ? '#ccc' : 'rgba(212, 175, 55, 0.3)'
+                                }}
+                              >
+                                {rev.displayed ? 'Hide' : 'Display'}
+                              </button>
+                              <button onClick={() => handleDeleteReview(rev._id)} className="delete-btn">Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {reviews.length === 0 && (
+                        <tr>
+                          <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: '#666', background: '#fff' }}>No reviews found.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           )}

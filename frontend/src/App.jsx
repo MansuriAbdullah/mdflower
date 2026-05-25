@@ -709,68 +709,111 @@ const Navbar = () => {
   );
 };
 
-const Footer = () => (
-  <footer style={{
-    padding: '60px 8% 30px',
-    backgroundColor: '#fffdf0',
-    color: '#1a130d',
-    borderTop: '2px solid #8a6d3b',
-    position: 'relative'
-  }}>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '40px', marginBottom: '50px' }}>
-      <div style={{ gridColumn: 'span 1' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
-          <img src="/logo.png" alt="MD FLOWER" style={{ height: 'clamp(55px, 8vw, 75px)', width: 'auto' }} />
-          <h2 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.2rem)', fontFamily: 'Cinzel', margin: 0 }}>
-            <span className="gold-gradient-text">MD FLOWER</span>
-          </h2>
+const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState({ text: '', type: '' });
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      setMessage({ text: "Email is required.", type: "error" });
+      return;
+    }
+    if (!emailRegex.test(email.trim())) {
+      setMessage({ text: "Please enter a valid email.", type: "error" });
+      return;
+    }
+    setMessage({ text: "Thank you for subscribing!", type: "success" });
+    setEmail('');
+    setTimeout(() => setMessage({ text: '', type: '' }), 4000);
+  };
+
+  return (
+    <footer style={{
+      padding: '60px 8% 30px',
+      backgroundColor: '#fffdf0',
+      color: '#1a130d',
+      borderTop: '2px solid #8a6d3b',
+      position: 'relative'
+    }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '40px', marginBottom: '50px' }}>
+        <div style={{ gridColumn: 'span 1' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '25px' }}>
+            <img src="/logo.png" alt="MD FLOWER" style={{ height: 'clamp(55px, 8vw, 75px)', width: 'auto' }} />
+            <h2 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.2rem)', fontFamily: 'Cinzel', margin: 0 }}>
+              <span className="gold-gradient-text">MD FLOWER</span>
+            </h2>
+          </div>
+          <p style={{ color: '#5c4b22', fontSize: '0.85rem', marginBottom: '15px', lineHeight: '1.6' }}>
+            Bringing eternal beauty to your spaces with India's finest artificial floral collections.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
+            <p style={{ color: '#1a130d' }}><strong>📍 Office:</strong> 4455/SF/1, Niraj House, Ahmedabad</p>
+            <p style={{ color: '#1a130d' }}><strong>📞 WhatsApp:</strong> +91 90168 53590</p>
+            <p style={{ color: '#1a130d' }}><strong>✉️ Email:</strong> info@mdflowers.in</p>
+          </div>
         </div>
-        <p style={{ color: '#5c4b22', fontSize: '0.85rem', marginBottom: '15px', lineHeight: '1.6' }}>
-          Bringing eternal beauty to your spaces with India's finest artificial floral collections.
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem' }}>
-          <p style={{ color: '#1a130d' }}><strong>📍 Office:</strong> 4455/SF/1, Niraj House, Ahmedabad</p>
-          <p style={{ color: '#1a130d' }}><strong>📞 WhatsApp:</strong> +91 90168 53590</p>
-          <p style={{ color: '#1a130d' }}><strong>✉️ Email:</strong> info@mdflowers.in</p>
+
+        <div>
+          <h4 style={{ color: '#1a130d', marginBottom: '20px', fontSize: '1.1rem', fontFamily: 'Cinzel', fontWeight: 'bold', borderBottom: '1px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Categories</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
+            {['Loose Flower Heads', 'Leaves', 'Bunches', 'Hangings', 'Flower Sticks'].map(item => (
+              <Link key={item} to="/collection" style={{ color: '#5c4b22', textDecoration: 'none', transition: '0.3s', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#d4af37'} onMouseLeave={(e) => e.target.style.color = '#5c4b22'}>{item}</Link>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h4 style={{ color: '#1a130d', marginBottom: '20px', fontSize: '1.1rem', fontFamily: 'Cinzel', fontWeight: 'bold', borderBottom: '1px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Quick Links</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
+            {['About', 'Exibition', 'Contact', 'Privacy Policy', 'Terms'].map(item => (
+              <Link key={item} to={item === 'About' ? '/about' : item === 'Contact' ? '/contact' : '#'} style={{ color: '#5c4b22', textDecoration: 'none', transition: '0.3s', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#d4af37'} onMouseLeave={(e) => e.target.style.color = '#5c4b22'}>{item}</Link>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h4 style={{ color: '#1a130d', marginBottom: '20px', fontSize: '1.1rem', fontFamily: 'Cinzel', fontWeight: 'bold', borderBottom: '1px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Newsletter</h4>
+          <p style={{ color: '#5c4b22', fontSize: '0.85rem', marginBottom: '15px', marginTop: '15px' }}>Subscribe for luxury collection updates.</p>
+          <form onSubmit={handleSubscribe} style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <div style={{ display: 'flex', gap: '5px' }}>
+              <input 
+                type="text" 
+                placeholder="Email" 
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (message.text) setMessage({ text: '', type: '' });
+                }}
+                style={{ padding: '8px 12px', borderRadius: '5px', border: message.type === 'error' ? '1px solid #cc0000' : '1px solid #d4af37', background: 'transparent', flex: 1, fontSize: '0.8rem', color: '#1a130d', outline: 'none' }} 
+              />
+              <button type="submit" style={{ background: '#1a130d', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontSize: '0.8rem' }}>Join</button>
+            </div>
+            {message.text && (
+              <span style={{ 
+                fontSize: '0.75rem', 
+                color: message.type === 'error' ? '#cc0000' : '#16a34a', 
+                fontWeight: 'bold', 
+                marginTop: '4px',
+                display: 'block' 
+              }}>
+                {message.text}
+              </span>
+            )}
+          </form>
         </div>
       </div>
 
-      <div>
-        <h4 style={{ color: '#1a130d', marginBottom: '20px', fontSize: '1.1rem', fontFamily: 'Cinzel', fontWeight: 'bold', borderBottom: '1px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Categories</h4>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
-          {['Loose Flower Heads', 'Leaves', 'Bunches', 'Hangings', 'Flower Sticks'].map(item => (
-            <Link key={item} to="/collection" style={{ color: '#5c4b22', textDecoration: 'none', transition: '0.3s', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#d4af37'} onMouseLeave={(e) => e.target.style.color = '#5c4b22'}>{item}</Link>
-          ))}
+      <div style={{ borderTop: '1px solid rgba(138, 109, 59, 0.2)', paddingTop: '30px', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', marginBottom: '15px' }}>
+          {['Instagram', 'Facebook', 'WhatsApp', 'YouTube'].map(s => <a key={s} href="#" style={{ color: '#8a6d3b', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.85rem' }}>{s}</a>)}
         </div>
+        <p style={{ fontSize: '0.75rem', color: '#5c4b22' }}>&copy; 2026 MD Flowers Boutique. All Rights Reserved. Crafted with Luxury.</p>
       </div>
-
-      <div>
-        <h4 style={{ color: '#1a130d', marginBottom: '20px', fontSize: '1.1rem', fontFamily: 'Cinzel', fontWeight: 'bold', borderBottom: '1px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Quick Links</h4>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
-          {['About', 'Exibition', 'Contact', 'Privacy Policy', 'Terms'].map(item => (
-            <Link key={item} to={item === 'About' ? '/about' : item === 'Contact' ? '/contact' : '#'} style={{ color: '#5c4b22', textDecoration: 'none', transition: '0.3s', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#d4af37'} onMouseLeave={(e) => e.target.style.color = '#5c4b22'}>{item}</Link>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h4 style={{ color: '#1a130d', marginBottom: '20px', fontSize: '1.1rem', fontFamily: 'Cinzel', fontWeight: 'bold', borderBottom: '1px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Newsletter</h4>
-        <p style={{ color: '#5c4b22', fontSize: '0.85rem', marginBottom: '15px', marginTop: '15px' }}>Subscribe for luxury collection updates.</p>
-        <div style={{ display: 'flex', gap: '5px' }}>
-          <input type="email" placeholder="Email" style={{ padding: '8px 12px', borderRadius: '5px', border: '1px solid #d4af37', background: 'transparent', flex: 1, fontSize: '0.8rem' }} />
-          <button style={{ background: '#1a130d', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontSize: '0.8rem' }}>Join</button>
-        </div>
-      </div>
-    </div>
-
-    <div style={{ borderTop: '1px solid rgba(138, 109, 59, 0.2)', paddingTop: '30px', textAlign: 'center' }}>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '30px', marginBottom: '15px' }}>
-        {['Instagram', 'Facebook', 'WhatsApp', 'YouTube'].map(s => <a key={s} href="#" style={{ color: '#8a6d3b', textDecoration: 'none', fontWeight: 'bold', fontSize: '0.85rem' }}>{s}</a>)}
-      </div>
-      <p style={{ fontSize: '0.75rem', color: '#5c4b22' }}>&copy; 2026 MD Flowers Boutique. All Rights Reserved. Crafted with Luxury.</p>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
 
 const App = () => {
   const location = useLocation();

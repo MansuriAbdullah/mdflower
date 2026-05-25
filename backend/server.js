@@ -11,6 +11,7 @@ const Product = require('./models/Product');
 const Category = require('./models/Category');
 const TopSellingCategory = require('./models/TopSellingCategory');
 const SignatureMasterpiece = require('./models/SignatureMasterpiece');
+const Review = require('./models/Review');
 
 const app = express();
 
@@ -29,7 +30,29 @@ const upload = multer({
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log('MongoDB Connected to MDFLOWERS'))
+.then(async () => {
+  console.log('MongoDB Connected to MDFLOWERS');
+  try {
+    const count = await Review.countDocuments();
+    if (count === 0) {
+      console.log('Review collection empty, seeding default reviews...');
+      const defaultReviews = [
+        { name: "Priyanka Sharma", city: "Mumbai", img: "/client1.png", text: "The flower wall for my wedding exceeded all expectations. It was the centerpiece.", stars: 5, displayed: true },
+        { name: "Rahul Mehta", city: "Delhi", img: "/client2.png", text: "Premium quality artificial flowers that look more real than nature itself. Simply breathtaking.", stars: 5, displayed: true },
+        { name: "Ananya Iyer", city: "Bangalore", img: "/client3.png", text: "MD Flowers has changed my home. Their LED hangings bring a magical aura.", stars: 5, displayed: true },
+        { name: "Vikram Singh", city: "Jaipur", img: "https://picsum.photos/seed/v/100/100", text: "Exceptional craftsmanship. The attention to detail is unparalleled.", stars: 5, displayed: true },
+        { name: "Sanya Kapoor", city: "Chandigarh", img: "https://picsum.photos/seed/s/100/100", text: "Ordered custom floral drapes for a gala. Flawless design.", stars: 5, displayed: true },
+        { name: "Meera Das", city: "Kolkata", img: "https://picsum.photos/seed/m/100/100", text: "The loose jasmine heads are so fresh-looking. Perfect for ceremonies.", stars: 5, displayed: true },
+        { name: "Karan Johar", city: "Mumbai", img: "https://picsum.photos/seed/k/100/100", text: "The best floral decor in India. Period.", stars: 5, displayed: true },
+        { name: "Deepika P.", city: "Bangalore", img: "https://picsum.photos/seed/d/100/100", text: "Elegant, luxury, and classy. Exactly what I wanted.", stars: 5, displayed: true }
+      ];
+      await Review.insertMany(defaultReviews);
+      console.log('Default reviews seeded successfully!');
+    }
+  } catch (err) {
+    console.error('Error seeding default reviews:', err);
+  }
+})
 .catch(err => console.log('MongoDB Connection Error: ', err));
 
 // --- ROUTES ---
@@ -320,6 +343,79 @@ app.put('/api/signature-masterpieces', async (req, res) => {
     res.json(populated.products || []);
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+});
+
+// --- REVIEWS ROUTES ---
+
+// GET All Reviews (Admin View - all reviews sorted by newest first)
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const reviews = await Review.find().sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// GET Approved Reviews (Public View - displayed: true, sorted by newest first)
+app.get('/api/reviews/approved', async (req, res) => {
+  try {
+    const reviews = await Review.find({ displayed: true }).sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST New Review (Public submission)
+app.post('/api/reviews', async (req, res) => {
+  const { name, city, text, stars } = req.body;
+  
+  // Choose a random seed index for picsum photo, or let user have default avatar
+  const seedChar = name ? name.trim().charAt(0).toLowerCase() : 'a';
+  const imgUrl = `https://picsum.photos/seed/${seedChar + Math.floor(Math.random() * 100)}/100/100`;
+
+  try {
+    const newReview = new Review({
+      name,
+      city: city || 'India',
+      text,
+      stars: Number(stars) || 5,
+      img: imgUrl,
+      displayed: false // Awaits admin approval
+    });
+    const savedReview = await newReview.save();
+    res.status(201).json(savedReview);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// PUT Update Review (Admin approves/disapproves or updates status)
+app.put('/api/reviews/:id', async (req, res) => {
+  const { displayed } = req.body;
+  try {
+    const updatedReview = await Review.findByIdAndUpdate(
+      req.params.id,
+      { displayed },
+      { new: true }
+    );
+    if (!updatedReview) return res.status(404).json({ message: 'Review not found' });
+    res.json(updatedReview);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// DELETE Review (Admin deletes review)
+app.delete('/api/reviews/:id', async (req, res) => {
+  try {
+    const deletedReview = await Review.findByIdAndDelete(req.params.id);
+    if (!deletedReview) return res.status(404).json({ message: 'Review not found' });
+    res.json({ message: 'Review deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

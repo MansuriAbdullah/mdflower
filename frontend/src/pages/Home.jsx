@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { DataContext } from '../DataContext';
 
@@ -79,7 +80,7 @@ const heroSlides = [
   },
 ];
 
-const Hero = () => {
+const Hero = ({ onOpenVideo }) => {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
 
@@ -192,22 +193,28 @@ const Hero = () => {
         }}>{slide.sub}</p>
 
         <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-          <button className="btn-gold" onClick={() => window.location.href = '#collection'}>
+          <button className="btn-gold" onClick={() => {
+            const el = document.getElementById('collection');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}>
             The Collection
           </button>
-          <button style={{
-            padding: '14px 30px',
-            fontSize: '0.8rem',
-            background: 'transparent',
-            color: '#fff',
-            border: '2px solid rgba(255,255,255,0.7)',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: '700',
-            letterSpacing: '1px',
-            textTransform: 'uppercase',
-            transition: 'all 0.3s ease',
-          }}>
+          <button 
+            onClick={onOpenVideo}
+            style={{
+              padding: '14px 30px',
+              fontSize: '0.8rem',
+              background: 'transparent',
+              color: '#fff',
+              border: '2px solid rgba(255,255,255,0.7)',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              letterSpacing: '1px',
+              textTransform: 'uppercase',
+              transition: 'all 0.3s ease',
+            }}
+          >
             Studio Tour
           </button>
         </div>
@@ -250,43 +257,46 @@ const Hero = () => {
   );
 };
 
-const SummerBanner = () => (
-  <section id="summer" style={{ padding: '60px 8%' }}>
-    <div style={{ marginBottom: '20px' }}>
-      <h3 style={{ fontSize: '1.6rem', color: '#1a130d' }}>Summer Blooms</h3>
-      <p style={{ color: '#1a130d' }}>Where summer unfolds in exquisite florals</p>
-    </div>
-    <div style={{
-      minHeight: '320px',
-      width: '100%',
-      backgroundImage: `linear-gradient(rgba(255,253,240,0.1), rgba(255,253,240,0.1)), url('/summer_banner.png')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      borderRadius: '25px',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '40px 20px',
-      position: 'relative',
-      overflow: 'hidden',
-      boxShadow: '0 15px 30px rgba(0,0,0,0.1)'
-    }}>
-      <h2 style={{
-        fontSize: 'clamp(2rem, 8vw, 5rem)',
-        color: '#1a130d',
-        fontFamily: 'Playfair Display',
-        letterSpacing: 'clamp(4px, 2vw, 8px)',
-        marginBottom: '20px',
-        textAlign: 'center',
-        textShadow: '0 5px 12px rgba(255,255,255,0.5)'
+const SummerBanner = () => {
+  const navigate = useNavigate();
+  return (
+    <section id="summer" style={{ padding: '60px 8%' }}>
+      <div style={{ marginBottom: '20px' }}>
+        <h3 style={{ fontSize: '1.6rem', color: '#1a130d' }}>Summer Blooms</h3>
+        <p style={{ color: '#1a130d' }}>Where summer unfolds in exquisite florals</p>
+      </div>
+      <div style={{
+        minHeight: '320px',
+        width: '100%',
+        backgroundImage: `linear-gradient(rgba(255,253,240,0.1), rgba(255,253,240,0.1)), url('/summer_banner.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        borderRadius: '25px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '40px 20px',
+        position: 'relative',
+        overflow: 'hidden',
+        boxShadow: '0 15px 30px rgba(0,0,0,0.1)'
       }}>
-        SUMMER BLOOMS
-      </h2>
-      <button className="btn-gold" style={{ background: '#1a130d', color: '#fff', padding: '12px 40px', fontSize: '0.8rem' }}>Explore Collection</button>
-    </div>
-  </section>
-);
+        <h2 style={{
+          fontSize: 'clamp(2rem, 8vw, 5rem)',
+          color: '#1a130d',
+          fontFamily: 'Playfair Display',
+          letterSpacing: 'clamp(4px, 2vw, 8px)',
+          marginBottom: '20px',
+          textAlign: 'center',
+          textShadow: '0 5px 12px rgba(255,255,255,0.5)'
+        }}>
+          SUMMER BLOOMS
+        </h2>
+        <button className="btn-gold" onClick={() => navigate('/collection')} style={{ background: '#1a130d', color: '#fff', padding: '12px 40px', fontSize: '0.8rem' }}>Explore Collection</button>
+      </div>
+    </section>
+  );
+};
 
 const TrustedClients = () => {
   const clients = [
@@ -371,6 +381,7 @@ const TrustedClients = () => {
 };
 
 const ShopByCategory = () => {
+  const navigate = useNavigate();
   const categories = [
     { name: 'FLOOR PLANTS', img: '/cat_floor.png' },
     { name: 'PLANTERS & VASES', img: '/cat_planters.png' },
@@ -405,7 +416,7 @@ const ShopByCategory = () => {
       </div>
       <div className="categories-scroll" style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(15px, 2vw, 30px)', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '20px' }}>
         {categories.map((cat, i) => (
-          <div key={i} style={{ textAlign: 'center', cursor: 'pointer', flexShrink: 0 }} onClick={() => window.location.href = '/top-selling'}>
+          <div key={i} style={{ textAlign: 'center', cursor: 'pointer', flexShrink: 0 }} onClick={() => navigate('/top-selling')}>
             <div style={{ 
               width: 'clamp(120px, 10vw, 160px)', 
               height: 'clamp(120px, 10vw, 160px)', 
@@ -533,97 +544,216 @@ const IndiaDelivery = () => {
   );
 };
 
-const ContactSection = () => (
-  <section id="contact" style={{ 
-    padding: '60px 8%', 
-    background: '#fffdf0', 
-    position: 'relative', 
-    overflow: 'hidden',
-  }}>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '50px', alignItems: 'center', width: '100%', position: 'relative', zIndex: 2 }}>
-      <div>
-        <h4 style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', marginBottom: '10px', fontWeight: 'bold' }}>Contact Us</h4>
-        <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', marginBottom: '15px', lineHeight: '1', color: '#1a130d', fontFamily: 'Playfair Display, serif' }}>
-          Get In <span style={{ color: '#d4af37', fontStyle: 'italic' }}>Touch</span>
-        </h2>
-        <p style={{ fontSize: '1.05rem', color: '#5c4b22', marginBottom: '30px', lineHeight: '1.6', maxWidth: '500px' }}>
-          Whether it's for a wedding, corporate event, or a personal gift, we're here to make your vision golden.
-        </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {[
-            { icon: '📍', title: 'Head Office', text: '4455/SF/1, Niraj House, Fuvara Gandhi Road, Ahmedabad, Gujarat 380001' },
-            { icon: '📍', title: 'Showroom', text: 'HS Landmark-2, Aaree Denim, Narol, Ahmedabad, Gujarat-382405' },
-            { icon: '✉️', title: 'Email Us', text: 'info@mdflowers.in' }
-          ].map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <span style={{ 
-                fontSize: '1.2rem', 
-                background: '#fff', 
-                border: '1px solid rgba(212,175,55,0.3)',
-                width: '45px',
-                height: '45px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '50%',
-                color: '#d4af37',
-                boxShadow: '0 5px 15px rgba(212,175,55,0.1)'
-              }}>{item.icon}</span>
-              <div>
-                <p style={{ fontWeight: 'bold', color: '#1a130d', fontSize: '0.95rem', marginBottom: '3px' }}>{item.title}</p>
-                <p style={{ color: '#5c4b22', fontSize: '0.85rem', lineHeight: '1.4', maxWidth: '280px' }}>{item.text}</p>
+const ContactSection = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [showModal, setShowModal] = useState(false);
+
+  const validate = () => {
+    const tempErrors = {};
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      tempErrors.name = "Name is required.";
+    } else if (formData.name.trim().length < 3) {
+      tempErrors.name = "Name must be at least 3 characters.";
+    } else if (!/^[A-Za-z\s]+$/.test(formData.name)) {
+      tempErrors.name = "Name must contain only alphabets.";
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      tempErrors.email = "Email is required.";
+    } else if (!emailRegex.test(formData.email.trim())) {
+      tempErrors.email = "Please enter a valid email address.";
+    }
+
+    // Message validation
+    if (!formData.message.trim()) {
+      tempErrors.message = "Message is required.";
+    } else if (formData.message.trim().length < 10) {
+      tempErrors.message = "Message must be at least 10 characters.";
+    }
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validate()) {
+      setShowModal(true);
+      setFormData({
+        name: '',
+        email: '',
+        message: ''
+      });
+      setErrors({});
+    }
+  };
+
+  return (
+    <section id="contact" style={{ 
+      padding: '60px 8%', 
+      background: '#fffdf0', 
+      position: 'relative', 
+      overflow: 'hidden',
+    }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '50px', alignItems: 'center', width: '100%', position: 'relative', zIndex: 2 }}>
+        <div>
+          <h4 style={{ color: '#d4af37', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', marginBottom: '10px', fontWeight: 'bold' }}>Contact Us</h4>
+          <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 3.5rem)', marginBottom: '15px', lineHeight: '1', color: '#1a130d', fontFamily: 'Playfair Display, serif' }}>
+            Get In <span style={{ color: '#d4af37', fontStyle: 'italic' }}>Touch</span>
+          </h2>
+          <p style={{ fontSize: '1.05rem', color: '#5c4b22', marginBottom: '30px', lineHeight: '1.6', maxWidth: '500px' }}>
+            Whether it's for a wedding, corporate event, or a personal gift, we're here to make your vision golden.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {[
+              { icon: '📍', title: 'Head Office', text: '4455/SF/1, Niraj House, Fuvara Gandhi Road, Ahmedabad, Gujarat 380001' },
+              { icon: '📍', title: 'Showroom', text: 'HS Landmark-2, Aaree Denim, Narol, Ahmedabad, Gujarat-382405' },
+              { icon: '✉️', title: 'Email Us', text: 'info@mdflowers.in' }
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <span style={{ 
+                  fontSize: '1.2rem', 
+                  background: '#fff', 
+                  border: '1px solid rgba(212,175,55,0.3)',
+                  width: '45px',
+                  height: '45px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  color: '#d4af37',
+                  boxShadow: '0 5px 15px rgba(212,175,55,0.1)'
+                }}>{item.icon}</span>
+                <div>
+                  <p style={{ fontWeight: 'bold', color: '#1a130d', fontSize: '0.95rem', marginBottom: '3px' }}>{item.title}</p>
+                  <p style={{ color: '#5c4b22', fontSize: '0.85rem', lineHeight: '1.4', maxWidth: '280px' }}>{item.text}</p>
+                </div>
               </div>
+            ))}
+          </div>
+        </div>
+        
+        <div style={{ 
+          padding: '30px 40px', 
+          background: '#fff', 
+          borderRadius: '15px', 
+          border: '1px solid rgba(212,175,55,0.2)',
+          boxShadow: '0 15px 40px rgba(0,0,0,0.05)'
+        }}>
+          <h3 style={{ fontSize: '1.5rem', color: '#1a130d', marginBottom: '25px', fontFamily: 'Playfair Display, serif' }}>Send a Message</h3>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ position: 'relative' }}>
+              <input 
+                type="text" 
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Your Name" 
+                style={{ 
+                  padding: '12px 15px', borderRadius: '8px', border: errors.name ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                  background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
+                  transition: 'border 0.3s ease'
+                }} 
+                onFocus={(e) => { if (!errors.name) e.target.style.border = '1px solid #d4af37'; }} 
+                onBlur={(e) => { if (!errors.name) e.target.style.border = '1px solid #e0e0e0'; }}
+              />
+              {errors.name && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.name}</span>}
             </div>
-          ))}
+            <div style={{ position: 'relative' }}>
+              <input 
+                type="text" 
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Your Email" 
+                style={{ 
+                  padding: '12px 15px', borderRadius: '8px', border: errors.email ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                  background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
+                  transition: 'border 0.3s ease'
+                }} 
+                onFocus={(e) => { if (!errors.email) e.target.style.border = '1px solid #d4af37'; }} 
+                onBlur={(e) => { if (!errors.email) e.target.style.border = '1px solid #e0e0e0'; }}
+              />
+              {errors.email && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.email}</span>}
+            </div>
+            <div style={{ position: 'relative' }}>
+              <textarea 
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                placeholder="Your Message" 
+                rows="4" 
+                style={{ 
+                  padding: '12px 15px', borderRadius: '8px', border: errors.message ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                  background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
+                  resize: 'none', transition: 'border 0.3s ease'
+                }} 
+                onFocus={(e) => { if (!errors.message) e.target.style.border = '1px solid #d4af37'; }} 
+                onBlur={(e) => { if (!errors.message) e.target.style.border = '1px solid #e0e0e0'; }}
+              ></textarea>
+              {errors.message && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.message}</span>}
+            </div>
+            <button 
+              type="submit"
+              style={{ 
+                width: '100%', padding: '15px', background: '#d4af37', color: '#fff', 
+                border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', 
+                cursor: 'pointer', letterSpacing: '1px', textTransform: 'uppercase', transition: 'all 0.3s ease',
+                boxShadow: '0 8px 15px rgba(212,175,55,0.3)'
+              }} 
+              onMouseEnter={(e) => {e.target.style.background = '#1a130d'; e.target.style.boxShadow = '0 8px 15px rgba(26,19,13,0.3)';}} 
+              onMouseLeave={(e) => {e.target.style.background = '#d4af37'; e.target.style.boxShadow = '0 8px 15px rgba(212,175,55,0.3)';}}
+            >
+              Send Request
+            </button>
+          </form>
         </div>
       </div>
-      
-      <div style={{ 
-        padding: '30px 40px', 
-        background: '#fff', 
-        borderRadius: '15px', 
-        border: '1px solid rgba(212,175,55,0.2)',
-        boxShadow: '0 15px 40px rgba(0,0,0,0.05)'
-      }}>
-        <h3 style={{ fontSize: '1.5rem', color: '#1a130d', marginBottom: '25px', fontFamily: 'Playfair Display, serif' }}>Send a Message</h3>
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ position: 'relative' }}>
-            <input type="text" placeholder="Your Name" style={{ 
-              padding: '12px 15px', borderRadius: '8px', border: '1px solid #e0e0e0', 
-              background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
-              transition: 'border 0.3s ease'
-            }} onFocus={(e) => e.target.style.border = '1px solid #d4af37'} onBlur={(e) => e.target.style.border = '1px solid #e0e0e0'}/>
-          </div>
-          <div style={{ position: 'relative' }}>
-            <input type="email" placeholder="Your Email" style={{ 
-               padding: '12px 15px', borderRadius: '8px', border: '1px solid #e0e0e0', 
-               background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
-               transition: 'border 0.3s ease'
-            }} onFocus={(e) => e.target.style.border = '1px solid #d4af37'} onBlur={(e) => e.target.style.border = '1px solid #e0e0e0'}/>
-          </div>
-          <div style={{ position: 'relative' }}>
-            <textarea placeholder="Your Message" rows="4" style={{ 
-               padding: '12px 15px', borderRadius: '8px', border: '1px solid #e0e0e0', 
-               background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
-               resize: 'none', transition: 'border 0.3s ease'
-            }} onFocus={(e) => e.target.style.border = '1px solid #d4af37'} onBlur={(e) => e.target.style.border = '1px solid #e0e0e0'}></textarea>
-          </div>
-          <button style={{ 
-            width: '100%', padding: '15px', background: '#d4af37', color: '#fff', 
-            border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', 
-            cursor: 'pointer', letterSpacing: '1px', textTransform: 'uppercase', transition: 'all 0.3s ease',
-            boxShadow: '0 8px 15px rgba(212,175,55,0.3)'
-          }} onMouseEnter={(e) => {e.target.style.background = '#1a130d'; e.target.style.boxShadow = '0 8px 15px rgba(26,19,13,0.3)';}} 
-             onMouseLeave={(e) => {e.target.style.background = '#d4af37'; e.target.style.boxShadow = '0 8px 15px rgba(212,175,55,0.3)';}}>
-            Send Request
-          </button>
-        </form>
-      </div>
-    </div>
-  </section>
-);
 
-const MagicalTreeSection = () => (
+      {/* Success Modal */}
+      {showModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: '#fffdf0', border: '2px solid #d4af37', borderRadius: '25px', padding: '40px 30px', maxWidth: '500px', width: '90%', textAlign: 'center', boxShadow: '0 20px 50px rgba(0,0,0,0.15)' }}>
+            <span style={{ fontSize: '4rem', display: 'block', marginBottom: '15px' }}>✉️</span>
+            <h3 style={{ fontFamily: 'Cinzel, serif', fontSize: '1.8rem', color: '#1a130d', marginBottom: '15px' }}>Message Sent!</h3>
+            <p style={{ color: '#5c4b22', lineHeight: '1.6', marginBottom: '25px', fontSize: '1rem' }}>
+              Thank you, your message has been received! Our support team will review your message and get back to you shortly.
+            </p>
+            <button className="btn-gold" style={{ padding: '12px 35px', borderRadius: '50px' }} onClick={() => setShowModal(false)}>
+              CLOSE
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+};
+
+const MagicalTreeSection = ({ onOpenVideo }) => (
   <section id="why-choose" style={{ padding: '80px 8%', background: 'linear-gradient(to bottom, #fffdf0, #fcf9e1)' }}>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '50px', alignItems: 'center' }}>
       <div style={{ textAlign: 'left' }}>
@@ -657,14 +787,15 @@ const MagicalTreeSection = () => (
           ))}
         </ul>
 
-        <button className="btn-gold" style={{
+        <button className="btn-gold" onClick={onOpenVideo} style={{
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
           padding: '14px 30px',
           background: '#1a130d',
           color: '#fff',
-          fontSize: '0.85rem'
+          fontSize: '0.85rem',
+          cursor: 'pointer'
         }}>
           Play Video
         </button>
@@ -689,6 +820,7 @@ const MagicalTreeSection = () => (
 );
 
 const Testimonials = () => {
+  const navigate = useNavigate();
   const reviews = [
     { name: "Priyanka Sharma", city: "Mumbai", img: "/client1.png", text: "Exceeded all expectations. Truly luxury at its best! The floral wall was the highlight of our event.", stars: 5 },
     { name: "Rahul Mehta", city: "Delhi", img: "/client2.png", text: "Artificial flowers that look more real than nature. Stunning quality and breathtaking detail.", stars: 5 },
@@ -791,7 +923,7 @@ const Testimonials = () => {
         </div>
       </div>
       <div style={{ textAlign: 'center', marginTop: '40px' }}>
-        <button className="btn-gold" style={{ padding: '12px 35px' }} onClick={() => window.location.href = '/reviews'}>View All Stories</button>
+        <button className="btn-gold" style={{ padding: '12px 35px' }} onClick={() => navigate('/reviews')}>View All Stories</button>
       </div>
     </section>
   );
@@ -799,10 +931,11 @@ const Testimonials = () => {
 
 const Home = () => {
   const { signatureMasterpieces, loading } = useContext(DataContext);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   return (
     <>
-      <Hero />
+      <Hero onOpenVideo={() => setShowVideoModal(true)} />
       <section id="collection" style={{ padding: '80px 0', position: 'relative', overflow: 'hidden' }}>
         <style>{`
           .masterpieces-slider-container {
@@ -876,8 +1009,71 @@ const Home = () => {
       <TrustedClients />
       <IndiaDelivery />
       <Testimonials />
-      <MagicalTreeSection />
+      <MagicalTreeSection onOpenVideo={() => setShowVideoModal(true)} />
       <ContactSection />
+
+      {showVideoModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          animation: 'fadeIn 0.3s ease'
+        }}>
+          <div style={{
+            background: '#1a130d',
+            border: '2px solid #d4af37',
+            borderRadius: '25px',
+            padding: '20px',
+            maxWidth: '850px',
+            width: '90%',
+            position: 'relative',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+            textAlign: 'center'
+          }}>
+            <button 
+              onClick={() => setShowVideoModal(false)}
+              style={{
+                position: 'absolute',
+                top: '-15px',
+                right: '-15px',
+                background: '#d4af37',
+                color: '#1a130d',
+                border: 'none',
+                width: '35px',
+                height: '35px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                fontSize: '1.2rem',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 5px 15px rgba(0,0,0,0.3)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.target.style.background = '#fff'}
+              onMouseLeave={(e) => e.target.style.background = '#d4af37'}
+            >
+              ×
+            </button>
+            <h3 style={{ fontFamily: 'Cinzel, serif', color: '#d4af37', marginBottom: '15px', fontSize: '1.5rem', letterSpacing: '2px' }}>STUDIO TOUR & ARTISTRY</h3>
+            <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '15px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.3)' }}>
+              <video 
+                src="https://assets.mixkit.co/videos/preview/mixkit-flowers-in-a-vase-41662-large.mp4" 
+                controls 
+                autoPlay 
+                loop 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

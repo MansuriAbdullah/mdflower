@@ -1,6 +1,75 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [showModal, setShowModal] = useState(false);
+
+  const validate = () => {
+    const tempErrors = {};
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      tempErrors.name = "Name is required.";
+    } else if (formData.name.trim().length < 3) {
+      tempErrors.name = "Name must be at least 3 characters.";
+    } else if (!/^[A-Za-z\s]+$/.test(formData.name)) {
+      tempErrors.name = "Name must contain only alphabets.";
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      tempErrors.email = "Email is required.";
+    } else if (!emailRegex.test(formData.email.trim())) {
+      tempErrors.email = "Please enter a valid email address.";
+    }
+
+    // Message validation
+    if (!formData.message.trim()) {
+      tempErrors.message = "Message is required.";
+    } else if (formData.message.trim().length < 10) {
+      tempErrors.message = "Message must be at least 10 characters.";
+    }
+
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error for that field on change
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validate()) {
+      // Simulate submission
+      setShowModal(true);
+      setFormData({
+        name: '',
+        email: '',
+        message: ''
+      });
+      setErrors({});
+    }
+  };
+
   return (
     <div style={{ 
       padding: 'clamp(100px, 12vw, 140px) 5% 40px', 
@@ -28,20 +97,44 @@ const Contact = () => {
       }}>
         <div className="glass-card" style={{ padding: 'clamp(15px, 4vw, 30px)', background: '#fff', border: '1px solid #8a6d3b' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '25px', color: '#1a130d', fontFamily: 'Cinzel' }}>Send a Message</h2>
-          <form style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '0.8rem', color: '#1a130d' }}>YOUR NAME</label>
-                <input type="text" placeholder="Enter your name" style={{ padding: '12px 15px', borderRadius: '10px', border: '1px solid rgba(138, 109, 59, 0.3)', background: '#fffdf0', width: '100%', outline: 'none', fontSize: '0.9rem' }} />
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '0.8rem', color: '#1a130d' }}>YOUR NAME *</label>
+                <input 
+                  type="text" 
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter your name" 
+                  style={{ padding: '12px 15px', borderRadius: '10px', border: errors.name ? '1.5px solid #cc0000' : '1px solid rgba(138, 109, 59, 0.3)', background: '#fffdf0', width: '100%', outline: 'none', fontSize: '0.9rem' }} 
+                />
+                {errors.name && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.name}</span>}
             </div>
             <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '0.8rem', color: '#1a130d' }}>EMAIL ADDRESS</label>
-                <input type="email" placeholder="Enter your email" style={{ padding: '12px 15px', borderRadius: '10px', border: '1px solid rgba(138, 109, 59, 0.3)', background: '#fffdf0', width: '100%', outline: 'none', fontSize: '0.9rem' }} />
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '0.8rem', color: '#1a130d' }}>EMAIL ADDRESS *</label>
+                <input 
+                  type="text" 
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email" 
+                  style={{ padding: '12px 15px', borderRadius: '10px', border: errors.email ? '1.5px solid #cc0000' : '1px solid rgba(138, 109, 59, 0.3)', background: '#fffdf0', width: '100%', outline: 'none', fontSize: '0.9rem' }} 
+                />
+                {errors.email && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.email}</span>}
             </div>
             <div>
-                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '0.8rem', color: '#1a130d' }}>MESSAGE</label>
-                <textarea placeholder="How can we help you?" rows="4" style={{ padding: '12px 15px', borderRadius: '10px', border: '1px solid rgba(138, 109, 59, 0.3)', background: '#fffdf0', width: '100%', outline: 'none', resize: 'none', fontSize: '0.9rem' }}></textarea>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '0.8rem', color: '#1a130d' }}>MESSAGE *</label>
+                <textarea 
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="How can we help you?" 
+                  rows="4" 
+                  style={{ padding: '12px 15px', borderRadius: '10px', border: errors.message ? '1.5px solid #cc0000' : '1px solid rgba(138, 109, 59, 0.3)', background: '#fffdf0', width: '100%', outline: 'none', resize: 'none', fontSize: '0.9rem' }}
+                ></textarea>
+                {errors.message && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.message}</span>}
             </div>
-            <button className="btn-gold" style={{ width: '100%', padding: '15px', borderRadius: '10px', marginTop: '10px' }}>SEND MESSAGE</button>
+            <button type="submit" className="btn-gold" style={{ width: '100%', padding: '15px', borderRadius: '10px', marginTop: '10px' }}>SEND MESSAGE</button>
           </form>
         </div>
 
@@ -76,6 +169,22 @@ const Contact = () => {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: '#fffdf0', border: '2px solid #d4af37', borderRadius: '25px', padding: '40px 30px', maxWidth: '500px', width: '90%', textAlign: 'center', boxShadow: '0 20px 50px rgba(0,0,0,0.15)' }}>
+            <span style={{ fontSize: '4rem', display: 'block', marginBottom: '15px' }}>✉️</span>
+            <h3 style={{ fontFamily: 'Cinzel, serif', fontSize: '1.8rem', color: '#1a130d', marginBottom: '15px' }}>Message Sent!</h3>
+            <p style={{ color: '#5c4b22', lineHeight: '1.6', marginBottom: '25px', fontSize: '1rem' }}>
+              Thank you, your message has been received! Our support team will review your message and get back to you shortly.
+            </p>
+            <button className="btn-gold" style={{ padding: '12px 35px', borderRadius: '50px' }} onClick={() => setShowModal(false)}>
+              CLOSE
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
