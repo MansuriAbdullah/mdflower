@@ -9,6 +9,7 @@ import Reviews from './pages/Reviews';
 import TopSellingArticles from './pages/TopSellingArticles';
 import Varieties from './pages/Varieties';
 import Admin from './pages/Admin';
+import Offers from './pages/Offers';
 import { CartProvider, CartContext } from './CartContext';
 import { DataProvider } from './DataContext';
 
@@ -566,6 +567,7 @@ const Navbar = () => {
           { name: 'About', path: '/about' },
           { name: 'Collection', path: '/collection' },
           { name: 'Reviews', path: '/reviews' },
+          { name: 'Offers', path: '/offers' },
           { name: 'Contact', path: '/contact' }
         ].map((item, i) => (
           <Link key={item.name} to={item.path} style={{
@@ -676,6 +678,7 @@ const Navbar = () => {
             { name: 'About', path: '/about' },
             { name: 'Collection', path: '/collection' },
             { name: 'Reviews', path: '/reviews' },
+            { name: 'Offers', path: '/offers' },
             { name: 'Contact', path: '/contact' }
           ].map((item) => (
             <Link
@@ -767,8 +770,8 @@ const Footer = () => {
         <div>
           <h4 style={{ color: '#1a130d', marginBottom: '20px', fontSize: '1.1rem', fontFamily: 'Cinzel', fontWeight: 'bold', borderBottom: '1px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Quick Links</h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
-            {['About', 'Exibition', 'Contact', 'Privacy Policy', 'Terms'].map(item => (
-              <Link key={item} to={item === 'About' ? '/about' : item === 'Contact' ? '/contact' : '#'} style={{ color: '#5c4b22', textDecoration: 'none', transition: '0.3s', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#d4af37'} onMouseLeave={(e) => e.target.style.color = '#5c4b22'}>{item}</Link>
+            {['About', 'Exibition', 'Contact', 'Offers', 'Privacy Policy', 'Terms'].map(item => (
+              <Link key={item} to={item === 'About' ? '/about' : item === 'Contact' ? '/contact' : item === 'Offers' ? '/offers' : '#'} style={{ color: '#5c4b22', textDecoration: 'none', transition: '0.3s', fontSize: '0.9rem' }} onMouseEnter={(e) => e.target.style.color = '#d4af37'} onMouseLeave={(e) => e.target.style.color = '#5c4b22'}>{item}</Link>
             ))}
           </div>
         </div>
@@ -838,6 +841,7 @@ const App = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/varieties" element={<Varieties />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/offers" element={<Offers />} />
           </Routes>
           
           {!isAdminRoute && <Footer />}
