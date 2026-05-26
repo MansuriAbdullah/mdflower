@@ -1,19 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 const Offers = () => {
-  const navigate = useNavigate();
-  const [toast, setToast] = useState({ show: false, message: '' });
-
-  const copyToClipboard = (text, code) => {
-    navigator.clipboard.writeText(code).then(() => {
-      setToast({ show: true, message: `Promo Code "${code}" copied to clipboard!` });
-      setTimeout(() => setToast({ show: false, message: '' }), 2500);
-    }).catch(err => {
-      console.error('Failed to copy text: ', err);
-    });
-  };
-
   const offerList = [
     {
       id: 'gift',
@@ -21,8 +8,6 @@ const Offers = () => {
       title: 'Free Exquisite Gift',
       subtitle: 'On purchase of ₹1,00,000 (1 Lakh) or more',
       desc: 'Receive a complimentary signature handcrafted masterwork arrangement from our luxury collection as a token of our appreciation.',
-      code: 'LUXURYGIFT',
-      actionText: 'Copy Code',
       icon: '🎁',
       bgGradient: 'linear-gradient(135deg, #1a130d 0%, #3a2e24 100%)',
       textColor: '#fffdf0',
@@ -35,41 +20,11 @@ const Offers = () => {
       title: 'MDFlower Collector\'s T-Shirt',
       subtitle: 'Complimentary on your first order',
       desc: 'Celebrate your first step with us. Get a premium crafted, 100% organic cotton MDFlowers insignia T-shirt with your package.',
-      code: 'FIRSTCHIC',
-      actionText: 'Copy Code',
       icon: '👕',
       bgGradient: 'linear-gradient(135deg, #ffffff 0%, #fffbf0 100%)',
       textColor: '#1a130d',
       badgeColor: '#b08d57',
       isPremium: false
-    },
-    {
-      id: 'discount',
-      badge: 'FESTIVAL SPECIAL',
-      title: 'Vasant Blossoms Bonus',
-      subtitle: 'Flat 15% OFF + Free India Delivery',
-      desc: 'Elevate your summer space design. Get 15% discount and complimentary white-glove logistics across India on orders above ₹25,000.',
-      code: 'BLOOM15',
-      actionText: 'Copy Code',
-      icon: '🌸',
-      bgGradient: 'linear-gradient(135deg, #ffffff 0%, #fffdf0 100%)',
-      textColor: '#1a130d',
-      badgeColor: '#d4af37',
-      isPremium: false
-    },
-    {
-      id: 'consult',
-      badge: 'BUSINESS & EVENTS',
-      title: 'Bespoke Décor Mockups',
-      subtitle: 'Free Corporate Consultation & Styling Samples',
-      desc: 'Interested in outfitting hotels, corporate offices, or large banquets? Our senior designer will visit your site and provide samples.',
-      code: 'CONTACT_US',
-      actionText: 'Inquire Now',
-      icon: '🏢',
-      bgGradient: 'linear-gradient(135deg, #1a130d 0%, #2a2016 100%)',
-      textColor: '#fffdf0',
-      badgeColor: '#f3e19c',
-      isPremium: true
     }
   ];
 
@@ -82,6 +37,14 @@ const Offers = () => {
       overflow: 'hidden',
       fontFamily: 'Montserrat, sans-serif'
     }}>
+      {/* CSS Styles */}
+      <style>{`
+        .offer-card:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 25px 50px rgba(184, 134, 11, 0.15) !important;
+        }
+      `}</style>
+
       {/* Background Ornaments */}
       <div style={{ position: 'absolute', top: '15%', left: '-5%', fontSize: '12rem', opacity: 0.03, transform: 'rotate(-25deg)', pointerEvents: 'none' }}>🌸</div>
       <div style={{ position: 'absolute', bottom: '10%', right: '-5%', fontSize: '15rem', opacity: 0.04, transform: 'rotate(15deg)', pointerEvents: 'none' }}>✨</div>
@@ -114,7 +77,9 @@ const Offers = () => {
         gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', 
         gap: '40px',
         position: 'relative',
-        zIndex: 2
+        zIndex: 2,
+        maxWidth: '1000px',
+        margin: '0 auto'
       }}>
         {offerList.map((offer) => (
           <div 
@@ -177,89 +142,12 @@ const Offers = () => {
                 fontSize: '0.85rem', 
                 lineHeight: '1.7', 
                 opacity: 0.85, 
-                marginBottom: '30px' 
+                marginBottom: '0' 
               }}>{offer.desc}</p>
-            </div>
-
-            {/* Actions Box */}
-            <div style={{ borderTop: `1px solid ${offer.textColor === '#fffdf0' ? 'rgba(255,255,255,0.1)' : 'rgba(26,19,13,0.1)'}`, paddingTop: '25px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px', flexWrap: 'wrap' }}>
-              {offer.code !== 'CONTACT_US' ? (
-                <>
-                  <div>
-                    <span style={{ fontSize: '0.65rem', display: 'block', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>PROMO CODE</span>
-                    <span style={{ fontFamily: 'monospace', fontSize: '1.1rem', fontWeight: 'bold', letterSpacing: '1.5px', color: '#d4af37' }}>{offer.code}</span>
-                  </div>
-                  <button 
-                    onClick={() => copyToClipboard(offer.title, offer.code)}
-                    className="btn-gold"
-                    style={{ 
-                      background: offer.isPremium ? '#d4af37' : '#1a130d',
-                      color: offer.isPremium ? '#1a130d' : '#fffdf0',
-                      padding: '12px 25px',
-                      fontSize: '0.75rem',
-                      borderRadius: '8px'
-                    }}
-                  >
-                    {offer.actionText}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Terms & Conditions Apply</span>
-                  <button 
-                    onClick={() => navigate('/contact')}
-                    className="btn-gold"
-                    style={{ 
-                      background: '#d4af37',
-                      color: '#1a130d',
-                      padding: '12px 30px',
-                      fontSize: '0.75rem',
-                      borderRadius: '8px'
-                    }}
-                  >
-                    {offer.actionText}
-                  </button>
-                </>
-              )}
             </div>
           </div>
         ))}
       </div>
-
-      {/* Floating Clipboard Notification Toast */}
-      {toast.show && (
-        <div style={{
-          position: 'fixed',
-          bottom: '30px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(26, 19, 13, 0.95)',
-          color: '#fffdf0',
-          border: '1.5px solid #d4af37',
-          padding: '15px 30px',
-          borderRadius: '50px',
-          boxShadow: '0 15px 40px rgba(0,0,0,0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          zIndex: 100000,
-          animation: 'slideUp 0.3s ease-out forwards'
-        }}>
-          <span style={{ color: '#d4af37', fontSize: '1.2rem' }}>✨</span>
-          <span style={{ fontSize: '0.85rem', fontWeight: 'bold', letterSpacing: '1px' }}>{toast.message}</span>
-          
-          <style>{`
-            @keyframes slideUp {
-              from { transform: translate(-50%, 50px); opacity: 0; }
-              to { transform: translate(-50%, 0); opacity: 1; }
-            }
-            .offer-card:hover {
-              transform: translateY(-10px);
-              box-shadow: 0 25px 50px rgba(184, 134, 11, 0.15) !important;
-            }
-          `}</style>
-        </div>
-      )}
     </div>
   );
 };

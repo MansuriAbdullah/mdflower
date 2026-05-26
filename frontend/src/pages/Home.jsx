@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import ProductCard from '../components/ProductCard';
 import { DataContext } from '../DataContext';
+
+const getApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  return 'http://localhost:5000';
+};
+const API_URL = getApiUrl();
 
 const ColorfulGlow = () => {
   const particles = useMemo(() => Array.from({ length: 40 }).map((_, i) => ({
@@ -932,9 +939,105 @@ const Testimonials = () => {
 const Home = () => {
   const { signatureMasterpieces, loading } = useContext(DataContext);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showInquiryModal, setShowInquiryModal] = useState(false);
+  const [inquiryForm, setInquiryForm] = useState({ name: '', number: '', category: 'Table Décor' });
+  const [inquiryErrors, setInquiryErrors] = useState({});
+  const [inquirySubmitted, setInquirySubmitted] = useState(false);
+
+  useEffect(() => {
+    const hasInteracted = sessionStorage.getItem('inquiryPopupDismissed');
+    if (!hasInteracted) {
+      const timer = setTimeout(() => {
+        setShowInquiryModal(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const validateInquiry = () => {
+    const errors = {};
+    if (!inquiryForm.name.trim()) {
+      errors.name = "Name is required.";
+    } else if (inquiryForm.name.trim().length < 3) {
+      errors.name = "Name must be at least 3 characters.";
+    } else if (!/^[A-Za-z\s]+$/.test(inquiryForm.name)) {
+      errors.name = "Name must contain only alphabets.";
+    }
+
+    if (!inquiryForm.number.trim()) {
+      errors.number = "Phone number is required.";
+    } else if (!/^\d{10}$/.test(inquiryForm.number.trim())) {
+      errors.number = "Please enter a valid 10-digit phone number.";
+    }
+
+    if (!inquiryForm.category) {
+      errors.category = "Please select a category.";
+    }
+
+    setInquiryErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleInquiryChange = (e) => {
+    const { name, value } = e.target;
+    setInquiryForm(prev => ({ ...prev, [name]: value }));
+    if (inquiryErrors[name]) {
+      setInquiryErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleInquirySubmit = async (e) => {
+    e.preventDefault();
+    if (validateInquiry()) {
+      try {
+        await axios.post(`${API_URL}/api/leads`, {
+          name: inquiryForm.name,
+          number: inquiryForm.number,
+          category: inquiryForm.category
+        });
+        setInquirySubmitted(true);
+        sessionStorage.setItem('inquiryPopupDismissed', 'true');
+      } catch (err) {
+        console.error('Error submitting inquiry lead:', err);
+        setInquiryErrors(prev => ({
+          ...prev,
+          submit: 'Failed to submit inquiry. Please try again later.'
+        }));
+      }
+    }
+  };
+
+  const closeInquiryModal = () => {
+    setShowInquiryModal(false);
+    setInquiryForm({ name: '', number: '', category: 'Table Décor' });
+    setInquiryErrors({});
+    setInquirySubmitted(false);
+    sessionStorage.setItem('inquiryPopupDismissed', 'true');
+  };
 
   return (
     <>
+      {/* Styles for Animations & Pulse effect */}
+      <style>{`
+        @keyframes fadeInModal {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUpModal {
+          from { transform: translateY(50px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes scaleUpCheck {
+          from { transform: scale(0); }
+          to { transform: scale(1); }
+        }
+        @keyframes pulseGlow {
+          0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(212,175,55,0); }
+          100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+        }
+      `}</style>
+
       <Hero onOpenVideo={() => setShowVideoModal(true)} />
       <section id="collection" style={{ padding: '80px 0', position: 'relative', overflow: 'hidden' }}>
         <style>{`
@@ -1011,6 +1114,231 @@ const Home = () => {
       <Testimonials />
       <MagicalTreeSection onOpenVideo={() => setShowVideoModal(true)} />
       <ContactSection />
+
+      {/* Pulsing Floating Inquiry Button */}
+      <button 
+        onClick={() => setShowInquiryModal(true)}
+        style={{
+          position: 'fixed',
+          bottom: '30px',
+          right: '30px',
+          width: '60px',
+          height: '60px',
+          borderRadius: '50%',
+          background: 'linear-gradient(135deg, #1a130d 0%, #3a2e24 100%)',
+          color: '#d4af37',
+          border: '2px solid #d4af37',
+          cursor: 'pointer',
+          boxShadow: '0 10px 25px rgba(212,175,55,0.4)',
+          zIndex: 999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.5rem',
+          transition: 'all 0.3s ease',
+          animation: 'pulseGlow 2s infinite'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.1) translateY(-3px)';
+          e.currentTarget.style.background = '#d4af37';
+          e.currentTarget.style.color = '#1a130d';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1) translateY(0)';
+          e.currentTarget.style.background = 'linear-gradient(135deg, #1a130d 0%, #3a2e24 100%)';
+          e.currentTarget.style.color = '#d4af37';
+        }}
+        title="Quick Inquiry"
+      >
+        ✉️
+      </button>
+
+      {/* Inquiry Modal */}
+      {showInquiryModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.6)',
+          backdropFilter: 'blur(5px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          animation: 'fadeInModal 0.3s ease'
+        }}>
+          <div style={{
+            background: '#fffdf0',
+            border: '2.5px solid #d4af37',
+            borderRadius: '25px',
+            padding: '40px 30px',
+            maxWidth: '450px',
+            width: '90%',
+            position: 'relative',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.2)',
+            animation: 'slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            textAlign: 'center'
+          }}>
+            <button 
+              onClick={closeInquiryModal}
+              style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '1.8rem',
+                cursor: 'pointer',
+                color: '#1a130d',
+                transition: 'color 0.3s ease',
+                lineHeight: 1
+              }}
+              onMouseEnter={(e) => e.target.style.color = '#d4af37'}
+              onMouseLeave={(e) => e.target.style.color = '#1a130d'}
+            >
+              ×
+            </button>
+
+            {!inquirySubmitted ? (
+              <>
+                <span style={{ fontSize: '3rem', display: 'block', marginBottom: '10px' }}>🌸</span>
+                <h3 style={{ fontFamily: 'Cinzel, serif', fontSize: '1.8rem', color: '#1a130d', marginBottom: '10px' }}>Quick Inquiry</h3>
+                <p style={{ color: '#5c4b22', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.5' }}>
+                  Please share your details to inquire about our premium collections.
+                </p>
+
+                <form onSubmit={handleInquirySubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px', textAlign: 'left' }}>
+                  {/* Name Input */}
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '6px', display: 'block', letterSpacing: '0.5px' }}>NAME</label>
+                    <input 
+                      type="text" 
+                      name="name"
+                      value={inquiryForm.name}
+                      onChange={handleInquiryChange}
+                      placeholder="Enter your name" 
+                      style={{ 
+                        padding: '12px 15px', 
+                        borderRadius: '8px', 
+                        border: inquiryErrors.name ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                        background: '#fcfcfc', 
+                        width: '100%', 
+                        outline: 'none', 
+                        color: '#1a130d', 
+                        fontSize: '0.95rem',
+                        transition: 'border 0.3s ease'
+                      }} 
+                      onFocus={(e) => { if (!inquiryErrors.name) e.target.style.border = '1px solid #d4af37'; }} 
+                      onBlur={(e) => { if (!inquiryErrors.name) e.target.style.border = '1px solid #e0e0e0'; }}
+                    />
+                    {inquiryErrors.name && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{inquiryErrors.name}</span>}
+                  </div>
+
+                  {/* Phone Number Input */}
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '6px', display: 'block', letterSpacing: '0.5px' }}>PHONE NUMBER</label>
+                    <input 
+                      type="tel" 
+                      name="number"
+                      value={inquiryForm.number}
+                      onChange={handleInquiryChange}
+                      placeholder="Enter 10-digit mobile number" 
+                      style={{ 
+                        padding: '12px 15px', 
+                        borderRadius: '8px', 
+                        border: inquiryErrors.number ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                        background: '#fcfcfc', 
+                        width: '100%', 
+                        outline: 'none', 
+                        color: '#1a130d', 
+                        fontSize: '0.95rem',
+                        transition: 'border 0.3s ease'
+                      }} 
+                      onFocus={(e) => { if (!inquiryErrors.number) e.target.style.border = '1px solid #d4af37'; }} 
+                      onBlur={(e) => { if (!inquiryErrors.number) e.target.style.border = '1px solid #e0e0e0'; }}
+                    />
+                    {inquiryErrors.number && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{inquiryErrors.number}</span>}
+                  </div>
+
+                  {/* Category Selection Dropdown */}
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '6px', display: 'block', letterSpacing: '0.5px' }}>INQUIRY CATEGORY</label>
+                    <select 
+                      name="category"
+                      value={inquiryForm.category}
+                      onChange={handleInquiryChange}
+                      style={{ 
+                        padding: '12px 15px', 
+                        borderRadius: '8px', 
+                        border: inquiryErrors.category ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                        background: '#fcfcfc', 
+                        width: '100%', 
+                        outline: 'none', 
+                        color: '#1a130d', 
+                        fontSize: '0.95rem',
+                        transition: 'border 0.3s ease'
+                      }}
+                      onFocus={(e) => { if (!inquiryErrors.category) e.target.style.border = '1px solid #d4af37'; }} 
+                      onBlur={(e) => { if (!inquiryErrors.category) e.target.style.border = '1px solid #e0e0e0'; }}
+                    >
+                      <option value="Table Décor">Table Décor</option>
+                      <option value="Floor Plants">Floor Plants</option>
+                      <option value="Planters & Vases">Planters & Vases</option>
+                      <option value="Hanging Plants">Hanging Plants</option>
+                      <option value="Wall Décor">Wall Décor</option>
+                      <option value="Hanging Flowers">Hanging Flowers</option>
+                      <option value="LED Lights">LED Lights</option>
+                      <option value="Wedding / Event Flowers">Wedding / Event Flowers</option>
+                      <option value="Other / Custom Inquiry">Other / Custom Inquiry</option>
+                    </select>
+                    {inquiryErrors.category && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{inquiryErrors.category}</span>}
+                  </div>
+
+                  {inquiryErrors.submit && (
+                    <span style={{ color: '#cc0000', fontSize: '0.85rem', fontWeight: 'bold', display: 'block', margin: '10px 0', textAlign: 'center' }}>
+                      {inquiryErrors.submit}
+                    </span>
+                  )}
+
+                  <button 
+                    type="submit"
+                    style={{ 
+                      width: '100%', 
+                      padding: '15px', 
+                      background: '#d4af37', 
+                      color: '#fff', 
+                      border: 'none', 
+                      borderRadius: '8px', 
+                      fontSize: '1rem', 
+                      fontWeight: 'bold', 
+                      cursor: 'pointer', 
+                      letterSpacing: '1px', 
+                      textTransform: 'uppercase', 
+                      transition: 'all 0.3s ease',
+                      boxShadow: '0 8px 15px rgba(212,175,55,0.3)',
+                      marginTop: '10px'
+                    }} 
+                    onMouseEnter={(e) => {e.target.style.background = '#1a130d'; e.target.style.boxShadow = '0 8px 15px rgba(26,19,13,0.3)';}} 
+                    onMouseLeave={(e) => {e.target.style.background = '#d4af37'; e.target.style.boxShadow = '0 8px 15px rgba(212,175,55,0.3)';}}
+                  >
+                    Submit Inquiry
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div style={{ padding: '20px 0' }}>
+                <span style={{ fontSize: '4.5rem', display: 'block', marginBottom: '20px', animation: 'scaleUpCheck 0.4s ease' }}>✅</span>
+                <h3 style={{ fontFamily: 'Cinzel, serif', fontSize: '1.8rem', color: '#1a130d', marginBottom: '15px' }}>Inquiry Submitted!</h3>
+                <p style={{ color: '#5c4b22', lineHeight: '1.6', marginBottom: '30px', fontSize: '0.95rem' }}>
+                  Thank you, <strong>{inquiryForm.name}</strong>! We have received your inquiry regarding <strong>{inquiryForm.category}</strong>. Our expert styling team will contact you shortly at <strong>{inquiryForm.number}</strong>.
+                </p>
+                <button className="btn-gold" style={{ padding: '12px 40px', borderRadius: '50px' }} onClick={closeInquiryModal}>
+                  CLOSE
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {showVideoModal && (
         <div style={{

@@ -12,6 +12,7 @@ const Category = require('./models/Category');
 const TopSellingCategory = require('./models/TopSellingCategory');
 const SignatureMasterpiece = require('./models/SignatureMasterpiece');
 const Review = require('./models/Review');
+const Lead = require('./models/Lead');
 
 const app = express();
 
@@ -414,6 +415,57 @@ app.delete('/api/reviews/:id', async (req, res) => {
     const deletedReview = await Review.findByIdAndDelete(req.params.id);
     if (!deletedReview) return res.status(404).json({ message: 'Review not found' });
     res.json({ message: 'Review deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// --- LEADS ROUTES ---
+
+// GET All Leads (Admin view)
+app.get('/api/leads', async (req, res) => {
+  try {
+    const leads = await Lead.find().sort({ createdAt: -1 });
+    res.json(leads);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST New Lead (Public submission)
+app.post('/api/leads', async (req, res) => {
+  const { name, number, category } = req.body;
+  try {
+    const newLead = new Lead({ name, number, category });
+    const savedLead = await newLead.save();
+    res.status(201).json(savedLead);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// PUT Update Lead Status (Admin updates status e.g. Contacted, Pending)
+app.put('/api/leads/:id', async (req, res) => {
+  const { status } = req.body;
+  try {
+    const updatedLead = await Lead.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!updatedLead) return res.status(404).json({ message: 'Lead not found' });
+    res.json(updatedLead);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// DELETE Lead (Admin deletes lead)
+app.delete('/api/leads/:id', async (req, res) => {
+  try {
+    const deletedLead = await Lead.findByIdAndDelete(req.params.id);
+    if (!deletedLead) return res.status(404).json({ message: 'Lead not found' });
+    res.json({ message: 'Lead deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

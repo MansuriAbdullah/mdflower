@@ -72,6 +72,9 @@ const Admin = () => {
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
 
+  const [leads, setLeads] = useState([]);
+  const [leadsLoading, setLeadsLoading] = useState(false);
+
   const fetchAdminReviews = async () => {
     try {
       setReviewsLoading(true);
@@ -82,6 +85,42 @@ const Admin = () => {
       showMsg("Failed to load reviews", "error");
     } finally {
       setReviewsLoading(false);
+    }
+  };
+
+  const fetchAdminLeads = async () => {
+    try {
+      setLeadsLoading(true);
+      const res = await axios.get(`${API_URL}/api/leads`);
+      setLeads(res.data);
+    } catch (err) {
+      console.error("Error loading leads", err);
+      showMsg("Failed to load leads", "error");
+    } finally {
+      setLeadsLoading(false);
+    }
+  };
+
+  const handleToggleLeadStatus = async (lead) => {
+    try {
+      const newStatus = lead.status === 'Pending' ? 'Contacted' : 'Pending';
+      await axios.put(`${API_URL}/api/leads/${lead._id}`, { status: newStatus });
+      showMsg(`Lead status updated to ${newStatus}!`);
+      setLeads(prev => prev.map(l => l._id === lead._id ? { ...l, status: newStatus } : l));
+    } catch (err) {
+      showMsg("Failed to update lead status", "error");
+    }
+  };
+
+  const handleDeleteLead = async (id) => {
+    if (window.confirm("Are you sure you want to delete this lead?")) {
+      try {
+        await axios.delete(`${API_URL}/api/leads/${id}`);
+        showMsg("Lead deleted successfully!");
+        setLeads(prev => prev.filter(l => l._id !== id));
+      } catch (err) {
+        showMsg("Failed to delete lead", "error");
+      }
     }
   };
 
@@ -112,6 +151,7 @@ const Admin = () => {
     const originalBg = document.body.style.backgroundColor;
     document.body.style.backgroundColor = '#ffffff';
     fetchAdminReviews();
+    fetchAdminLeads();
     return () => {
       document.body.style.backgroundColor = originalBg;
     };
@@ -120,6 +160,9 @@ const Admin = () => {
   useEffect(() => {
     if (activeTab === 'REVIEWS') {
       fetchAdminReviews();
+    }
+    if (activeTab === 'LEADS') {
+      fetchAdminLeads();
     }
   }, [activeTab]);
 
@@ -632,6 +675,9 @@ const Admin = () => {
           <li onClick={() => { setActiveTab('REVIEWS'); setShowAddProduct(false); setShowAddCategory(false); setIsMobileMenuOpen(false); }} style={{ ...sidebarItem, background: activeTab === 'REVIEWS' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'REVIEWS' ? '#1a130d' : '#666', borderLeft: activeTab === 'REVIEWS' ? '4px solid #d4af37' : '4px solid transparent' }}>
             <span style={{ fontSize: '1.2rem', marginRight: '15px' }}>💬</span> Reviews
           </li>
+          <li onClick={() => { setActiveTab('LEADS'); setShowAddProduct(false); setShowAddCategory(false); setIsMobileMenuOpen(false); }} style={{ ...sidebarItem, background: activeTab === 'LEADS' ? 'rgba(212,175,55,0.08)' : 'transparent', color: activeTab === 'LEADS' ? '#1a130d' : '#666', borderLeft: activeTab === 'LEADS' ? '4px solid #d4af37' : '4px solid transparent' }}>
+            <span style={{ fontSize: '1.2rem', marginRight: '15px' }}>📈</span> Inquiry Leads
+          </li>
         </ul>
 
         <div style={{ marginTop: 'auto', textAlign: 'center', padding: '20px', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
@@ -679,6 +725,13 @@ const Admin = () => {
                   <div>
                     <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>TOTAL REVIEWS</p>
                     <h3 style={{ fontSize: '3rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{reviews.length}</h3>
+                  </div>
+                </div>
+                <div className="stat-card" style={{...statCard, cursor: 'pointer'}} onClick={() => setActiveTab('LEADS')}>
+                  <div style={{...statIconBox, background: 'rgba(212, 175, 55, 0.1)', borderColor: 'rgba(212, 175, 55, 0.3)'}}>📈</div>
+                  <div>
+                    <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>TOTAL LEADS</p>
+                    <h3 style={{ fontSize: '3rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{leads.length}</h3>
                   </div>
                 </div>
               </div>
@@ -1795,6 +1848,108 @@ const Admin = () => {
                       {reviews.length === 0 && (
                         <tr>
                           <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: '#666', background: '#fff' }}>No reviews found.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* --- LEADS TAB --- */}
+          {activeTab === 'LEADS' && (
+            <div className="fade-in">
+              <div className="admin-header-flex" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '15px' }}>
+                <div>
+                   <h1 style={headerStyle}>Inquiry Leads</h1>
+                   <p style={{ color: '#666' }}>Manage user inquiry submissions from the homepage popup.</p>
+                </div>
+              </div>
+
+              {/* Statistics */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px', marginBottom: '35px' }}>
+                <div className="stat-card" style={statCard}>
+                  <div style={statIconBox}>📈</div>
+                  <div>
+                    <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>TOTAL LEADS</p>
+                    <h3 style={{ fontSize: '2rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{leads.length}</h3>
+                  </div>
+                </div>
+                <div className="stat-card" style={statCard}>
+                  <div style={{...statIconBox, background: 'rgba(253, 224, 141, 0.15)', borderColor: 'rgba(253, 224, 141, 0.4)'}}>⏳</div>
+                  <div>
+                    <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>PENDING</p>
+                    <h3 style={{ fontSize: '2rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{leads.filter(l => l.status === 'Pending').length}</h3>
+                  </div>
+                </div>
+                <div className="stat-card" style={statCard}>
+                  <div style={{...statIconBox, background: 'rgba(74, 222, 128, 0.1)', borderColor: 'rgba(74, 222, 128, 0.3)'}}>🟢</div>
+                  <div>
+                    <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>CONTACTED</p>
+                    <h3 style={{ fontSize: '2rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{leads.filter(l => l.status === 'Contacted').length}</h3>
+                  </div>
+                </div>
+              </div>
+
+              {/* Leads Table */}
+              <div className="table-container" style={tableContainer}>
+                {leadsLoading ? (
+                  <div style={{ textAlign: 'center', padding: '50px' }}>
+                    <div style={{ display: 'inline-block', width: '35px', height: '35px', border: '3px solid rgba(212,175,55,0.2)', borderTopColor: '#d4af37', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                    <p style={{ color: '#8a6d3b', marginTop: '10px', fontWeight: 'bold' }}>Loading leads...</p>
+                  </div>
+                ) : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <thead style={{ background: '#f8f9fa', borderBottom: '1px solid #eaeaea' }}>
+                      <tr>
+                        <th style={thStyle}>Date Submitted</th>
+                        <th style={thStyle}>Name</th>
+                        <th style={thStyle}>Phone Number</th>
+                        <th style={thStyle}>Category</th>
+                        <th style={thStyle}>Status</th>
+                        <th style={thStyle}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {leads.map(lead => (
+                        <tr key={lead._id} style={{ borderBottom: '1px solid #f0f0f0', background: '#fff', transition: 'background 0.3s' }} onMouseEnter={e => e.currentTarget.style.background = '#fcfcfc'} onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
+                          <td style={{...tdStyle, fontSize: '0.85rem', color: '#666'}}>
+                            {new Date(lead.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                          </td>
+                          <td style={{...tdStyle, fontWeight: 'bold', color: '#1a130d'}}>{lead.name}</td>
+                          <td style={{...tdStyle, color: '#d4af37', fontWeight: 'bold'}}>
+                            <a href={`tel:${lead.number}`} style={{ color: '#d4af37', textDecoration: 'none' }}>{lead.number}</a>
+                          </td>
+                          <td style={tdStyle}><span style={badgeStyle}>{lead.category}</span></td>
+                          <td style={tdStyle}>
+                            {lead.status === 'Contacted' ? (
+                              <span style={{...badgeStyle, background: 'rgba(74, 222, 128, 0.1)', color: '#16a34a', borderColor: 'rgba(74, 222, 128, 0.3)'}}>Contacted</span>
+                            ) : (
+                              <span style={{...badgeStyle, background: 'rgba(253, 224, 141, 0.1)', color: '#d97706', borderColor: 'rgba(253, 224, 141, 0.3)'}}>Pending</span>
+                            )}
+                          </td>
+                          <td style={tdStyle}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                              <button 
+                                onClick={() => handleToggleLeadStatus(lead)} 
+                                className="edit-btn"
+                                style={{
+                                  background: lead.status === 'Contacted' ? 'rgba(0,0,0,0.03)' : 'rgba(212, 175, 55, 0.15)',
+                                  color: lead.status === 'Contacted' ? '#666' : '#b8860b',
+                                  borderColor: lead.status === 'Contacted' ? '#ccc' : 'rgba(212, 175, 55, 0.3)'
+                                }}
+                              >
+                                {lead.status === 'Contacted' ? 'Mark Pending' : 'Mark Contacted'}
+                              </button>
+                              <button onClick={() => handleDeleteLead(lead._id)} className="delete-btn">Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {leads.length === 0 && (
+                        <tr>
+                          <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: '#666', background: '#fff' }}>No inquiry leads found.</td>
                         </tr>
                       )}
                     </tbody>
