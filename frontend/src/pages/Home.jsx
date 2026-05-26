@@ -6,7 +6,13 @@ import { DataContext } from '../DataContext';
 
 const getApiUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  return 'http://localhost:5000';
+  const hostname = window.location.hostname;
+  const isLocal = hostname === 'localhost' || 
+                  hostname === '127.0.0.1' || 
+                  hostname.startsWith('192.168.') || 
+                  hostname.startsWith('10.') || 
+                  hostname.startsWith('172.');
+  return isLocal ? `http://${hostname}:5000` : 'https://mdflower-qvjl.vercel.app';
 };
 const API_URL = getApiUrl();
 
