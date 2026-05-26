@@ -945,13 +945,10 @@ const Home = () => {
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
 
   useEffect(() => {
-    const hasInteracted = sessionStorage.getItem('inquiryPopupDismissed');
-    if (!hasInteracted) {
-      const timer = setTimeout(() => {
-        setShowInquiryModal(true);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => {
+      setShowInquiryModal(true);
+    }, 3000);
+    return () => clearTimeout(timer);
   }, []);
 
   const validateInquiry = () => {
@@ -996,7 +993,6 @@ const Home = () => {
           category: inquiryForm.category
         });
         setInquirySubmitted(true);
-        sessionStorage.setItem('inquiryPopupDismissed', 'true');
       } catch (err) {
         console.error('Error submitting inquiry lead:', err);
         setInquiryErrors(prev => ({
@@ -1012,7 +1008,6 @@ const Home = () => {
     setInquiryForm({ name: '', number: '', category: 'Table Décor' });
     setInquiryErrors({});
     setInquirySubmitted(false);
-    sessionStorage.setItem('inquiryPopupDismissed', 'true');
   };
 
   return (
