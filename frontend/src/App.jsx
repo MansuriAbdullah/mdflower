@@ -12,6 +12,19 @@ import Admin from './pages/Admin';
 import Offers from './pages/Offers';
 import { CartProvider, CartContext } from './CartContext';
 import { DataProvider } from './DataContext';
+import axios from 'axios';
+
+const getApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  const hostname = window.location.hostname;
+  const isLocal = hostname === 'localhost' || 
+                  hostname === '127.0.0.1' || 
+                  hostname.startsWith('192.168.') || 
+                  hostname.startsWith('10.') || 
+                  hostname.startsWith('172.');
+  return isLocal ? `http://${hostname}:5000` : 'https://mdflower-qvjl.vercel.app';
+};
+const API_URL = getApiUrl();
 
 // --- Global Styles ---
 const GlobalStyles = () => (
@@ -821,6 +834,13 @@ const Footer = () => {
 const App = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+
+  useEffect(() => {
+    // Only track public page visits, not admin page views
+    if (!isAdminRoute) {
+      axios.post(`${API_URL}/api/visits`).catch(err => console.error("Error logging visit:", err));
+    }
+  }, [location.pathname, isAdminRoute]);
 
   return (
     <CartProvider>

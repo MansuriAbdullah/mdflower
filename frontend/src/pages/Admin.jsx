@@ -79,6 +79,25 @@ const Admin = () => {
   const [leads, setLeads] = useState([]);
   const [leadsLoading, setLeadsLoading] = useState(false);
 
+  const [analytics, setAnalytics] = useState({
+    today: { pageViews: 0, uniqueVisitors: 0 },
+    month: { pageViews: 0, uniqueVisitors: 0 },
+    total: { pageViews: 0, uniqueVisitors: 0 }
+  });
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const res = await axios.get(`${API_URL}/api/analytics`);
+      setAnalytics(res.data);
+    } catch (err) {
+      console.error("Error loading traffic analytics", err);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
   const fetchAdminReviews = async () => {
     try {
       setReviewsLoading(true);
@@ -156,12 +175,16 @@ const Admin = () => {
     document.body.style.backgroundColor = '#ffffff';
     fetchAdminReviews();
     fetchAdminLeads();
+    fetchAnalytics();
     return () => {
       document.body.style.backgroundColor = originalBg;
     };
   }, []);
 
   useEffect(() => {
+    if (activeTab === 'OVERVIEW') {
+      fetchAnalytics();
+    }
     if (activeTab === 'REVIEWS') {
       fetchAdminReviews();
     }
@@ -705,11 +728,12 @@ const Admin = () => {
         <div style={{ position: 'relative', zIndex: 1 }}>
           {/* --- OVERVIEW TAB --- */}
           {activeTab === 'OVERVIEW' && (
-            <div className="fade-in">
+            <div className="fade-in" style={{ padding: '0 40px 40px' }}>
               <h1 style={headerStyle}>System Overview</h1>
               <p style={{ color: '#666', marginBottom: '40px' }}>Welcome back. Here is the current status of your database.</p>
               
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px' }}>
+              <h3 style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', fontSize: '1.2rem', marginBottom: '20px', letterSpacing: '1px', borderBottom: '2px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Boutique Statistics</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px', marginBottom: '50px' }}>
                 <div className="stat-card" style={statCard}>
                   <div style={statIconBox}>📦</div>
                   <div>
@@ -739,6 +763,42 @@ const Admin = () => {
                   </div>
                 </div>
               </div>
+
+              <h3 style={{ fontFamily: 'Cinzel, serif', color: '#1a130d', fontSize: '1.2rem', marginBottom: '20px', letterSpacing: '1px', borderBottom: '2px solid #d4af37', display: 'inline-block', paddingBottom: '5px' }}>Website Traffic & Visits</h3>
+              {analyticsLoading ? (
+                <p style={{ color: '#666' }}>Loading traffic statistics...</p>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '30px' }}>
+                  <div className="stat-card" style={statCard}>
+                    <div style={{...statIconBox, color: '#0d6efd', backgroundColor: 'rgba(13, 110, 253, 0.1)', borderColor: 'rgba(13, 110, 253, 0.2)'}}>👥</div>
+                    <div>
+                      <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>TODAY'S UNIQUE VISITORS</p>
+                      <h3 style={{ fontSize: '3rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{analytics.today.uniqueVisitors}</h3>
+                    </div>
+                  </div>
+                  <div className="stat-card" style={statCard}>
+                    <div style={{...statIconBox, color: '#198754', backgroundColor: 'rgba(25, 135, 84, 0.1)', borderColor: 'rgba(25, 135, 84, 0.2)'}}>🖱️</div>
+                    <div>
+                      <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>TODAY'S PAGE VIEWS</p>
+                      <h3 style={{ fontSize: '3rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{analytics.today.pageViews}</h3>
+                    </div>
+                  </div>
+                  <div className="stat-card" style={statCard}>
+                    <div style={{...statIconBox, color: '#6f42c1', backgroundColor: 'rgba(111, 66, 193, 0.1)', borderColor: 'rgba(111, 66, 193, 0.2)'}}>📅</div>
+                    <div>
+                      <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>MONTHLY UNIQUE VISITORS</p>
+                      <h3 style={{ fontSize: '3rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{analytics.month.uniqueVisitors}</h3>
+                    </div>
+                  </div>
+                  <div className="stat-card" style={statCard}>
+                    <div style={{...statIconBox, color: '#fd7e14', backgroundColor: 'rgba(253, 126, 20, 0.1)', borderColor: 'rgba(253, 126, 20, 0.2)'}}>📊</div>
+                    <div>
+                      <p style={{ color: '#666', fontSize: '0.85rem', letterSpacing: '1px', marginBottom: '5px', fontWeight: 'bold' }}>MONTHLY PAGE VIEWS</p>
+                      <h3 style={{ fontSize: '3rem', color: '#1a130d', margin: 0, fontFamily: 'Cinzel, serif' }}>{analytics.month.pageViews}</h3>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

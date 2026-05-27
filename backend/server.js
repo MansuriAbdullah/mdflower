@@ -13,6 +13,7 @@ const TopSellingCategory = require('./models/TopSellingCategory');
 const SignatureMasterpiece = require('./models/SignatureMasterpiece');
 const Review = require('./models/Review');
 const Lead = require('./models/Lead');
+const Visit = require('./models/Visit');
 
 const app = express();
 
@@ -468,6 +469,70 @@ app.delete('/api/leads/:id', async (req, res) => {
     res.json({ message: 'Lead deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+// --- ANALYTICS / VISITOR TRACKING ROUTES ---
+
+// POST Route to log page visits
+app.post('/api/visits', async (req, res) => {
+  try {
+    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    if (ip.includes(',')) {
+      ip = ip.split(',')[0].trim();
+    }
+    
+    // Get IST Date string (YYYY-MM-DD)
+    const utcDate = new Date();
+    const istDate = new Date(utcDate.getTime() + (330 * 60 * 1000));
+    const dateStr = istDate.toISOString().split('T')[0];
+
+    const newVisit = new Visit({ ip, date: dateStr });
+    await newVisit.save();
+    res.status(201).json({ success: true });
+  } catch (err) {
+    console.error('Error logging visit:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET Route to fetch traffic stats
+app.get('/api/analytics', async (req, res) => {
+  try {
+    const utcDate = new Date();
+    const istDate = new Date(utcDate.getTime() + (330 * 60 * 1000));
+    const today = istDate.toISOString().split('T')[0];
+    const currentMonth = today.substring(0, 7); // YYYY-MM
+
+    // 1. Today's stats
+    const todayPageViews = await Visit.countDocuments({ date: today });
+    const todayUniqueVisitors = await Visit.distinct('ip', { date: today }).then(ips => ips.length);
+
+    // 2. Current Month's stats
+    const monthPageViews = await Visit.countDocuments({ date: new RegExp('^' + currentMonth) });
+    const monthUniqueVisitors = await Visit.distinct('ip', { date: new RegExp('^' + currentMonth) }).then(ips => ips.length);
+
+    // 3. Total stats
+    const totalPageViews = await Visit.countDocuments();
+    const totalUniqueVisitors = await Visit.distinct('ip').then(ips => ips.length);
+
+    res.json({
+      today: {
+        pageViews: todayPageViews,
+        uniqueVisitors: todayUniqueVisitors
+      },
+      month: {
+        pageViews: monthPageViews,
+        uniqueVisitors: monthUniqueVisitors
+      },
+      total: {
+        pageViews: totalPageViews,
+        uniqueVisitors: totalUniqueVisitors
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching analytics:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 

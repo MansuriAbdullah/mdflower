@@ -61,7 +61,7 @@ const ColorfulGlow = () => {
 const heroSlides = [
   {
     id: 'hero1',
-    image: '/hero_banner.png',
+    image: '/hero_flowers.png',
     badge: 'By MD FLOWER • Est. 1998',
     heading: 'Luxury',
     headingGold: 'Floristry',
@@ -69,27 +69,27 @@ const heroSlides = [
   },
   {
     id: 'hero2',
-    image: '/summer_banner.png',
-    badge: 'Summer Collection 2024',
-    heading: 'Blooming',
-    headingGold: 'Summer',
-    sub: 'Discover vibrant summer arrangements that bring the warmth of the season into every celebration and space.',
+    image: '/hero_led_lights.png',
+    badge: 'Glow Collection',
+    heading: 'Luminous',
+    headingGold: 'LED Decor',
+    sub: 'Brighten your special events with our premium, warm-glowing LED installations and luxury light displays.',
   },
   {
     id: 'hero3',
-    image: '/product1.png',
-    badge: 'Signature Pieces',
-    heading: 'Crafted',
-    headingGold: 'With Love',
-    sub: 'Every petal, every stem — handpicked and designed to create unforgettable floral masterpieces just for you.',
+    image: '/hero_hanging.png',
+    badge: 'Hanging Installations',
+    heading: 'Enchanted',
+    headingGold: 'Hangings',
+    sub: 'Drape your ceilings and walls with exquisite hanging florals and lush green creepers that capture attention.',
   },
   {
     id: 'hero4',
-    image: '/product2.png',
-    badge: 'Premium Decor',
+    image: '/hero_candles.png',
+    badge: 'Candlelight Luxury',
     heading: 'Timeless',
-    headingGold: 'Elegance',
-    sub: 'Transform any event into a breathtaking floral experience with our premium, bespoke arrangements.',
+    headingGold: 'Candlelight',
+    sub: 'Set the perfect mood with elegant taper candles and bespoke luxury table decor designed for intimacy.',
   },
 ];
 
@@ -143,7 +143,7 @@ const Hero = ({ onOpenVideo }) => {
       <div style={{
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(to right, rgba(10,6,3,0.78) 0%, rgba(10,6,3,0.45) 55%, rgba(10,6,3,0.10) 100%)',
+        background: 'linear-gradient(to right, rgba(26,19,13,0.7) 0%, rgba(26,19,13,0.4) 55%, rgba(26,19,13,0.05) 100%)',
         zIndex: 1,
       }} />
 
@@ -951,10 +951,13 @@ const Home = () => {
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowInquiryModal(true);
-    }, 3000);
-    return () => clearTimeout(timer);
+    const hasFilled = localStorage.getItem('hasFilledInquiry');
+    if (!hasFilled) {
+      const timer = setTimeout(() => {
+        setShowInquiryModal(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   const validateInquiry = () => {
@@ -999,6 +1002,7 @@ const Home = () => {
           category: inquiryForm.category
         });
         setInquirySubmitted(true);
+        localStorage.setItem('hasFilledInquiry', 'true');
       } catch (err) {
         console.error('Error submitting inquiry lead:', err);
         setInquiryErrors(prev => ({
@@ -1116,43 +1120,6 @@ const Home = () => {
       <MagicalTreeSection onOpenVideo={() => setShowVideoModal(true)} />
       <ContactSection />
 
-      {/* Pulsing Floating Inquiry Button */}
-      <button 
-        onClick={() => setShowInquiryModal(true)}
-        style={{
-          position: 'fixed',
-          bottom: '30px',
-          right: '30px',
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #1a130d 0%, #3a2e24 100%)',
-          color: '#d4af37',
-          border: '2px solid #d4af37',
-          cursor: 'pointer',
-          boxShadow: '0 10px 25px rgba(212,175,55,0.4)',
-          zIndex: 999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '1.5rem',
-          transition: 'all 0.3s ease',
-          animation: 'pulseGlow 2s infinite'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.1) translateY(-3px)';
-          e.currentTarget.style.background = '#d4af37';
-          e.currentTarget.style.color = '#1a130d';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1) translateY(0)';
-          e.currentTarget.style.background = 'linear-gradient(135deg, #1a130d 0%, #3a2e24 100%)';
-          e.currentTarget.style.color = '#d4af37';
-        }}
-        title="Quick Inquiry"
-      >
-        ✉️
-      </button>
 
       {/* Inquiry Modal */}
       {showInquiryModal && (
