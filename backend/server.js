@@ -110,6 +110,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     mongoUriDefined: !!process.env.MONGO_URI,
     mongoUriPrefix: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 15) : null,
+    mongoUri: process.env.MONGO_URI ? process.env.MONGO_URI.replace(/:([^@]+)@/, ':****@') : null,
     apiVersion: 'v3-connection-middleware'
   });
 });
