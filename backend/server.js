@@ -23,17 +23,10 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Multer Storage Configuration (Memory Storage for Vercel)
-const storage = multer.memoryStorage();
-const upload = multer({ 
-  storage,
-  limits: { fileSize: 50 * 1024 * 1024 } // 50 MB limit
-});
+// Database Connection Caching helper for Serverless environments (Vercel)
+let connectionPromise = null;
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-.then(async () => {
-  console.log('MongoDB Connected to MDFLOWERS');
+const seedDefaultReviews = async () => {
   try {
     const count = await Review.countDocuments();
     if (count === 0) {
@@ -54,8 +47,55 @@ mongoose.connect(process.env.MONGO_URI)
   } catch (err) {
     console.error('Error seeding default reviews:', err);
   }
-})
-.catch(err => console.log('MongoDB Connection Error: ', err));
+};
+
+const connectDB = async () => {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+  
+  if (!connectionPromise) {
+    console.log('Database connection initiated...');
+    connectionPromise = mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000 // Fast timeout so we don't hang serverless functions indefinitely
+    }).then(async (conn) => {
+      console.log('MongoDB Connected to MDFLOWERS');
+      await seedDefaultReviews();
+      return conn;
+    }).catch((err) => {
+      connectionPromise = null;
+      console.error('MongoDB Connection Error: ', err);
+      throw err;
+    });
+  }
+  
+  await connectionPromise;
+  return mongoose.connection;
+};
+
+// Proactively initiate connection on server startup
+connectDB().catch(err => console.log('MongoDB Connection error at startup:', err));
+
+// Database connection middleware to handle cold starts and ensure DB is ready before request execution
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('Database connection error in middleware:', err);
+    res.status(500).json({ error: 'Database connection failed: ' + err.message });
+  }
+});
+
+// Multer Storage Configuration (Memory Storage for Vercel)
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 } // 50 MB limit
+});
+
+// Connection is managed dynamically by the connectDB helper and middleware
+
 
 // --- ROUTES ---
 
@@ -69,7 +109,8 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     mongoUriDefined: !!process.env.MONGO_URI,
-    mongoUriPrefix: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 15) : null
+    mongoUriPrefix: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 15) : null,
+    apiVersion: 'v3-connection-middleware'
   });
 });
 
@@ -477,7 +518,7 @@ app.delete('/api/leads/:id', async (req, res) => {
 // POST Route to log page visits
 app.post('/api/visits', async (req, res) => {
   try {
-    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    let ip = req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || 'unknown';
     if (ip.includes(',')) {
       ip = ip.split(',')[0].trim();
     }
