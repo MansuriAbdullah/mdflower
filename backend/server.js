@@ -54,6 +54,10 @@ const connectDB = async () => {
     return mongoose.connection;
   }
   
+  if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+    connectionPromise = null;
+  }
+  
   if (!connectionPromise) {
     console.log('Database connection initiated...');
     connectionPromise = mongoose.connect(process.env.MONGO_URI, {
@@ -111,6 +115,7 @@ app.get('/api/health', (req, res) => {
     mongoUriDefined: !!process.env.MONGO_URI,
     mongoUriPrefix: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 15) : null,
     mongoUri: process.env.MONGO_URI ? process.env.MONGO_URI.replace(/:([^@]+)@/, ':****@') : null,
+    mongooseState: mongoose.connection.readyState,
     apiVersion: 'v3-connection-middleware'
   });
 });
