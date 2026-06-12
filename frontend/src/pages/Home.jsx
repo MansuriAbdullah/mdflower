@@ -7,11 +7,11 @@ import { DataContext } from '../DataContext';
 const getApiUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
   const hostname = window.location.hostname;
-  const isLocal = hostname === 'localhost' || 
-                  hostname === '127.0.0.1' || 
-                  hostname.startsWith('192.168.') || 
-                  hostname.startsWith('10.') || 
-                  hostname.startsWith('172.');
+  const isLocal = hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname.startsWith('192.168.') ||
+    hostname.startsWith('10.') ||
+    hostname.startsWith('172.');
   return isLocal ? `http://${hostname}:5000` : 'https://mdflower-qvjl.vercel.app';
 };
 const API_URL = getApiUrl();
@@ -236,7 +236,7 @@ const Hero = ({ onOpenVideo }) => {
           }}>
             The Collection
           </button>
-          <button 
+          <button
             onClick={onOpenVideo}
             style={{
               padding: '14px 30px',
@@ -375,15 +375,15 @@ const TrustedClients = () => {
                 transition: 'transform 0.3s ease',
               }}
             >
-              <img 
-                src={client.img} 
-                alt={client.name} 
-                style={{ 
+              <img
+                src={client.img}
+                alt={client.name}
+                style={{
                   maxHeight: '130%', /* Allows image to grow larger than container slightly if needed */
                   maxWidth: '130%',
                   objectFit: 'contain',
                   transform: 'scale(1.2)', /* Scales up the image inside the container to reduce white space */
-                }} 
+                }}
               />
             </div>
           ))}
@@ -454,24 +454,24 @@ const ShopByCategory = () => {
       <div className="categories-scroll" style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(15px, 2vw, 30px)', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '20px' }}>
         {categories.map((cat, i) => (
           <div key={i} style={{ textAlign: 'center', cursor: 'pointer', flexShrink: 0 }} onClick={() => navigate('/top-selling')}>
-            <div style={{ 
-              width: 'clamp(120px, 10vw, 160px)', 
-              height: 'clamp(120px, 10vw, 160px)', 
-              borderRadius: '50%', 
-              overflow: 'hidden', 
+            <div style={{
+              width: 'clamp(120px, 10vw, 160px)',
+              height: 'clamp(120px, 10vw, 160px)',
+              borderRadius: '50%',
+              overflow: 'hidden',
               marginBottom: '20px',
               border: '2px solid rgba(212, 175, 55, 0.2)',
               transition: 'transform 0.4s ease',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
               <img src={cat.img} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            <h3 style={{ 
-              fontSize: '0.85rem', 
-              fontWeight: '900', 
-              letterSpacing: '1px', 
+            <h3 style={{
+              fontSize: '0.85rem',
+              fontWeight: '900',
+              letterSpacing: '1px',
               color: '#1a130d',
               borderBottom: '2px solid #1a130d',
               display: 'inline-block',
@@ -592,7 +592,7 @@ const ContactSection = () => {
 
   const validate = () => {
     const tempErrors = {};
-    
+
     // Name validation
     if (!formData.name.trim()) {
       tempErrors.name = "Name is required.";
@@ -627,7 +627,7 @@ const ContactSection = () => {
       ...prev,
       [name]: value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -650,10 +650,10 @@ const ContactSection = () => {
   };
 
   return (
-    <section id="contact" style={{ 
-      padding: '60px 8%', 
-      background: '#fffdf0', 
-      position: 'relative', 
+    <section id="contact" style={{
+      padding: '60px 8%',
+      background: '#fffdf0',
+      position: 'relative',
       overflow: 'hidden',
     }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '50px', alignItems: 'center', width: '100%', position: 'relative', zIndex: 2 }}>
@@ -672,9 +672,9 @@ const ContactSection = () => {
               { icon: '✉️', title: 'Email Us', text: 'info@mdflowers.in' }
             ].map((item, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <span style={{ 
-                  fontSize: '1.2rem', 
-                  background: '#fff', 
+                <span style={{
+                  fontSize: '1.2rem',
+                  background: '#fff',
                   border: '1px solid rgba(212,175,55,0.3)',
                   width: '45px',
                   height: '45px',
@@ -693,77 +693,77 @@ const ContactSection = () => {
             ))}
           </div>
         </div>
-        
-        <div style={{ 
-          padding: '30px 40px', 
-          background: '#fff', 
-          borderRadius: '15px', 
+
+        <div style={{
+          padding: '30px 40px',
+          background: '#fff',
+          borderRadius: '15px',
           border: '1px solid rgba(212,175,55,0.2)',
           boxShadow: '0 15px 40px rgba(0,0,0,0.05)'
         }}>
           <h3 style={{ fontSize: '1.5rem', color: '#1a130d', marginBottom: '25px', fontFamily: 'Playfair Display, serif' }}>Send a Message</h3>
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div style={{ position: 'relative' }}>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Your Name" 
-                style={{ 
-                  padding: '12px 15px', borderRadius: '8px', border: errors.name ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                placeholder="Your Name"
+                style={{
+                  padding: '12px 15px', borderRadius: '8px', border: errors.name ? '1.5px solid #cc0000' : '1px solid #e0e0e0',
                   background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
                   transition: 'border 0.3s ease'
-                }} 
-                onFocus={(e) => { if (!errors.name) e.target.style.border = '1px solid #d4af37'; }} 
+                }}
+                onFocus={(e) => { if (!errors.name) e.target.style.border = '1px solid #d4af37'; }}
                 onBlur={(e) => { if (!errors.name) e.target.style.border = '1px solid #e0e0e0'; }}
               />
               {errors.name && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.name}</span>}
             </div>
             <div style={{ position: 'relative' }}>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Your Email" 
-                style={{ 
-                  padding: '12px 15px', borderRadius: '8px', border: errors.email ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                placeholder="Your Email"
+                style={{
+                  padding: '12px 15px', borderRadius: '8px', border: errors.email ? '1.5px solid #cc0000' : '1px solid #e0e0e0',
                   background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
                   transition: 'border 0.3s ease'
-                }} 
-                onFocus={(e) => { if (!errors.email) e.target.style.border = '1px solid #d4af37'; }} 
+                }}
+                onFocus={(e) => { if (!errors.email) e.target.style.border = '1px solid #d4af37'; }}
                 onBlur={(e) => { if (!errors.email) e.target.style.border = '1px solid #e0e0e0'; }}
               />
               {errors.email && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.email}</span>}
             </div>
             <div style={{ position: 'relative' }}>
-              <textarea 
+              <textarea
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Your Message" 
-                rows="4" 
-                style={{ 
-                  padding: '12px 15px', borderRadius: '8px', border: errors.message ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
+                placeholder="Your Message"
+                rows="4"
+                style={{
+                  padding: '12px 15px', borderRadius: '8px', border: errors.message ? '1.5px solid #cc0000' : '1px solid #e0e0e0',
                   background: '#fcfcfc', width: '100%', outline: 'none', color: '#1a130d', fontSize: '0.95rem',
                   resize: 'none', transition: 'border 0.3s ease'
-                }} 
-                onFocus={(e) => { if (!errors.message) e.target.style.border = '1px solid #d4af37'; }} 
+                }}
+                onFocus={(e) => { if (!errors.message) e.target.style.border = '1px solid #d4af37'; }}
                 onBlur={(e) => { if (!errors.message) e.target.style.border = '1px solid #e0e0e0'; }}
               ></textarea>
               {errors.message && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{errors.message}</span>}
             </div>
-            <button 
+            <button
               type="submit"
-              style={{ 
-                width: '100%', padding: '15px', background: '#d4af37', color: '#fff', 
-                border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold', 
+              style={{
+                width: '100%', padding: '15px', background: '#d4af37', color: '#fff',
+                border: 'none', borderRadius: '8px', fontSize: '1rem', fontWeight: 'bold',
                 cursor: 'pointer', letterSpacing: '1px', textTransform: 'uppercase', transition: 'all 0.3s ease',
                 boxShadow: '0 8px 15px rgba(212,175,55,0.3)'
-              }} 
-              onMouseEnter={(e) => {e.target.style.background = '#1a130d'; e.target.style.boxShadow = '0 8px 15px rgba(26,19,13,0.3)';}} 
-              onMouseLeave={(e) => {e.target.style.background = '#d4af37'; e.target.style.boxShadow = '0 8px 15px rgba(212,175,55,0.3)';}}
+              }}
+              onMouseEnter={(e) => { e.target.style.background = '#1a130d'; e.target.style.boxShadow = '0 8px 15px rgba(26,19,13,0.3)'; }}
+              onMouseLeave={(e) => { e.target.style.background = '#d4af37'; e.target.style.boxShadow = '0 8px 15px rgba(212,175,55,0.3)'; }}
             >
               Send Request
             </button>
@@ -1120,11 +1120,11 @@ const Home = () => {
             <div className="masterpieces-track">
               {[...signatureMasterpieces, ...signatureMasterpieces, ...signatureMasterpieces, ...signatureMasterpieces].map((item, index) => (
                 <div key={`${item._id}-${index}`} className="masterpieces-card-wrapper">
-                  <ProductCard 
-                    id={item._id} 
-                    name={item.name} 
-                    price={item.price} 
-                    image={item.image} 
+                  <ProductCard
+                    id={item._id}
+                    name={item.name}
+                    price={item.price}
+                    image={item.image}
                   />
                 </div>
               ))}
@@ -1170,7 +1170,7 @@ const Home = () => {
             animation: 'slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
             textAlign: 'center'
           }}>
-            <button 
+            <button
               onClick={closeInquiryModal}
               style={{
                 position: 'absolute',
@@ -1202,24 +1202,24 @@ const Home = () => {
                   {/* Name Input */}
                   <div>
                     <label style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '6px', display: 'block', letterSpacing: '0.5px' }}>NAME</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       name="name"
                       value={inquiryForm.name}
                       onChange={handleInquiryChange}
-                      placeholder="Enter your name" 
-                      style={{ 
-                        padding: '12px 15px', 
-                        borderRadius: '8px', 
-                        border: inquiryErrors.name ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
-                        background: '#fcfcfc', 
-                        width: '100%', 
-                        outline: 'none', 
-                        color: '#1a130d', 
+                      placeholder="Enter your name"
+                      style={{
+                        padding: '12px 15px',
+                        borderRadius: '8px',
+                        border: inquiryErrors.name ? '1.5px solid #cc0000' : '1px solid #e0e0e0',
+                        background: '#fcfcfc',
+                        width: '100%',
+                        outline: 'none',
+                        color: '#1a130d',
                         fontSize: '0.95rem',
                         transition: 'border 0.3s ease'
-                      }} 
-                      onFocus={(e) => { if (!inquiryErrors.name) e.target.style.border = '1px solid #d4af37'; }} 
+                      }}
+                      onFocus={(e) => { if (!inquiryErrors.name) e.target.style.border = '1px solid #d4af37'; }}
                       onBlur={(e) => { if (!inquiryErrors.name) e.target.style.border = '1px solid #e0e0e0'; }}
                     />
                     {inquiryErrors.name && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{inquiryErrors.name}</span>}
@@ -1228,24 +1228,24 @@ const Home = () => {
                   {/* Phone Number Input */}
                   <div>
                     <label style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '6px', display: 'block', letterSpacing: '0.5px' }}>PHONE NUMBER</label>
-                    <input 
-                      type="tel" 
+                    <input
+                      type="tel"
                       name="number"
                       value={inquiryForm.number}
                       onChange={handleInquiryChange}
-                      placeholder="Enter 10-digit mobile number" 
-                      style={{ 
-                        padding: '12px 15px', 
-                        borderRadius: '8px', 
-                        border: inquiryErrors.number ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
-                        background: '#fcfcfc', 
-                        width: '100%', 
-                        outline: 'none', 
-                        color: '#1a130d', 
+                      placeholder="Enter 10-digit mobile number"
+                      style={{
+                        padding: '12px 15px',
+                        borderRadius: '8px',
+                        border: inquiryErrors.number ? '1.5px solid #cc0000' : '1px solid #e0e0e0',
+                        background: '#fcfcfc',
+                        width: '100%',
+                        outline: 'none',
+                        color: '#1a130d',
                         fontSize: '0.95rem',
                         transition: 'border 0.3s ease'
-                      }} 
-                      onFocus={(e) => { if (!inquiryErrors.number) e.target.style.border = '1px solid #d4af37'; }} 
+                      }}
+                      onFocus={(e) => { if (!inquiryErrors.number) e.target.style.border = '1px solid #d4af37'; }}
                       onBlur={(e) => { if (!inquiryErrors.number) e.target.style.border = '1px solid #e0e0e0'; }}
                     />
                     {inquiryErrors.number && <span style={{ color: '#cc0000', fontSize: '0.75rem', marginTop: '4px', display: 'block', fontWeight: 'bold' }}>{inquiryErrors.number}</span>}
@@ -1254,22 +1254,22 @@ const Home = () => {
                   {/* Category Selection Dropdown */}
                   <div>
                     <label style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#1a130d', marginBottom: '6px', display: 'block', letterSpacing: '0.5px' }}>INQUIRY CATEGORY</label>
-                    <select 
+                    <select
                       name="category"
                       value={inquiryForm.category}
                       onChange={handleInquiryChange}
-                      style={{ 
-                        padding: '12px 15px', 
-                        borderRadius: '8px', 
-                        border: inquiryErrors.category ? '1.5px solid #cc0000' : '1px solid #e0e0e0', 
-                        background: '#fcfcfc', 
-                        width: '100%', 
-                        outline: 'none', 
-                        color: '#1a130d', 
+                      style={{
+                        padding: '12px 15px',
+                        borderRadius: '8px',
+                        border: inquiryErrors.category ? '1.5px solid #cc0000' : '1px solid #e0e0e0',
+                        background: '#fcfcfc',
+                        width: '100%',
+                        outline: 'none',
+                        color: '#1a130d',
                         fontSize: '0.95rem',
                         transition: 'border 0.3s ease'
                       }}
-                      onFocus={(e) => { if (!inquiryErrors.category) e.target.style.border = '1px solid #d4af37'; }} 
+                      onFocus={(e) => { if (!inquiryErrors.category) e.target.style.border = '1px solid #d4af37'; }}
                       onBlur={(e) => { if (!inquiryErrors.category) e.target.style.border = '1px solid #e0e0e0'; }}
                     >
                       <option value="Table Décor">Table Décor</option>
@@ -1291,26 +1291,26 @@ const Home = () => {
                     </span>
                   )}
 
-                  <button 
+                  <button
                     type="submit"
-                    style={{ 
-                      width: '100%', 
-                      padding: '15px', 
-                      background: '#d4af37', 
-                      color: '#fff', 
-                      border: 'none', 
-                      borderRadius: '8px', 
-                      fontSize: '1rem', 
-                      fontWeight: 'bold', 
-                      cursor: 'pointer', 
-                      letterSpacing: '1px', 
-                      textTransform: 'uppercase', 
+                    style={{
+                      width: '100%',
+                      padding: '15px',
+                      background: '#d4af37',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      letterSpacing: '1px',
+                      textTransform: 'uppercase',
                       transition: 'all 0.3s ease',
                       boxShadow: '0 8px 15px rgba(212,175,55,0.3)',
                       marginTop: '10px'
-                    }} 
-                    onMouseEnter={(e) => {e.target.style.background = '#1a130d'; e.target.style.boxShadow = '0 8px 15px rgba(26,19,13,0.3)';}} 
-                    onMouseLeave={(e) => {e.target.style.background = '#d4af37'; e.target.style.boxShadow = '0 8px 15px rgba(212,175,55,0.3)';}}
+                    }}
+                    onMouseEnter={(e) => { e.target.style.background = '#1a130d'; e.target.style.boxShadow = '0 8px 15px rgba(26,19,13,0.3)'; }}
+                    onMouseLeave={(e) => { e.target.style.background = '#d4af37'; e.target.style.boxShadow = '0 8px 15px rgba(212,175,55,0.3)'; }}
                   >
                     Submit Inquiry
                   </button>
@@ -1355,7 +1355,7 @@ const Home = () => {
             boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
             textAlign: 'center'
           }}>
-            <button 
+            <button
               onClick={() => setShowVideoModal(false)}
               style={{
                 position: 'absolute',
@@ -1383,11 +1383,11 @@ const Home = () => {
             </button>
             <h3 style={{ fontFamily: 'Cinzel, serif', color: '#d4af37', marginBottom: '15px', fontSize: '1.5rem', letterSpacing: '2px' }}>STUDIO TOUR & ARTISTRY</h3>
             <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '15px', overflow: 'hidden', border: '1px solid rgba(212,175,55,0.3)' }}>
-              <video 
-                src="https://assets.mixkit.co/videos/preview/mixkit-flowers-in-a-vase-41662-large.mp4" 
-                controls 
-                autoPlay 
-                loop 
+              <video
+                src={`${API_URL}/uploads/WhatsApp%20Video%202026-06-11%20at%2012.05.08%20PM.mp4`}
+                controls
+                autoPlay
+                loop
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>

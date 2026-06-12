@@ -32,6 +32,12 @@ const Collection = () => {
   const { addToCart } = useContext(CartContext);
   const { products, categories, loading } = useContext(DataContext);
 
+  const [visibleCount, setVisibleCount] = useState(24);
+
+  useEffect(() => {
+    setVisibleCount(24);
+  }, [activeMainCategory, activeSubCategory, selectedTypes, selectedPrices, selectedColors, searchQuery, sortOption]);
+
   const handleTypeChange = (type) => setSelectedTypes(prev => prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]);
   const handlePriceChange = (price) => setSelectedPrices(prev => prev.includes(price) ? prev.filter(p => p !== price) : [...prev, price]);
   const handleColorChange = (color) => setSelectedColors(prev => prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]);
@@ -93,6 +99,10 @@ const Collection = () => {
     }
     return filtered;
   }, [searchQuery, activeMainCategory, activeSubCategory, selectedTypes, selectedPrices, selectedColors, sortOption, products]);
+
+  const displayedProducts = useMemo(() => {
+    return filteredProducts.slice(0, visibleCount);
+  }, [filteredProducts, visibleCount]);
 
   const activeCategoryObj = categories.find(c => c.name === activeMainCategory) || { name: 'SHOP ALL', subs: [] };
   const typeOptions = activeCategoryObj.subs.map(s => s.name);
@@ -311,7 +321,7 @@ const Collection = () => {
           gridTemplateColumns: `repeat(${gridColumns}, minmax(0, 1fr))`, 
           gap: '30px' 
         }}>
-          {filteredProducts.map((p, i) => (
+          {displayedProducts.map((p, i) => (
             <div 
               key={i} 
               onClick={() => { setSelectedProduct(p); setCurrentColor('Default'); }}
@@ -332,6 +342,27 @@ const Collection = () => {
             </div>
           ))}
         </div>
+        
+        {visibleCount < filteredProducts.length && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px', marginBottom: '20px' }}>
+            <button 
+              onClick={() => setVisibleCount(prev => prev + 24)}
+              className="btn-gold"
+              style={{ 
+                padding: '14px 40px', 
+                fontSize: '0.85rem', 
+                fontWeight: 'bold', 
+                letterSpacing: '2px', 
+                cursor: 'pointer',
+                borderRadius: '8px',
+                border: 'none',
+                boxShadow: '0 8px 15px rgba(212, 175, 55, 0.15)'
+              }}
+            >
+              LOAD MORE BLOOMS
+            </button>
+          </div>
+        )}
         
         {filteredProducts.length === 0 && (
            <div style={{ textAlign: 'center', padding: '100px 0', color: '#d4af37', fontSize: '1.2rem', fontWeight: 'bold' }}>

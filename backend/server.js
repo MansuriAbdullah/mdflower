@@ -14,6 +14,7 @@ const SignatureMasterpiece = require('./models/SignatureMasterpiece');
 const Review = require('./models/Review');
 const Lead = require('./models/Lead');
 const Visit = require('./models/Visit');
+const Image = require('./models/Image');
 
 const app = express();
 
@@ -120,6 +121,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Helper function to strip domain host from database image URLs
+const stripApiUrl = (url) => {
+  if (!url || typeof url !== 'string') return url;
+  const match = url.match(/(https?:\/\/[^\/]+)?(\/api\/images\/[a-f0-9]+|\/uploads\/[a-zA-Z0-9_\-\.\/]+)/);
+  return match ? match[2] : url;
+};
+
 // Image Upload Route
 app.post('/api/upload', upload.single('image'), async (req, res) => {
   if (!req.file) {
@@ -136,19 +144,40 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
       fileBuffer = await heicConvert({
         buffer: fileBuffer,
         format: 'JPEG',
-        quality: 0.8 // Slightly reduced quality to keep base64 size manageable
+        quality: 0.95 // High quality conversion for HEIC
       });
       mimeType = 'image/jpeg';
     }
     
-    // Convert buffer to base64
-    const base64Image = fileBuffer.toString('base64');
-    const imageUrl = `data:${mimeType};base64,${base64Image}`;
+    // Create new Image document in DB
+    const newImage = new Image({
+      data: fileBuffer,
+      contentType: mimeType
+    });
+    const savedImage = await newImage.save();
     
+    // Return relative API image URL
+    const imageUrl = `/api/images/${savedImage._id}`;
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error processing image:', error);
     res.status(500).json({ message: 'Failed to process image' });
+  }
+});
+
+// GET Route to serve binary images from DB with cache headers
+app.get('/api/images/:id', async (req, res) => {
+  try {
+    const img = await Image.findById(req.params.id);
+    if (!img) {
+      return res.status(404).send('Image not found');
+    }
+    res.set('Content-Type', img.contentType);
+    res.set('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    res.send(img.data);
+  } catch (err) {
+    console.error('Error serving image:', err);
+    res.status(500).send('Error serving image');
   }
 });
 
@@ -166,7 +195,11 @@ app.get('/api/categories', async (req, res) => {
 app.post('/api/categories', async (req, res) => {
   const { name, subs } = req.body;
   try {
-    const newCat = new Category({ name, subs: subs || [] });
+    const cleanedSubs = (subs || []).map(s => ({
+      name: s.name,
+      img: stripApiUrl(s.img)
+    }));
+    const newCat = new Category({ name, subs: cleanedSubs });
     const savedCat = await newCat.save();
     res.status(201).json(savedCat);
   } catch (err) {
@@ -189,9 +222,13 @@ app.delete('/api/categories/:id', async (req, res) => {
 app.put('/api/categories/:id', async (req, res) => {
   const { name, subs } = req.body;
   try {
+    const cleanedSubs = (subs || []).map(s => ({
+      name: s.name,
+      img: stripApiUrl(s.img)
+    }));
     const updatedCat = await Category.findByIdAndUpdate(
       req.params.id, 
-      { name, subs: subs || [] },
+      { name, subs: cleanedSubs },
       { new: true }
     );
     if (!updatedCat) return res.status(404).json({ message: 'Category not found' });
@@ -214,7 +251,11 @@ app.get('/api/products', async (req, res) => {
 // POST New Product
 app.post('/api/products', async (req, res) => {
   try {
-    const newProduct = new Product(req.body);
+    const productData = { ...req.body };
+    if (productData.image) {
+      productData.image = stripApiUrl(productData.image);
+    }
+    const newProduct = new Product(productData);
     const savedProduct = await newProduct.save();
     res.status(201).json(savedProduct);
   } catch (err) {
@@ -236,9 +277,13 @@ app.delete('/api/products/:id', async (req, res) => {
 // PUT (Update) Product
 app.put('/api/products/:id', async (req, res) => {
   try {
+    const productData = { ...req.body };
+    if (productData.image) {
+      productData.image = stripApiUrl(productData.image);
+    }
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id, 
-      req.body, 
+      productData, 
       { new: true }
     );
     if (!updatedProduct) return res.status(404).json({ message: 'Product not found' });
@@ -264,7 +309,16 @@ app.get('/api/top-selling', async (req, res) => {
 app.post('/api/top-selling', async (req, res) => {
   const { name, image, subs } = req.body;
   try {
-    const newCat = new TopSellingCategory({ name, image, subs: subs || [] });
+    const cleanedImage = stripApiUrl(image);
+    const cleanedSubs = (subs || []).map(sub => ({
+      name: sub.name,
+      products: (sub.products || []).map(p => ({
+        name: p.name,
+        price: p.price,
+        image: stripApiUrl(p.image)
+      }))
+    }));
+    const newCat = new TopSellingCategory({ name, image: cleanedImage, subs: cleanedSubs });
     const savedCat = await newCat.save();
     res.status(201).json(savedCat);
   } catch (err) {
@@ -287,9 +341,18 @@ app.delete('/api/top-selling/:id', async (req, res) => {
 app.put('/api/top-selling/:id', async (req, res) => {
   const { name, image, subs } = req.body;
   try {
+    const cleanedImage = stripApiUrl(image);
+    const cleanedSubs = (subs || []).map(sub => ({
+      name: sub.name,
+      products: (sub.products || []).map(p => ({
+        name: p.name,
+        price: p.price,
+        image: stripApiUrl(p.image)
+      }))
+    }));
     const updatedCat = await TopSellingCategory.findByIdAndUpdate(
       req.params.id, 
-      { name, image, subs: subs || [] },
+      { name, image: cleanedImage, subs: cleanedSubs },
       { new: true }
     );
     if (!updatedCat) return res.status(404).json({ message: 'Top selling category not found' });

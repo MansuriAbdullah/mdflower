@@ -34,7 +34,7 @@ const loadHeic2Any = () => {
  * @param {number} quality - Quality of compression (0.0 to 1.0).
  * @returns {Promise<File|Blob>} A promise that resolves to the compressed File or Blob object.
  */
-export const compressImage = (file, maxWidth = 350, maxHeight = 350, quality = 0.5) => {
+export const compressImage = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.85) => {
   return new Promise(async (resolve) => {
     // Safety check: if file is not valid or has no name, return it immediately
     if (!file || !file.name) {

@@ -16,13 +16,12 @@ const API_URL = getApiUrl();
 
 const resolveImageUrl = (img) => {
   if (!img) return '';
-  if (img.startsWith('/') && !img.startsWith('/uploads')) {
-    return img;
+  if (img.startsWith('data:') || img.startsWith('http')) return img;
+  if (img.startsWith('/uploads') || img.startsWith('/api/images')) {
+    return `${API_URL}${img}`;
   }
-  if (img.startsWith('http') || img.startsWith('data:')) {
-    return img;
-  }
-  return `${API_URL}${img.startsWith('/') ? img : '/' + img}`;
+  if (img.startsWith('/')) return img;
+  return `${API_URL}/${img}`;
 };
 
 const TopSellingArticles = () => {

@@ -19,7 +19,7 @@ async function compressBase64(base64Str) {
     // Read image using Jimp
     const image = await Jimp.read(buffer);
     
-    const maxDim = 800;
+    const maxDim = 350;
     let width = image.bitmap.width;
     let height = image.bitmap.height;
     
@@ -36,7 +36,7 @@ async function compressBase64(base64Str) {
       resized = true;
     }
     
-    image.quality(70); // Compress to 70% JPEG quality
+    image.quality(50); // Compress to 50% JPEG quality
     
     const compressedBuffer = await image.getBufferAsync(Jimp.MIME_JPEG);
     const compressedBase64 = compressedBuffer.toString('base64');
