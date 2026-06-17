@@ -192,10 +192,15 @@ app.get('/api/images/:id', async (req, res) => {
     if (!img) {
       return res.status(404).send('Image not found');
     }
+    
+    // Express res.send() needs a Node Buffer to serve binary data correctly.
+    // Mongoose .lean() queries return MongoDB Binary objects instead of Buffers.
+    const buffer = Buffer.isBuffer(img.data) ? img.data : img.data.buffer;
+    
     res.set('Content-Type', img.contentType);
     // Cache for 1 year in browser and Vercel Edge CDN
     res.set('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
-    res.send(img.data);
+    res.send(buffer);
   } catch (err) {
     console.error('Error serving image:', err);
     res.status(500).send('Error serving image');
