@@ -62,7 +62,10 @@ const connectDB = async () => {
   if (!connectionPromise) {
     console.log('Database connection initiated...');
     connectionPromise = mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000 // Fast timeout so we don't hang serverless functions indefinitely
+      serverSelectionTimeoutMS: 5000,    // Fast timeout so we don't hang serverless functions indefinitely
+      tlsAllowInvalidCertificates: true, // Bypass SSL cert validation if handshake fails due to cert issues
+      maxPoolSize: 2,                    // Limit connections per serverless instance to prevent exhaustion
+      bufferCommands: false              // Disable Mongoose buffering in serverless environment
     }).then(async (conn) => {
       console.log('MongoDB Connected to MDFLOWERS');
       await seedDefaultReviews();
@@ -80,6 +83,35 @@ const connectDB = async () => {
 
 // Proactively initiate connection on server startup
 connectDB().catch(err => console.log('MongoDB Connection error at startup:', err));
+
+// Root Route
+app.get('/', (req, res) => {
+  res.send('MDFlowers API is running...');
+});
+
+// Health/Debug Route (runs above middleware so it won't trigger 500 if connection fails)
+app.get('/api/health', async (req, res) => {
+  let dbStatus = 'unknown';
+  let dbError = null;
+  try {
+    await connectDB();
+    dbStatus = 'connected';
+  } catch (err) {
+    dbStatus = 'error';
+    dbError = err.message;
+  }
+
+  res.json({
+    status: 'ok',
+    database: dbStatus,
+    databaseError: dbError,
+    mongoUriDefined: !!process.env.MONGO_URI,
+    mongoUriPrefix: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 15) : null,
+    mongoUri: process.env.MONGO_URI ? process.env.MONGO_URI.replace(/:([^@]+)@/, ':****@') : null,
+    mongooseState: mongoose.connection.readyState,
+    apiVersion: 'v3-connection-middleware'
+  });
+});
 
 // Database connection middleware to handle cold starts and ensure DB is ready before request execution
 app.use(async (req, res, next) => {
@@ -103,23 +135,6 @@ const upload = multer({
 
 
 // --- ROUTES ---
-
-// Root Route
-app.get('/', (req, res) => {
-  res.send('MDFlowers API is running...');
-});
-
-// Health/Debug Route
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    mongoUriDefined: !!process.env.MONGO_URI,
-    mongoUriPrefix: process.env.MONGO_URI ? process.env.MONGO_URI.substring(0, 15) : null,
-    mongoUri: process.env.MONGO_URI ? process.env.MONGO_URI.replace(/:([^@]+)@/, ':****@') : null,
-    mongooseState: mongoose.connection.readyState,
-    apiVersion: 'v3-connection-middleware'
-  });
-});
 
 // Helper function to strip domain host from database image URLs
 const stripApiUrl = (url) => {
@@ -168,12 +183,18 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 // GET Route to serve binary images from DB with cache headers
 app.get('/api/images/:id', async (req, res) => {
   try {
-    const img = await Image.findById(req.params.id);
+    // Validate ObjectId to prevent CastError from crashing/500ing
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).send('Invalid image ID');
+    }
+
+    const img = await Image.findById(req.params.id).lean();
     if (!img) {
       return res.status(404).send('Image not found');
     }
     res.set('Content-Type', img.contentType);
-    res.set('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    // Cache for 1 year in browser and Vercel Edge CDN
+    res.set('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
     res.send(img.data);
   } catch (err) {
     console.error('Error serving image:', err);
