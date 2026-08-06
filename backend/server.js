@@ -180,8 +180,8 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
   }
 });
 
-// GET Route to serve product detail HTML page for shared links (e.g. WhatsApp)
-app.get(['/product/:id', '/api/product/:id'], async (req, res) => {
+// GET Route to serve product detail HTML page for shared links (e.g. WhatsApp) or JSON for API
+app.get(['/api/products/:id', '/api/product/:id', '/product/:id'], async (req, res) => {
   try {
     const { id } = req.params;
     let product = null;

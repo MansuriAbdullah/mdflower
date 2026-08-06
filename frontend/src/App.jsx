@@ -396,7 +396,7 @@ const CartSidebar = () => {
 
       const productId = item._id || item.id;
       if (productId) {
-        message += `   Product Page: ${vercelBase}/api/product/${productId}\n`;
+        message += `   Product Page: ${vercelBase}/api/products/${productId}\n`;
       }
 
       message += `\n`;
