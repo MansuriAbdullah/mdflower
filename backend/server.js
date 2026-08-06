@@ -181,7 +181,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 });
 
 // GET Route to serve product detail HTML page for shared links (e.g. WhatsApp) or JSON for API
-app.get(['/api/products/:id', '/api/product/:id', '/product/:id'], async (req, res) => {
+const handleProductRequest = async (req, res) => {
   try {
     const { id } = req.params;
     let product = null;
@@ -238,7 +238,11 @@ app.get(['/api/products/:id', '/api/product/:id', '/product/:id'], async (req, r
     console.error('Error handling product link:', err);
     res.status(500).send('Error loading product');
   }
-});
+};
+
+app.get('/api/products/:id', handleProductRequest);
+app.get('/api/product/:id', handleProductRequest);
+app.get('/product/:id', handleProductRequest);
 
 // GET Route to serve binary images from DB with cache headers
 app.get('/api/images/:id', async (req, res) => {
