@@ -3,6 +3,28 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { DataContext } from '../DataContext';
 import { CartContext } from '../CartContext';
 
+const getApiUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  const hostname = window.location.hostname;
+  const isLocal = hostname === 'localhost' || 
+                  hostname === '127.0.0.1' || 
+                  hostname.startsWith('192.168.') || 
+                  hostname.startsWith('10.') || 
+                  hostname.startsWith('172.');
+  return isLocal ? `http://${hostname}:5000` : 'https://mdflower-qvjl.vercel.app';
+};
+const API_URL = getApiUrl();
+
+const resolveImageUrl = (img) => {
+  if (!img) return '';
+  if (img.startsWith('data:') || img.startsWith('http')) return img;
+  if (img.startsWith('/uploads') || img.startsWith('/api/images')) {
+    return `${API_URL}${img}`;
+  }
+  if (img.startsWith('/')) return img;
+  return `${API_URL}/${img}`;
+};
+
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -42,8 +64,9 @@ const ProductDetails = () => {
         <div style={{ position: 'relative' }}>
           <div className="glass-card" style={{ padding: 'clamp(10px, 3vw, 20px)', borderRadius: '30px' }}>
             <img 
-              src={product.image} 
+              src={resolveImageUrl(product.image)} 
               alt={product.name} 
+              referrerPolicy="no-referrer"
               style={{ width: '100%', height: 'auto', borderRadius: '20px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} 
             />
           </div>

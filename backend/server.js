@@ -226,7 +226,7 @@ const handleProductRequest = async (req, res) => {
 </head>
 <body>
   <div class="container">
-    ${imageUrl ? `<img src="${imageUrl}" alt="${productName}" />` : ''}
+    ${imageUrl ? `<img src="${imageUrl}" alt="${productName}" loading="eager" referrerpolicy="no-referrer" />` : ''}
     <h1>${productName}</h1>
     ${productPrice ? `<div class="price">${productPrice}</div>` : ''}
     <div class="desc">${productDesc}</div>
@@ -261,6 +261,7 @@ app.get('/api/images/:id', async (req, res) => {
     // Mongoose .lean() queries return MongoDB Binary objects instead of Buffers.
     const buffer = Buffer.isBuffer(img.data) ? img.data : img.data.buffer;
     
+    res.set('Access-Control-Allow-Origin', '*');
     res.set('Content-Type', img.contentType);
     // Cache for 1 year in browser and Vercel Edge CDN
     res.set('Cache-Control', 'public, max-age=31536000, s-maxage=31536000, immutable');
