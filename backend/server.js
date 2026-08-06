@@ -180,6 +180,66 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
   }
 });
 
+// GET Route to serve product detail HTML page for shared links (e.g. WhatsApp)
+app.get('/product/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    let product = null;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      product = await Product.findById(id).lean();
+    }
+    if (!product) {
+      product = await Product.findOne({ id: id }).lean();
+    }
+
+    const host = req.get('host') || 'mdflower-qvjl.vercel.app';
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const baseUrl = `${protocol}://${host}`;
+
+    let imageUrl = product && product.image ? product.image : '';
+    if (imageUrl && !imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+      imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+    }
+
+    const productName = product ? product.name : 'MD Flowers Product';
+    const productPrice = product ? product.price : '';
+    const productDesc = product ? (product.description || 'Premium luxury floral design from MD Flowers Collection.') : 'MD Flowers Premium Collection';
+
+    res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${productName} - MD Flowers</title>
+  <meta property="og:title" content="${productName} - ${productPrice}">
+  <meta property="og:description" content="${productDesc}">
+  <meta property="og:image" content="${imageUrl}">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #fffdf0; color: #1a130d; margin: 0; padding: 40px 20px; text-align: center; }
+    .container { max-width: 500px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #d4af37; }
+    img { max-width: 100%; height: 300px; object-fit: cover; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(212,175,55,0.3); }
+    h1 { color: #1a130d; font-size: 1.8rem; margin-bottom: 10px; }
+    .price { color: #d4af37; font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; }
+    .desc { color: #555; line-height: 1.6; margin-bottom: 25px; font-size: 0.95rem; }
+    .btn { display: inline-block; background: #1a130d; color: #d4af37; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: bold; border: 1px solid #d4af37; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    ${imageUrl ? `<img src="${imageUrl}" alt="${productName}" />` : ''}
+    <h1>${productName}</h1>
+    ${productPrice ? `<div class="price">${productPrice}</div>` : ''}
+    <div class="desc">${productDesc}</div>
+    <a href="https://wa.me/919016853590?text=${encodeURIComponent(`Hello MD FLOWERS, I am interested in ${productName}`)}" class="btn">Order on WhatsApp 💬</a>
+  </div>
+</body>
+</html>`);
+  } catch (err) {
+    console.error('Error handling product link:', err);
+    res.status(500).send('Error loading product');
+  }
+});
+
 // GET Route to serve binary images from DB with cache headers
 app.get('/api/images/:id', async (req, res) => {
   try {

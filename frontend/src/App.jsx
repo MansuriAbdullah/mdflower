@@ -368,16 +368,41 @@ const CartSidebar = () => {
 
   const handleCheckout = () => {
     const phoneNumber = "9016853590";
+    const vercelBase = "https://mdflower-qvjl.vercel.app";
+
     let message = `Hello MD FLOWERS, I would like to place an order:\n\n`;
+
     cartItems.forEach((item, index) => {
       let itemName = item.name;
       if (item.selectedColor && item.selectedColor !== 'Default') {
-        itemName += ` [Color: ${item.selectedColor}]`;
+        itemName += ` (${item.selectedColor})`;
       }
-      message += `${index + 1}. ${itemName} - ${item.price} (Qty: ${item.qty})\n`;
-      message += `   Image: https://mdflowers.in${item.image}\n`;
+      
+      message += `${index + 1}. ${itemName}\n`;
+      message += `   Quantity: ${item.qty}\n`;
+      message += `   Price: ${item.price}\n`;
+
+      if (item.image) {
+        let imageUrl = item.image;
+        if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+          imageUrl = `${vercelBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+        } else if (imageUrl.includes('localhost:5000') || imageUrl.includes('127.0.0.1:5000')) {
+          imageUrl = imageUrl.replace(/http:\/\/(localhost|127\.0\.0\.1):5000/, vercelBase);
+        }
+        if (!imageUrl.startsWith('data:')) {
+          message += `   Flower Photo: ${imageUrl}\n`;
+        }
+      }
+
+      const productId = item._id || item.id;
+      if (productId) {
+        message += `   Product Page: ${vercelBase}/product/${productId}\n`;
+      }
+
+      message += `\n`;
     });
-    message += `\n*Total Amount: ₹${total.toFixed(2)}*\n\nPlease process my order.`;
+
+    message += `Total Amount: ₹${total.toFixed(2)}\n\nPlease process my order.`;
 
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/91${phoneNumber}?text=${encodedMessage}`, "_blank");
